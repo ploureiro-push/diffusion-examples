@@ -15,7 +15,7 @@
  * This example is written in C99. Please use an appropriate C99 capable compiler
  *
  * @author DiffusionData Limited
- * @since 6.9
+ * @since 6.8
  */
 
 /*
