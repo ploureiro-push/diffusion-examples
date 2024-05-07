@@ -211,7 +211,7 @@ int main(int argc, char** argv)
                 );
 
                 // Write the [comparison_value] in a string to update the topic
-                char string_value[10];
+                char string_value[21];
                 sprintf(string_value, "%ld", (long) comparison_value);
 
                 BUF_T *value_update_buf = buf_create();
