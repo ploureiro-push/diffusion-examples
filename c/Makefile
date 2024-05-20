@@ -1,10 +1,16 @@
 # The following two variables must be set.
 #
 # Directory containing the C client include files.
-# DIFFUSION_C_CLIENT_INCDIR	=
+# DIFFUSION_C_CLIENT_INCDIR =
 #
 # Directory containing libdiffusion.a
-# DIFFUSION_C_CLIENT_LIBDIR	=
+# DIFFUSION_C_CLIENT_LIBDIR =
+#
+# Directory containing the various external Diffusion dependencies
+# DIFFUSION_C_CLIENT_DEPENDENCIES_DIR =
+#
+# Directory that will contain the executables and generated objects
+# TARGET_FOLDER =
 
 ifndef DIFFUSION_C_CLIENT_INCDIR
 $(error DIFFUSION_C_CLIENT_INCDIR is not set)
@@ -14,161 +20,239 @@ ifndef DIFFUSION_C_CLIENT_LIBDIR
 $(error DIFFUSION_C_CLIENT_LIBDIR is not set)
 endif
 
-CC		= gcc
+ifndef TARGET_FOLDER
+$(error TARGET_FOLDER is not set)
+endif
 
-# Extra definitions from parent directory, if they exist.
--include ../makefile.defs
+# Extra definitions from current directory, if they exist.
+-include makefile.defs
 
-CFLAGS		+= -g -Wall -Werror -Wno-error=deprecated-declarations -std=c99 -D_POSIX_C_SOURCE=200112L -D_XOPEN_SOURCE=700 -I$(DIFFUSION_C_CLIENT_INCDIR)
-LDFLAGS		+= $(DIFFUSION_C_CLIENT_LIBDIR)/libdiffusion.a -lpthread -lpcre -lz $(LIBS)
-# If you have openssl installed then you can uncomment these.
-ifdef HAVE_OPEN_SSL
-LDFLAGS     += -lssl -lcrypto
+CFLAGS	+=	$(INCLUDES) \
+			-g -std=c99 -D_POSIX_C_SOURCE=200112L -D_XOPEN_SOURCE=700 \
+			-Wall -Werror -Wno-error=deprecated-declarations \
+			-I$(DIFFUSION_C_CLIENT_INCDIR)
+
+LDFLAGS	+= 	-lpthread -lpcre -lcurl -lz \
+			$(DIFFUSION_C_CLIENT_LIBDIR)/$(ARCH)/libdiffusion.a \
+			$(LIBS)
+
+# Detect the platform the Diffusion Client will be running on
+PLATFORM	= 	$(shell uname -s | tr '[A-Z]' '[a-z]' | sed -e 's/darwin/osx/')
+
+ifeq ($(PLATFORM),osx)
+	CC		= 	clang
+else
+	# If not MacOS, add '-lrt' to the linker flags
+	CC		= 	gcc
+	LDFLAGS	+=	-lrt
 endif
 
 ARFLAGS		+=
-SOURCES = subscribe.c fetch-request.c 	\
-		  auth-service.c					\
-		  change-principal.c add-topics.c 			\
-		  subscribe-multiple.c update-record.c connect.c	\
-		  connect-async.c system-auth-control.c			\
-		  session-properties-listener.c				\
-		  get-session-properties.c				\
-	 	  missing-topic-notification.c				\
-		  subscription-control.c reconnect.c			\
-		  json/json-publishing-example.c			\
-		  json/json-subscribing-example.c			\
-		  recordv2-topics.c binary-topics.c			\
-		  int64-topics.c double-topics.c string-topics.c	\
-		  send-request-to-session.c send-request-to-path.c	\
-		  send-request-to-filter.c topic-update.c		\
-		  topic-update-with-constraint.c topic-update-stream.c	\
-		  topic-update-add-and-set.c time-series-append.c	\
-		  topic-views.c						\
+SOURCES 	=	connect-async.c \
+				connect.c \
+				reconnect.c \
+				session-factory.c \
+				features/authentication_control/auth-service.c \
+				features/client-control-change-roles-with-filter.c \
+				features/client-control-change-roles-with-session.c \
+				features/client-control-close-with-filter.c \
+				features/client_control/get-session-properties.c \
+				features/client_control/session-properties-listener.c \
+				features/messaging/send-request-to-filter.c \
+				features/messaging/send-request-to-path.c \
+				features/messaging/send-request-to-session.c \
+				features/remote_servers/remote-servers.c \
+				features/security/change-principal.c \
+				features/subscription_control/subscription-control.c \
+				features/system_authentication_control/system-auth-control.c \
+				features/time_series/time-series-range-query.c \
+				features/time_series/time-series-append.c \
+				features/time_series/time-series-edit.c \
+				features/topic_control/missing-topic-notification.c \
+				features/topic_control/add-topics.c \
+				features/topic_update/update-record.c \
+				features/topic_update/topic-update.c \
+				features/topic_update/topic-update-stream.c \
+				features/topic_update/topic-update-with-constraint.c \
+				features/topic_update/topic-update-add-and-set.c \
+				features/topic_views/topic-views.c \
+				features/topic_views/topic-views-remove.c \
+				features/topic_views/topic-views-list.c \
+				features/topics/subscribe.c \
+				features/topics/subscribe-multiple.c \
+				features/topics/recordv2-topics.c \
+				features/topics/string-topics.c \
+				features/topics/double-topics.c \
+				features/topics/fetch-request.c \
+				features/topics/int64-topics.c \
+				features/topics/binary-topics.c
 
-TARGETDIR	= target
-OBJDIR		= $(TARGETDIR)/objs
-BINDIR		= $(TARGETDIR)/bin
-OBJECTS		= $(SOURCES:.c=.o)
-TARGETS = subscribe fetch-request \
-		  auth-service change-principal add-topics		\
-		  subscribe-multiple update-record			\
-		  connect connect-async system-auth-control		\
-		  session-properties-listener				\
-		  get-session-properties				\
-                  missing-topic-notification				\
-		  subscription-control reconnect			\
-		  json-publishing-example json-subscribing-example	\
-		  recordv2-topics binary-topics				\
-		  int64-topics double-topics string-topics		\
-		  send-request-to-session send-request-to-path		\
-		  send-request-to-filter topic-update			\
-		  topic-update-with-constraint topic-update-stream	\
-		  topic-update-add-and-set time-series-append		\
-		  topic-views						\
+OBJ_DIR		= 	$(TARGET_FOLDER)/objs/$(ARCH)
+BIN_DIR		= 	$(TARGET_FOLDER)/bin/$(ARCH)
+OBJECTS		= 	$(SOURCES:.c=.o)
 
-all:		prepare $(TARGETS)
-.PHONY:		all
+TARGETS 	= 	connect-async \
+				connect \
+				reconnect \
+				session-factory \
+				authentication_control \
+				client-control-change-roles-with-filter \
+				client-control-change-roles-with-session \
+				client-control-close-with-filter \
+				client-control-get-session-properties \
+				client-control-session-properties-listener \
+				messaging-send-request-to-filter \
+				messaging-send-request-to-path \
+				messaging-send-request-to-session \
+				remote-servers \
+				security-change-principal \
+				subscription-control \
+				system-authentication-control \
+				time-series-range-query \
+				time-series-append \
+				time-series-edit \
+				topic-control-missing-topic-notification \
+				topic-control-add-topics \
+				topic-update-record \
+				topic-update \
+				topic-update-stream \
+				topic-update-with-constraint \
+				topic-update-add-and-set \
+				topic-views \
+				topic-views-remove \
+				topic-views-list \
+				topics-subscribe \
+				topics-subscribe-multiple \
+				topics-recordv2 \
+				topics-string \
+				topics-double \
+				topics-fetch \
+				topics-int64 \
+				topics-binary
+
+.PHONY: all
+
+all: prepare $(TARGETS)
 
 prepare:
-		mkdir -p $(OBJDIR) $(BINDIR)
+		mkdir -p $(OBJ_DIR) $(BIN_DIR)
 
-$(OBJDIR)/%.o:	%.c
+$(OBJ_DIR)/%.o: %.c
 		$(CC) $(CFLAGS) -c -o $@ $<
 
-subscribe:	$(OBJDIR)/subscribe.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+connect-async: $(OBJ_DIR)/connect-async.o
+		$(CC) $< $(LDFLAGS) -o $(BIN_DIR)/$@
 
-fetch-request:		$(OBJDIR)/fetch-request.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+connect: $(OBJ_DIR)/connect.o
+		$(CC) $< $(LDFLAGS) -o $(BIN_DIR)/$@
 
-send-request-to-session:	$(OBJDIR)/send-request-to-session.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+reconnect: $(OBJ_DIR)/reconnect.o
+		$(CC) $< $(LDFLAGS) -o $(BIN_DIR)/$@
 
-send-request-to-path:	$(OBJDIR)/send-request-to-path.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+session-factory: $(OBJ_DIR)/session-factory.o
+		$(CC) $< $(LDFLAGS) -o $(BIN_DIR)/$@
 
-send-request-to-filter:	$(OBJDIR)/send-request-to-filter.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+authentication_control: features/authentication_control/auth-service.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-auth-service:	$(OBJDIR)/auth-service.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+client-control-change-roles-with-filter: features/client_control/change-roles-with-filter.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-change-principal:   $(OBJDIR)/change-principal.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+client-control-change-roles-with-session: features/client_control/change-roles-with-session.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-add-topics:	$(OBJDIR)/add-topics.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+client-control-close-with-filter: features/client_control/close-with-filter.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-update-record:	$(OBJDIR)/update-record.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+client-control-get-session-properties: features/client_control/get-session-properties.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-subscribe-multiple:	$(OBJDIR)/subscribe-multiple.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+client-control-session-properties-listener: features/client_control/session-properties-listener.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-connect:	$(OBJDIR)/connect.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+messaging-send-request-to-filter: features/messaging/send-request-to-filter.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-connect-async:	$(OBJDIR)/connect-async.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+messaging-send-request-to-path: features/messaging/send-request-to-path.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-system-auth-control:	$(OBJDIR)/system-auth-control.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+messaging-send-request-to-session: features/messaging/send-request-to-session.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-session-properties-listener:	$(OBJDIR)/session-properties-listener.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+remote-servers: features/remote_servers/remote-servers.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-get-session-properties:	$(OBJDIR)/get-session-properties.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+security-change-principal: features/security/change-principal.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-missing-topic-notification:	$(OBJDIR)/missing-topic-notification.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+subscription-control: features/subscription_control/subscription-control.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-subscription-control:	$(OBJDIR)/subscription-control.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+system-authentication-control: features/system_authentication_control/system-auth-control.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-reconnect:	$(OBJDIR)/reconnect.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+time-series-range-query: features/time_series/time-series-range-query.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-json-publishing-example:	json/json-publishing-example.c
-		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BINDIR)/$@
+time-series-append: features/time_series/time-series-append.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-json-subscribing-example:	json/json-subscribing-example.c
-		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BINDIR)/$@
+time-series-edit: features/time_series/time-series-edit.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-recordv2-topics:	$(OBJDIR)/recordv2-topics.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-control-missing-topic-notification: features/topic_control/missing-topic-notification.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-binary-topics:	$(OBJDIR)/binary-topics.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-control-add-topics: features/topic_control/add-topics.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-int64-topics:	$(OBJDIR)/int64-topics.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-update-record: features/topic_update/update-record.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-double-topics:	$(OBJDIR)/double-topics.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-update: features/topic_update/topic-update.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-string-topics:	$(OBJDIR)/string-topics.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-update-stream: features/topic_update/topic-update-stream.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-topic-update:	$(OBJDIR)/topic-update.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-update-with-constraint: features/topic_update/topic-update-with-constraint.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-topic-update-with-constraint:	$(OBJDIR)/topic-update-with-constraint.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-update-add-and-set: features/topic_update/topic-update-add-and-set.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-topic-update-stream:	$(OBJDIR)/topic-update-stream.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-views: features/topic_views/topic-views.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-topic-update-add-and-set:	$(OBJDIR)/topic-update-add-and-set.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-views-remove: features/topic_views/topic-views-remove.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-time-series-append:	$(OBJDIR)/time-series-append.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topic-views-list: features/topic_views/topic-views-list.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
-topic-views:	$(OBJDIR)/topic-views.o
-		$(CC) $< $(LDFLAGS) -o $(BINDIR)/$@
+topics-subscribe: features/topics/subscribe.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
+topics-subscribe-multiple: features/topics/subscribe-multiple.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
+
+topics-recordv2: features/topics/recordv2-topics.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
+
+topics-string: features/topics/string-topics.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
+
+topics-double: features/topics/double-topics.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
+
+topics-fetch: features/topics/fetch-request.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
+
+topics-int64: features/topics/int64-topics.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
+
+topics-binary: features/topics/binary-topics.c
+		$(CC) $^ $(CFLAGS) $(LDFLAGS) -lm -o $(BIN_DIR)/$@
 
 clean:
-		rm -rf $(TARGETS) $(OBJECTS) $(TARGETDIR) core a.out
+		rm -rf $(TARGETS) $(OBJECTS) $(TARGET_FOLDER) core a.out

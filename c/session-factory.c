@@ -1,5 +1,5 @@
 /**
- * Copyright © 2014 - 2023 DiffusionData Ltd.
+ * Copyright © 2022 - 2023 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,19 @@
  * This example is written in C99. Please use an appropriate C99 capable compiler
  *
  * @author DiffusionData Limited
- * @since 5.0
+ * @since 6.9
  */
 
 /*
- * This example shows how to make a synchronous connection to Diffusion.
+ * This examples shows how to connect to Diffusion via a session factory.
  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
 #ifndef WIN32
-        #include <unistd.h>
+#include <unistd.h>
 #else
-        #define sleep(x) Sleep(1000 * x)
+#define sleep(x) Sleep(1000 * x)
 #endif
 
 #include "diffusion.h"
@@ -40,28 +39,9 @@ ARG_OPTS_T arg_opts[] = {
         {'u', "url", "Diffusion server URL", ARG_OPTIONAL, ARG_HAS_VALUE, "ws://localhost:8080"},
         {'p', "principal", "Principal (username) for the connection", ARG_OPTIONAL, ARG_HAS_VALUE, "client"},
         {'c', "credentials", "Credentials (password) for the connection", ARG_OPTIONAL, ARG_HAS_VALUE, "password"},
-        {'d', "delay", "Delay between reconnection attempts, in ms", ARG_OPTIONAL, ARG_HAS_VALUE, "2000" },
-        {'r', "retries", "Reconnection retry attempts", ARG_OPTIONAL, ARG_HAS_VALUE, "5" },
-        {'t', "timeout", "Reconnection timeout for a disconnected session", ARG_OPTIONAL, ARG_HAS_VALUE, NULL },
         {'s', "sleep", "Time to sleep before disconnecting (in seconds).", ARG_OPTIONAL, ARG_HAS_VALUE, "5" },
         END_OF_ARG_OPTS
 };
-
-
-/*
- * This callback is used when the session state changes, e.g. when a session
- * moves from a "connecting" to a "connected" state, or from "connected" to
- * "closed".
- */
-static void on_session_state_changed(
-        SESSION_T *session,
-        const SESSION_STATE_T old_state,
-        const SESSION_STATE_T new_state)
-{
-        printf("Session state changed from %s (%d) to %s (%d)\n",
-               session_state_as_string(old_state), old_state,
-               session_state_as_string(new_state), new_state);
-}
 
 
 /*
@@ -86,54 +66,25 @@ int main(int argc, char **argv)
                 credentials = credentials_create_password(password);
         }
 
-        long retry_delay = atol(hash_get(options, "delay"));
-        long retry_count = atol(hash_get(options, "retries"));
-        long reconnect_timeout;
-        if(hash_get(options, "timeout") != NULL) {
-                reconnect_timeout = atol(hash_get(options, "timeout"));
-        }
-        else {
-                reconnect_timeout = -1;
-        }
-
         const unsigned int sleep_time = atol(hash_get(options, "sleep"));
 
-        SESSION_T *session;
-        DIFFUSION_ERROR_T error = { 0 };
-
-        SESSION_LISTENER_T session_listener = { 0 };
-        session_listener.on_state_changed = &on_session_state_changed;
-
-        /*
-         * Specify how we might want to failover or retry, and
-         * how long to keep the session alive on the server before
-         * it's discarded.
-         */
-        RECONNECTION_STRATEGY_T *reconnection_strategy =
-                make_reconnection_strategy_repeating_attempt(retry_count, retry_delay);
-
-        if(reconnect_timeout > 0) {
-                reconnection_strategy_set_timeout(reconnection_strategy, reconnect_timeout);
-        }
+        DIFFUSION_SESSION_FACTORY_T *session_factory = diffusion_session_factory_init();
+        diffusion_session_factory_principal(session_factory, principal);
+        diffusion_session_factory_credentials(session_factory, credentials);
 
         /*
          * Create a session, synchronously.
          */
-        session = session_create(
-                url,
-                principal,
-                credentials,
-                &session_listener,
-                reconnection_strategy,
-                &error);
+        SESSION_T *session = session_create_with_session_factory(session_factory, url);
         if(session != NULL) {
                 char *sid_str = session_id_to_string(session->id);
-                printf("Session created (state=%d, id=%s)\n", session_state_get(session), sid_str);
+                printf("Session created (state=%d, id=%s)\n",
+                       session_state_get(session),
+                       sid_str);
                 free(sid_str);
         }
         else {
-                printf("Failed to create session: %s\n", error.message);
-                free(error.message);
+                printf("Failed to create session\n");
         }
 
         /*
@@ -147,9 +98,10 @@ int main(int argc, char **argv)
         session_close(session, NULL);
         session_free(session);
 
+        diffusion_session_factory_free(session_factory);
+
         credentials_free(credentials);
         hash_free(options, NULL, free);
-        free_reconnection_strategy(reconnection_strategy);
 
         return EXIT_SUCCESS;
 }
