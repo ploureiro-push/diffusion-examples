@@ -14,6 +14,12 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.monitoring;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
 import com.pushtechnology.diffusion.client.features.TopicUpdate;
@@ -22,12 +28,6 @@ import com.pushtechnology.diffusion.client.features.control.topics.TopicNotifica
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This example demonstrates how to monitor topic notifications in Diffusion.
@@ -56,11 +56,10 @@ public class MonitoringTopicNotificationsExample {
 
         registration.select(">my");
 
-        final Map<String, String> myTopicData = new HashMap<String, String>() {{
-            put("my/topic/path", "Good morning");
-            put("my/other/topic/path", "Good afternoon");
-            put("other/path/of/the/topic/tree", "This will not generate a notification");
-        }};
+        final Map<String, String> myTopicData = new HashMap<>();
+        myTopicData.put("my/topic/path", "Good morning");
+        myTopicData.put("my/other/topic/path", "Good afternoon");
+        myTopicData.put("other/path/of/the/topic/tree", "This will not generate a notification");
 
         myTopicData.forEach((path, value) ->
             topicUpdate.addAndSet(

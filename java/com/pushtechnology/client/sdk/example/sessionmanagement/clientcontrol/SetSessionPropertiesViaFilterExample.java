@@ -14,16 +14,16 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.sessionmanagement.clientcontrol;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.control.clients.ClientControl;
-import com.pushtechnology.diffusion.client.features.control.clients.ClientControl.SessionFilterOperationResult;
-import com.pushtechnology.diffusion.client.session.Session;
+import java.util.Collections;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Map;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.features.control.clients.ClientControl;
+import com.pushtechnology.diffusion.client.features.control.clients.ClientControl.SessionFilterOperationResult;
+import com.pushtechnology.diffusion.client.session.Session;
 
 /**
  * This example demonstrates how to set session properties for multiple sessions

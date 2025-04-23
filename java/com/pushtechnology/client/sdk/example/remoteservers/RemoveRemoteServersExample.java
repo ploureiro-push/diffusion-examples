@@ -14,17 +14,17 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.remoteservers;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.RemoteServers;
 import com.pushtechnology.diffusion.client.features.control.RemoteServers.RemoteServer.ConnectionOption;
 import com.pushtechnology.diffusion.client.features.control.RemoteServers.SecondaryInitiator.SecondaryInitiatorBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This example demonstrates how to remove remote servers in Diffusion.
@@ -49,11 +49,10 @@ public class RemoveRemoteServersExample {
         final SecondaryInitiatorBuilder builder =
             Diffusion.newRemoteServerBuilder(SecondaryInitiatorBuilder.class);
 
-        final Map<ConnectionOption, String> myConnectionOptions = new HashMap<ConnectionOption, String>() {{
-            put(ConnectionOption.RECONNECTION_TIMEOUT, "120000");
-            put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
-            put(ConnectionOption.CONNECTION_TIMEOUT, "15000");
-        }};
+        final Map<ConnectionOption, String> myConnectionOptions = new HashMap<>();
+        myConnectionOptions.put(ConnectionOption.RECONNECTION_TIMEOUT, "120000");
+        myConnectionOptions.put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
+        myConnectionOptions.put(ConnectionOption.CONNECTION_TIMEOUT, "15000");
 
         remoteServersControl.createRemoteServer(
             builder

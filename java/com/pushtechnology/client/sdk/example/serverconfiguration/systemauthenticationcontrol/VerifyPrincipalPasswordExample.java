@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.ScriptException;
 import com.pushtechnology.diffusion.client.features.control.clients.SystemAuthenticationControl;
-import com.pushtechnology.diffusion.client.session.AuthenticationException;
 import com.pushtechnology.diffusion.client.session.Session;
 
 /**

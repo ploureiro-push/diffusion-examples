@@ -14,8 +14,6 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.sessionmanagement.subscriptioncontrol;
 
-import java.util.Collections;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

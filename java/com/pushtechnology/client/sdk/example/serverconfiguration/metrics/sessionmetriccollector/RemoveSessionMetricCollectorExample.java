@@ -16,12 +16,12 @@ package com.pushtechnology.client.sdk.example.serverconfiguration.metrics.sessio
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.Metrics;
 import com.pushtechnology.diffusion.client.session.Session;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This example demonstrates how to remove a session metric collector using the

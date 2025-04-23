@@ -15,7 +15,6 @@
 package com.pushtechnology.client.sdk.example.topicviews.dsl;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,7 @@ public class TopicViewsDslOptionsThrottleExample {
                 topicPath,
                 Diffusion.newTopicSpecification(TopicType.INT64), Long.class, 0L)
             .join();
-        
+
         topics.addStream(viewSelector, Long.class, valueStream);
         topics.subscribe(viewSelector).join();
 

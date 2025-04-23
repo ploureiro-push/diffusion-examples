@@ -14,17 +14,17 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl.ScriptBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.types.PathPermission;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This example demonstrates how to set default path permissions for a role using
@@ -50,10 +50,9 @@ public class SetDefaultPathPermissionsExample {
         final  SecurityControl securityControl = session.feature(SecurityControl.class);
         final ScriptBuilder builder = securityControl.scriptBuilder();
 
-        final Set<PathPermission> myPermissions = new HashSet<PathPermission>() {{
-            add(PathPermission.UPDATE_TOPIC);
-            add(PathPermission.MODIFY_TOPIC);
-        }};
+        final Set<PathPermission> myPermissions = new HashSet<>();
+        myPermissions.add(PathPermission.UPDATE_TOPIC);
+        myPermissions.add(PathPermission.MODIFY_TOPIC);
 
         builder.setDefaultPathPermissions("CLIENT", myPermissions);
         final  String script = builder.script();

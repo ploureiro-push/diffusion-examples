@@ -14,13 +14,13 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.establishment;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.session.Session.Listener;
 import com.pushtechnology.diffusion.client.session.Session.State;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This example demonstrates how to use a session state listener to monitor

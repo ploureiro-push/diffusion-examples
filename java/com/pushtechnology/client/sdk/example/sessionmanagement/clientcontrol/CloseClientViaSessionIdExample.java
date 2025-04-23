@@ -16,12 +16,12 @@ package com.pushtechnology.client.sdk.example.sessionmanagement.clientcontrol;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.ClientControl;
 import com.pushtechnology.diffusion.client.session.Session;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This example demonstrates how to close a session using its ID.

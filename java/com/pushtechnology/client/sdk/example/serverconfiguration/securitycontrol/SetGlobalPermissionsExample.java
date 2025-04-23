@@ -14,17 +14,17 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl.ScriptBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.types.GlobalPermission;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This example demonstrates how to set global permissions for a role using the
@@ -50,10 +50,9 @@ public class SetGlobalPermissionsExample {
         final SecurityControl securityControl = session.feature(SecurityControl.class);
         final ScriptBuilder builder = securityControl.scriptBuilder();
 
-        final Set<GlobalPermission> myPermissions = new HashSet<GlobalPermission>() {{
-            add(GlobalPermission.VIEW_SERVER);
-            add(GlobalPermission.VIEW_SESSION);
-        }};
+        final Set<GlobalPermission> myPermissions = new HashSet<>();
+        myPermissions.add(GlobalPermission.VIEW_SERVER);
+        myPermissions.add(GlobalPermission.VIEW_SESSION);
 
         builder.setGlobalPermissions("CLIENT", myPermissions);
         final String script = builder.script();

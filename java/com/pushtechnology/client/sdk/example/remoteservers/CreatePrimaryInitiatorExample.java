@@ -14,16 +14,16 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.remoteservers;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.control.RemoteServers;
-import com.pushtechnology.diffusion.client.features.control.RemoteServers.PrimaryInitiator.PrimaryInitiatorBuilder;
-import com.pushtechnology.diffusion.client.session.Session;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.features.control.RemoteServers;
+import com.pushtechnology.diffusion.client.features.control.RemoteServers.PrimaryInitiator.PrimaryInitiatorBuilder;
+import com.pushtechnology.diffusion.client.session.Session;
 
 /**
  * This example demonstrates how to create a primary initiator remote server in Diffusion.
@@ -48,11 +48,10 @@ public class CreatePrimaryInitiatorExample {
         final RemoteServers.PrimaryInitiator.PrimaryInitiatorBuilder builder =
             Diffusion.newRemoteServerBuilder(PrimaryInitiatorBuilder.class);
 
-        final List<String> urls = new ArrayList<String>() {{
-            add("ws://new.server.url.com:8080");
-            add("ws://new.server.url.com:8081");
-            add("ws://new.server.url.com:8082");
-        }};
+        final List<String> urls = new ArrayList<>();
+        urls.add("ws://new.server.url.com:8080");
+        urls.add("ws://new.server.url.com:8081");
+        urls.add("ws://new.server.url.com:8082");
 
         remoteServersControl.createRemoteServer(
             builder

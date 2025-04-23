@@ -34,11 +34,10 @@ public class TrustClientProposedPropertyInExample {
         final SystemAuthenticationControl authenticationControl =
             adminSession.feature(SystemAuthenticationControl.class);
 
-        final Set<String> allowedValues = new HashSet<String>() {{
-            add("Fred");
-            add("Wilma");
-            add("Pebbles");
-        }};
+        final Set<String> allowedValues = new HashSet<>();
+        allowedValues.add("Fred");
+        allowedValues.add("Wilma");
+        allowedValues.add("Pebbles");
 
         final String updateScript = authenticationControl.scriptBuilder()
             .trustClientProposedPropertyIn("Flintstone", allowedValues)

@@ -50,12 +50,10 @@ public class CheckRemoteServersExample {
         final SecondaryInitiatorBuilder builder =
             Diffusion.newRemoteServerBuilder(SecondaryInitiatorBuilder.class);
 
-        final Map<ConnectionOption, String> myConnectionOptions =
-            new HashMap<ConnectionOption, String>() {{
-            put(ConnectionOption.RECONNECTION_TIMEOUT, "120000");
-            put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
-            put(ConnectionOption.CONNECTION_TIMEOUT, "15000");
-        }};
+        final Map<ConnectionOption, String> myConnectionOptions = new HashMap<>();
+        myConnectionOptions.put(ConnectionOption.RECONNECTION_TIMEOUT, "120000");
+        myConnectionOptions.put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
+        myConnectionOptions.put(ConnectionOption.CONNECTION_TIMEOUT, "15000");
 
         remoteServersControl.createRemoteServer(
             builder
@@ -68,11 +66,10 @@ public class CheckRemoteServersExample {
         builder.reset();
 
         final Map<ConnectionOption, String> myOtherConnectionOptions =
-            new HashMap<ConnectionOption, String>() {{
-            put(ConnectionOption.RECONNECTION_TIMEOUT, "6000");
-            put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "10000");
-            put(ConnectionOption.CONNECTION_TIMEOUT, "5000");
-        }};
+            new HashMap<ConnectionOption, String>();
+        myOtherConnectionOptions.put(ConnectionOption.RECONNECTION_TIMEOUT, "6000");
+        myOtherConnectionOptions.put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "10000");
+        myOtherConnectionOptions.put(ConnectionOption.CONNECTION_TIMEOUT, "5000");
 
         remoteServersControl.createRemoteServer(
             builder

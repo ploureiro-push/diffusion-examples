@@ -14,15 +14,15 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.security;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.Security;
-import com.pushtechnology.diffusion.client.session.Session;
-import com.pushtechnology.diffusion.client.types.PathPermission;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.features.Security;
+import com.pushtechnology.diffusion.client.session.Session;
+import com.pushtechnology.diffusion.client.types.PathPermission;
 
 /**
  * This example demonstrates how to retrieve path permissions using the

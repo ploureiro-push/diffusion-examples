@@ -16,15 +16,15 @@ package com.pushtechnology.client.sdk.example.serverconfiguration.metrics.sessio
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.control.Metrics;
-import com.pushtechnology.diffusion.client.features.control.Metrics.SessionMetricCollector;
-import com.pushtechnology.diffusion.client.session.Session;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.features.control.Metrics;
+import com.pushtechnology.diffusion.client.features.control.Metrics.SessionMetricCollector;
+import com.pushtechnology.diffusion.client.session.Session;
 
 /**
  * This example demonstrates how to list session metric collectors using the

@@ -16,6 +16,11 @@ package com.pushtechnology.client.sdk.example.timeseries;
 
 import static com.pushtechnology.diffusion.datatype.DataTypes.DOUBLE_DATATYPE_NAME;
 
+import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
 import com.pushtechnology.diffusion.client.features.TimeSeries;
@@ -25,11 +30,6 @@ import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Random;
 
 /**
  * This example demonstrates cross-compatible data types when using values streams with time series topics.
@@ -52,7 +52,7 @@ public class TimeSeriesCrossCompatibleDatatypesExample {
         final Random r = new Random();
         final String myTopicPath = "my/time/series/topic/path";
         final String myTopicSelector = "?my/time/series//";
-        
+
         final TopicControl topicControl = session.feature(TopicControl.class);
         final Topics topics = session.feature(Topics.class);
         final TimeSeries timeSeries = session.feature(TimeSeries.class);

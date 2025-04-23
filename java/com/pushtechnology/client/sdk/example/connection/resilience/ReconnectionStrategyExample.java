@@ -14,16 +14,16 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.resilience;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.session.Session;
-import com.pushtechnology.diffusion.client.session.reconnect.ReconnectionStrategy;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.session.Session;
+import com.pushtechnology.diffusion.client.session.reconnect.ReconnectionStrategy;
 
 /**
  * This example demonstrates how to implement a custom reconnection strategy

@@ -14,17 +14,17 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.establishment;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.session.Session;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import java.security.cert.X509Certificate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.session.Session;
 
 /**
  * This example demonstrates how to establish a secure connection
@@ -50,8 +50,11 @@ public class ConnectAcceptingAllCertificatesExample {
             null,
             new TrustManager[] {
                 new X509TrustManager() {
+                    @Override
                     public void checkClientTrusted(X509Certificate[] certs, String authType) { }
+                    @Override
                     public void checkServerTrusted(X509Certificate[] certs, String authType) { }
+                    @Override
                     public X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
                     }

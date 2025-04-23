@@ -14,12 +14,12 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.sessiontrees;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.topics.SessionTrees;
 import com.pushtechnology.diffusion.client.session.Session;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This example demonstrates how to add and remove a session tree branch mapping table in Diffusion.

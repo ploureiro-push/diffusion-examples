@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2025 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,25 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.security;
 
+import java.util.Collections;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.Security;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.types.Credentials;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * This example demonstrates how to change the principal for a session in Diffusion.
+ * This example demonstrates how to re-authenticate a Diffusion session.
  *
  * @author DiffusionData Limited
  */
-public class ChangePrincipalExample {
+public class ReauthenticateExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
-        ChangePrincipalExample.class);
+        ReauthenticateExample.class);
 
     public static void main(String[] args) throws Exception {
 
@@ -42,10 +44,10 @@ public class ChangePrincipalExample {
             .open("ws://localhost:8080");
 
         session.feature(Security.class)
-            .changePrincipal("control", credentials)
+            .reauthenticate("control", credentials, Collections.emptyMap())
             .join();
 
-        LOG.info("Principal has been changed to {}", session.getPrincipal());
+        LOG.info("Session reauthenticated for principal {}", session.getPrincipal());
 
         session.close();
     }
