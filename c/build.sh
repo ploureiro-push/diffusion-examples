@@ -12,29 +12,41 @@ fi
 
 
 function build_linux() {
-    build_for_unix "x86_64" "linux"
+    build_for_unix "x86_64" "linux" false
 }
 
 
 function build_macos() {
-    build_for_unix "x86_64" "macos"
-    build_for_unix "arm64" "macos"
+    build_for_unix "x86_64" "macos" true
+    build_for_unix "arm64" "macos" true
 }
 
 
 function build_for_unix() {
     local architecture=$1
     local operating_system=$2
+    local is_macos=$3
     local cmake_dir="$TARGET_DIR/cmake-$operating_system-$architecture"
 
-    cmake --fresh                               \
+    if $is_macos ; then
+        if [[ "$architecture" == "x86_64" ]]; then
+            /usr/local/bin/brew shellenv
+
+        elif [[ "$architecture" == "arm64" ]]; then
+            /opt/homebrew/bin/brew shellenv
+        fi
+    fi
+
+    # shellcheck disable=SC2086
+    arch -$architecture cmake --fresh           \
         -S"$SOURCE_DIR"                         \
         -B"$cmake_dir"                          \
         -DTARGET="$TARGET_DIR"                  \
         -DOPERATING_SYSTEM="$operating_system"  \
         -DARCHITECTURE="$architecture"
 
-    cmake --build $cmake_dir
+    # shellcheck disable=SC2086
+    arch -$architecture cmake --build "$cmake_dir"
 }
 
 
