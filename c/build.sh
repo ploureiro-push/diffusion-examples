@@ -27,16 +27,7 @@ function build_for_unix() {
     local operating_system=$2
     local is_macos=$3
     local cmake_dir="$TARGET_DIR/cmake-$operating_system-$architecture"
-    IFS='' read -r -d '' BUILD_CMD << EOF
-cmake --fresh           \
-    -S"$SOURCE_DIR"                         \
-    -B"$cmake_dir"                          \
-    -DTARGET="$TARGET_DIR"                  \
-    -DOPERATING_SYSTEM="$operating_system"  \
-    -DARCHITECTURE="$architecture"
 
-cmake --build "$cmake_dir"
-EOF
     if $is_macos ; then
         if [[ "$architecture" == "x86_64" ]]; then
             /usr/local/bin/brew shellenv
@@ -44,11 +35,18 @@ EOF
         elif [[ "$architecture" == "arm64" ]]; then
             /opt/homebrew/bin/brew shellenv
         fi
-        arch "-$architecture" "$BUILD_CMD"
-    else
-      "${BUILD_CMD}"
     fi
 
+    # shellcheck disable=SC2086
+    arch -$architecture cmake --fresh           \
+        -S"$SOURCE_DIR"                         \
+        -B"$cmake_dir"                          \
+        -DTARGET="$TARGET_DIR"                  \
+        -DOPERATING_SYSTEM="$operating_system"  \
+        -DARCHITECTURE="$architecture"
+
+    # shellcheck disable=SC2086
+    arch -$architecture cmake --build "$cmake_dir"
 }
 
 
