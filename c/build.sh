@@ -35,10 +35,13 @@ function build_for_unix() {
         elif [[ "$architecture" == "arm64" ]]; then
             /opt/homebrew/bin/brew shellenv
         fi
+        PREFIX=("arch" "-$architecture")
+    else
+      PREFIX=()
     fi
 
     # shellcheck disable=SC2086
-    arch -$architecture cmake --fresh           \
+    "${PREFIX[@]}" "${SHELL}" -ic cmake --fresh           \
         -S"$SOURCE_DIR"                         \
         -B"$cmake_dir"                          \
         -DTARGET="$TARGET_DIR"                  \
@@ -46,7 +49,7 @@ function build_for_unix() {
         -DARCHITECTURE="$architecture"
 
     # shellcheck disable=SC2086
-    arch -$architecture cmake --build "$cmake_dir"
+    "${PREFIX[@]}" "${SHELL}" cmake --build "$cmake_dir"
 }
 
 
