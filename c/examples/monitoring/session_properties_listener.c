@@ -100,7 +100,6 @@ static int on_session_close(
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_INVALID_INBOUND_MESSAGE, "Connection Lost");
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_ABORTED, "Connection Lost");
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_LOST_MESSAGES, "Connection Lost");
-    hash_num_add(close_reason_map, SESSION_CLOSE_REASON_SERVER_CLOSING, "Connection Lost");
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_CLOSED_BY_CONTROLLER, "Connection Lost");
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_FAILED_OVER, "Connection Lost");
 
