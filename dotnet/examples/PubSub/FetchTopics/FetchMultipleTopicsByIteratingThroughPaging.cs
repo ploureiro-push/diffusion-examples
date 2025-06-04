@@ -36,7 +36,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.FetchTopics
 
             var topics = session.Topics;
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.STRING);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.STRING);
 
             for (int i = 1; i <= 25; i++)
             {

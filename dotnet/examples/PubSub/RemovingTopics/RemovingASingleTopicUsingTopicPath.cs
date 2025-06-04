@@ -40,7 +40,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.RemovingTopics
 
             string topic = "my/topic/path/to/be/removed";
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             await AddAndSetTopic(session, topic, topicSpecification, "{\"diffusion\":[\"data\", \"more data\"]}", cancellationToken);
             await AddAndSetTopic(session, "my/topic/path/will/not/be/removed", topicSpecification, "{\"diffusion\":[\"no data\"]}", cancellationToken);

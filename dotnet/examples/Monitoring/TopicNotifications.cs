@@ -44,7 +44,7 @@ namespace PushTechnology.ClientInterface.Examples.Monitoring
             var registration = await session.TopicNotifications.AddListenerAsync(topicNotificationListener, cancellationToken);
             await registration.SelectAsync(">my/topic/path", cancellationToken);
 
-            var specification = session.TopicControl.NewSpecification(TopicType.STRING);
+            var specification = Diffusion.NewSpecification(TopicType.STRING);
 
             await session.TopicUpdate.AddAndSetAsync("my/topic/path", specification, "Good morning", cancellationToken);
             await session.TopicUpdate.AddAndSetAsync("my/topic/path/descendant", specification, "Good afternoon", cancellationToken);

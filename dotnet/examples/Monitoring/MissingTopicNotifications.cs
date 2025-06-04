@@ -77,7 +77,7 @@ namespace PushTechnology.ClientInterface.Examples.Monitoring
             {
                 WriteLine($"Topic '{notification.TopicPath}' does not exist.");
 
-                session.TopicControl.AddTopicAsync(notification.TopicPath, session.TopicControl.NewSpecification(TopicType.STRING));
+                session.TopicControl.AddTopicAsync(notification.TopicPath, Diffusion.NewSpecification(TopicType.STRING));
             }
         }
 

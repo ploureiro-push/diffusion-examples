@@ -39,7 +39,7 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.API
             string topic2 = "my/topic/path/array";
 
             string json = "{\"diffusion\":\"data\"}";
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
             await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
             await session.TopicUpdate.AddAndSetAsync(topic2, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
 

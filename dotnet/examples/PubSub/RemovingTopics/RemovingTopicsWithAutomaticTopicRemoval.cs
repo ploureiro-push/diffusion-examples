@@ -53,7 +53,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.RemovingTopics
 
         private async Task AddTopic(ISession session, string topic, string removalValue, CancellationToken cancellationToken)
         {
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON).WithProperty(TopicSpecificationProperty.Removal, removalValue);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON).WithProperty(TopicSpecificationProperty.Removal, removalValue);
 
             var result = await session.TopicControl.AddTopicAsync(topic, topicSpecification, cancellationToken);
 

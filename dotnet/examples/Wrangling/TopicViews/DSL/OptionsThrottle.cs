@@ -42,7 +42,7 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
             string topic = "my/topic/path";
             string topicSelector = "?.*//";
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.INT64);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.INT64);
 
             await session.TopicUpdate.AddAndSetAsync<long?>(topic, topicSpecification, 0, cancellationToken);
 

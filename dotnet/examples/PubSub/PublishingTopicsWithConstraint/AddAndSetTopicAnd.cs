@@ -38,7 +38,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
             string topic = "my/topic/path";
 
             string json = "{\"diffusion\":\"data\"}";
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             var withoutConstraint = Diffusion.UpdateConstraints.JSONValue.Without("/bar");
             var withConstraint = Diffusion.UpdateConstraints.JSONValue.With("/diffusion", "data");

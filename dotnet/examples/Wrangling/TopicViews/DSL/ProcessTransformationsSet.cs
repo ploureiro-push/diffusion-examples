@@ -45,7 +45,7 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
             string topic2 = "my/topic/path/2";
             string topicSelector = "?views//";
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             string json = "{\"account\":\"1234\",\"balance\":{\"amount\":12.57,\"currency\":\"USD\"}}";
             await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);

@@ -40,7 +40,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
 
                 string topic = "my/topic/path";
 
-                var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+                var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
                 var result = await session.TopicControl.AddTopicAsync(topic, topicSpecification, cancellationToken);
 

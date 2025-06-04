@@ -37,7 +37,7 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.API
             string topic = "my/topic/path";
 
             string json = "{\"diffusion\":\"data\"}";
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
             await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
 
             var view1 = await session.TopicViews.CreateTopicViewAsync("topic_view_1", "map my/topic/path to views/<path(0)>", cancellationToken);

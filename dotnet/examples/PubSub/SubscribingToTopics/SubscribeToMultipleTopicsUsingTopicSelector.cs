@@ -43,7 +43,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             await AddTopic(session, "my/topic/path", topicSpecification, cancellationToken);
             await AddTopic(session, "my/other/topic/path", topicSpecification, cancellationToken);

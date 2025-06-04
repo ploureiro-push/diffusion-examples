@@ -39,7 +39,7 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.SessionTrees
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.STRING);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.STRING);
             await session.TopicUpdate.AddAndSetAsync("my/topic/path/for/admin", topicSpecification, "Good morning Administrator", cancellationToken);
             await session.TopicUpdate.AddAndSetAsync("my/topic/path/for/control", topicSpecification, "Good afternoon Control Client", cancellationToken);
             await session.TopicUpdate.AddAndSetAsync("my/topic/path/for/anonymous", topicSpecification, "Good night Anonymous", cancellationToken);

@@ -40,7 +40,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
                 string topic = "my/topic/path";
 
                 string json = "{\"diffusion\":\"data\"}";
-                var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+                var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
                 var sessionLock = await session.LockAsync(topic, cancellationToken);
                 var constraint = Diffusion.UpdateConstraints.Locked(sessionLock);

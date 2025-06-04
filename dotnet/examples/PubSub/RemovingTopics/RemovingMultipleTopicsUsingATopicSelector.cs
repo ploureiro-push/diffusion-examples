@@ -38,7 +38,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.RemovingTopics
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             await AddAndSetTopic(session, "my/topic/path/to/be/removed", topicSpecification, "{\"diffusion\":[\"data\", \"more data\"]}", cancellationToken);
             await AddAndSetTopic(session, "my/topic/path/to/be/also/removed", topicSpecification, "{\"diffusion\":[\"data\", \"also more data\"]}", cancellationToken);

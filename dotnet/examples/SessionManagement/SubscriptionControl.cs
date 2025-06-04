@@ -45,7 +45,7 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
             string topic = "my/topic/path/hello";
             string topicSelector = "?my/topic/path//";
 
-            var specification = session.TopicControl.NewSpecification(TopicType.STRING);
+            var specification = Diffusion.NewSpecification(TopicType.STRING);
 
             await session.TopicUpdate.AddAndSetAsync(topic, specification, "Hello World!", cancellationToken);
 

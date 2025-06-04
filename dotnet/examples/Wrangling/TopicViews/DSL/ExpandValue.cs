@@ -45,7 +45,7 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
             string topicSelector = "?views//";
 
             string json = "{\"currencies\":[\"USD\", \"GBP\", \"EUR\", \"CHF\"]}";
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
             await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
 
             var jsonStream = new JSONStream();

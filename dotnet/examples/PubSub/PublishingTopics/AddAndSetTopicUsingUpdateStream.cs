@@ -38,7 +38,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics
 
             var topic = "my/topic/path/with/update/stream";
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             var updateStream = session.TopicUpdate.NewUpdateStreamBuilder()
                 .Specification(topicSpecification)

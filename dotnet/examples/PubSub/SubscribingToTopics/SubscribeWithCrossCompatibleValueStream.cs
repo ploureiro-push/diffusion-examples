@@ -45,7 +45,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
             string topic = "my/int/topic/path";
             string topicSelector = ">my/int/topic/path";
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.INT64);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.INT64);
             var result = await session.TopicControl.AddTopicAsync(topic, topicSpecification, cancellationToken);
 
             if (result == AddTopicResult.CREATED)

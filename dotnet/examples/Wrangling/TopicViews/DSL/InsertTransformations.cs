@@ -44,7 +44,7 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
             string topic = "my/topic/path/original_cast";
             string topic2 = "my/topic/path/additional_cast";
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             string json = "[" +
                             " \"Fred Flintstone\", " +

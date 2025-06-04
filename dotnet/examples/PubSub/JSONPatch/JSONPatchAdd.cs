@@ -40,7 +40,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.JSONPatch
                 .Open(serverUrl);
 
             var topic = "my/topic/path";
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             string json = "{\"Fred\":\"Flintstone\",\"Barney\":\"Rubble\"}";
             await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
