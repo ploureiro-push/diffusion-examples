@@ -35,48 +35,7 @@ if(WIN32)
 
 elseif(UNIX)
     # Unix (MacOS or Linux)
-
-    if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
-        # MacOS
-        execute_process(
-            COMMAND brew --prefix zlib
-            RESULT_VARIABLE BREW_ZLIB
-            OUTPUT_VARIABLE BREW_ZLIB_PREFIX
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-
-        if (BREW_ZLIB EQUAL 0 AND EXISTS "${BREW_ZLIB_PREFIX}")
-            message(STATUS "Found ZLIB installed by Homebrew at ${BREW_ZLIB_PREFIX}")
-
-            add_library(zlib SHARED IMPORTED)
-            add_library(ZLIB_posix SHARED IMPORTED)
-
-            cmake_path(SET ZLIB_LIB_PATH ${BREW_ZLIB_PREFIX}/lib/libz.a)
-            cmake_path(SET ZLIB_INCLUDE_PATH ${BREW_ZLIB_PREFIX}/include)
-
-            set_target_properties(zlib PROPERTIES
-                IMPORTED_IMPLIB ${ZLIB_LIB_PATH}
-                IMPORTED_LOCATION ${ZLIB_LIB_PATH}
-                INTERFACE_INCLUDE_DIRECTORIES ${ZLIB_INCLUDE_PATH}
-            )
-
-            get_target_property(ZLIB_INTERFACE_INCLUDE_DIRECTORIES zlib INTERFACE_INCLUDE_DIRECTORIES)
-
-            set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${ZLIB_INTERFACE_INCLUDE_DIRECTORIES})
-
-            set(DEPENDENCIES ${DEPENDENCIES} zlib)
-
-        else()
-            message(STATUS "Unable to find ZLIB in this machine for architecture ${ARCHITECTURE}")
-
-        endif()
-
-    else()
-        # Linux
-        set(ADDITIONAL_LD_FLAGS ${ADDITIONAL_LD_FLAGS} "-lz")
-
-    endif()
-
+    set(ADDITIONAL_LD_FLAGS ${ADDITIONAL_LD_FLAGS} "-lz")
 
 endif()
 
