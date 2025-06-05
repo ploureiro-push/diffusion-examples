@@ -47,57 +47,7 @@ if(WIN32)
 
 elseif(UNIX)
     # Unix (MacOS or Linux)
-
-    if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
-        # MacOS
-        execute_process(
-            COMMAND brew --prefix pcre
-            RESULT_VARIABLE BREW_PCRE
-            OUTPUT_VARIABLE BREW_PCRE_PREFIX
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-
-        if (BREW_PCRE EQUAL 0 AND EXISTS "${BREW_PCRE_PREFIX}")
-            message(STATUS "Found PCRE installed by Homebrew at ${BREW_PCRE_PREFIX}")
-
-            add_library(pcre SHARED IMPORTED)
-            add_library(pcre_posix SHARED IMPORTED)
-
-            cmake_path(SET PCRE_LIB_PATH ${BREW_PCRE_PREFIX}/lib/libpcre.a)
-            cmake_path(SET PCRE_POSIX_LIB_PATH ${BREW_PCRE_PREFIX}/lib/libpcreposix.a)
-            cmake_path(SET PCRE_INCLUDE_PATH ${BREW_PCRE_PREFIX}/include)
-
-            set_target_properties(pcre PROPERTIES
-                IMPORTED_IMPLIB ${PCRE_LIB_PATH}
-                IMPORTED_LOCATION ${PCRE_LIB_PATH}
-                INTERFACE_INCLUDE_DIRECTORIES ${PCRE_INCLUDE_PATH}
-            )
-
-            set_target_properties(pcre_posix PROPERTIES
-                IMPORTED_IMPLIB ${PCRE_POSIX_LIB_PATH}
-                IMPORTED_LOCATION ${PCRE_POSIX_LIB_PATH}
-                INTERFACE_INCLUDE_DIRECTORIES ${PCRE_INCLUDE_PATH}
-            )
-
-            get_target_property(pcre_INTERFACE_INCLUDE_DIRECTORIES pcre INTERFACE_INCLUDE_DIRECTORIES)
-            get_target_property(pcre_posix_INTERFACE_INCLUDE_DIRECTORIES pcre_posix INTERFACE_INCLUDE_DIRECTORIES)
-
-            set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${pcre_INTERFACE_INCLUDE_DIRECTORIES})
-            set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${pcre_posix_INTERFACE_INCLUDE_DIRECTORIES})
-
-            set(DEPENDENCIES ${DEPENDENCIES} pcre pcre_posix)
-
-        else()
-            message(STATUS "Unable to find PCRE in this machine for architecture ${ARCHITECTURE}")
-
-        endif()
-
-
-    else()
-        # Linux
-        set(ADDITIONAL_LD_FLAGS ${ADDITIONAL_LD_FLAGS} "-lpcre")
-
-    endif()
+    set(ADDITIONAL_LD_FLAGS ${ADDITIONAL_LD_FLAGS} "-lpcre")
 
 endif()
 
