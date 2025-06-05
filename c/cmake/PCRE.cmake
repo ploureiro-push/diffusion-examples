@@ -92,7 +92,6 @@ elseif(UNIX)
 
         endif()
 
-
     else()
         # Linux
         set(ADDITIONAL_LD_FLAGS ${ADDITIONAL_LD_FLAGS} "-lpcre")
