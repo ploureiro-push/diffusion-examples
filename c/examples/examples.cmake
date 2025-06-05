@@ -45,9 +45,6 @@ function(add_example FOLDER_PATH FILE_NAME COPY_RESOURCES)
             endforeach()
         endif()
     endif()
-
-    get_target_property(OUT ${EXAMPLE_NAME} LINK_LIBRARIES)
-    message(STATUS ${OUT})
 endfunction()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -O1 -fsanitize=address -g -fno-omit-frame-pointer -Wdeprecated-declarations")
