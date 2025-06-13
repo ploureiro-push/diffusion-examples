@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 -2024 Diffusion Data Ltd.
+ * Copyright © 2025 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using static System.Console;
 using PushTechnology.ClientInterface.Client.Factories;
 using static PushTechnology.ClientInterface.Examples.Program;
 
 namespace PushTechnology.ClientInterface.Examples.Security
 {
-     public sealed class ChangePrincipal : Example
+     public sealed class Reauthenticate: Example
      {
         public override async Task Run(CancellationToken cancellationToken, string[] args)
         {
@@ -33,11 +34,11 @@ namespace PushTechnology.ClientInterface.Examples.Security
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            bool result = await session.Security.ChangePrincipalAsync("control", Diffusion.Credentials.Password("password"), cancellationToken);
+            bool result = await session.Security.ReauthenticateAsync("control", Diffusion.Credentials.Password("password"), new Dictionary<string, string>(), cancellationToken);
 
             if (result)
             {
-                WriteLine("Principal has been changed to control.");
+                WriteLine("Session reauthenticated for principal control.");
             }
             else
             {
