@@ -81,8 +81,8 @@ namespace PushTechnology.ClientInterface.Examples
                 // Start the ping server example
                 //runner.Start(new PingServer(), url);
 
-                // Start the change principal example
-                //runner.Start(new ChangePrincipal(), url);
+                // Start the reauthenticate example
+                //runner.Start(new Reauthenticate(), url);
 
                 // Start the get global permissions example
                 //runner.Start(new GetGlobalPermissions(), url);
