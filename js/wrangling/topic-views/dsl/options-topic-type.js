@@ -47,6 +47,9 @@ export async function topicViewsDslOptionsTopicType() {
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+    /// tag::log
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    /// end::log
 
     const queryResult = await session.timeseries.rangeQuery()
         .fromStart()
