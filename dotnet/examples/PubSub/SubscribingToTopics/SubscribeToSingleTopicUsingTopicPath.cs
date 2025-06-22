@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2025 Diffusion Data Ltd.
+ * Copyright © 2023 - 2024 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,16 +63,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
             await Task.Delay(2000);
 
             await session.Topics.SubscribeAsync(topicSelector, cancellationToken);
-
-            await Task.Delay(1000);
-
-            string json = "{\"diffusion\":\"data\"}";
-            await session.TopicUpdate.SetAsync<IJSON>(topic, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
-
-            await Task.Delay(1000);
-
-            string json2 = "{\"diffusion\":\"more data\"}";
-            await session.TopicUpdate.SetAsync<IJSON>(topic, Diffusion.DataTypes.JSON.FromJSONString(json2), cancellationToken);
 
             await Task.Delay(2000);
 
