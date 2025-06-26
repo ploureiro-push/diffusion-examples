@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Diffusion Data Ltd.
+ * Copyright (C) 2024 - 2025 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * limitations under the License.
  *******************************************************************************/
 
-import { connect, datatypes, topics, topicUpdate } from 'diffusion';
+import { connect, datatypes, topics } from 'diffusion';
 /// tag::log
 import { PartiallyOrderedCheckpointTester } from '../../../../test/util'
 /// end::log
