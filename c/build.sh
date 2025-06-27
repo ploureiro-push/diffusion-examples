@@ -65,7 +65,7 @@ function build_for_unix() {
 
         # Pass function definition and invoke it inside the new shell
         set -x
-        arch "-$architecture" /bin/zsh --login -c "$(declare -f build_commands); source ~/.zshrc && source ~/.profile && source ~/.zprofile && set -a; SOURCE_DIR=${SOURCE_DIR}; is_macos=${is_macos}; TARGET_DIR=${TARGET_DIR}; cmake_dir=${cmake_dir}; operating_system=${operating_system}; architecture=${architecture}; build_commands" || exit 1
+        arch "-$architecture" /bin/zsh -c "set -a; SOURCE_DIR=${SOURCE_DIR}; is_macos='1'; TARGET_DIR=${TARGET_DIR}; cmake_dir=${cmake_dir}; operating_system=${operating_system}; architecture=${architecture}; $(declare -f build_commands); build_commands" || exit 1
         set +x
     else
         build_commands
