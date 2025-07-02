@@ -164,6 +164,9 @@ namespace PushTechnology.ClientInterface.Examples
                 // Start the subscribe with cross compatible value stream example
                 //runner.Start(new SubscribeWithCrossCompatibleValueStream(), url);
 
+                // Start the subscribe using selection scopes example
+                //runner.Start(new SubscribeUsingSelectionScopes(), url);
+
                 // Start the removing a single topic using topic path example
                 //runner.Start(new RemovingASingleTopicUsingTopicPath(), url);
 
