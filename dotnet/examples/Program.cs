@@ -30,8 +30,10 @@ using PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics;
 using PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithConstraint;
 using PushTechnology.ClientInterface.Examples.PubSub.RemovingTopics;
 using PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics;
+using PushTechnology.ClientInterface.Examples.PubSub.JSONPatch;
 using PushTechnology.ClientInterface.Examples.TimeSeries;
 using PushTechnology.ClientInterface.Examples.Security;
+using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.SessionMetricCollector;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.TopicMetricCollector;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServers;
@@ -62,6 +64,15 @@ namespace PushTechnology.ClientInterface.Examples
             {
                 // Start the connect synchronously example
                 //runner.Start(new ConnectSynchronously(), url);
+
+                // Start the connect synchronously without URL example
+                //runner.Start(new ConnectSynchronouslyWithoutURL(), url);
+
+                // Start the connect asynchronously example
+                //runner.Start(new ConnectAsynchronously(), url);
+
+                // Start the connect asynchronously without URL example
+                //runner.Start(new ConnectAsynchronouslyWithoutURL(), url);
 
                 // Start the connect using a session factory example
                 //runner.Start(new ConnectUsingASessionFactory(), url);
