@@ -39,19 +39,21 @@ if(WIN32)
 
     list(APPEND WINDOWS_PATH ${PCRE_DLL_PATH} ${PCRE_POSIX_DLL_PATH})
 
-    message("")
-    message("PCRE has been imported from ${PCRE_ROOT_PATH}")
-    message("    - ${pcre_INTERFACE_INCLUDE_DIRECTORIES}")
-    message("    - ${pcre_posix_INTERFACE_INCLUDE_DIRECTORIES}")
-    message("")
+    message(STATUS "")
+    message(STATUS "PCRE has been imported from ${PCRE_ROOT_PATH}")
+    message(STATUS "    - ${pcre_INTERFACE_INCLUDE_DIRECTORIES}")
+    message(STATUS "    - ${pcre_posix_INTERFACE_INCLUDE_DIRECTORIES}")
+    message(STATUS "")
 
 elseif(UNIX)
     # Unix (MacOS or Linux)
 
     if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
         # MacOS
+        message(STATUS "HOMEBREW_ROOT_PATH is ${HOMEBREW_ROOT_PATH}")
+
         execute_process(
-            COMMAND brew --prefix pcre
+            COMMAND ${HOMEBREW_ROOT_PATH}/bin/brew --prefix pcre
             RESULT_VARIABLE BREW_PCRE
             OUTPUT_VARIABLE BREW_PCRE_PREFIX
             OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -86,6 +88,12 @@ elseif(UNIX)
             set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${pcre_posix_INTERFACE_INCLUDE_DIRECTORIES})
 
             set(DEPENDENCIES ${DEPENDENCIES} pcre pcre_posix)
+
+            message(STATUS "")
+            message(STATUS "PCRE has been imported from ${BREW_PCRE_PREFIX} for architecture ${ARCHITECTURE}")
+            message(STATUS "    - ${pcre_INTERFACE_INCLUDE_DIRECTORIES}")
+            message(STATUS "    - ${pcre_posix_INTERFACE_INCLUDE_DIRECTORIES}")
+            message(STATUS "")
 
         else()
             message(STATUS "Unable to find PCRE in this machine for architecture ${ARCHITECTURE}")

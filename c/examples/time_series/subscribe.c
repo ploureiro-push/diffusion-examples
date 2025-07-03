@@ -65,7 +65,7 @@ static int on_value(
         read_diffusion_double_value(old_event_value, &old_value_double, NULL);
 
         old_value_string = calloc(20, sizeof(char));
-        sprintf(old_value_string, "%g", old_value_double);
+        snprintf(old_value_string, 20, "%g", old_value_double);
 
         diffusion_time_series_event_free(old_event);
         diffusion_value_free(old_event_value);
@@ -85,7 +85,7 @@ static int on_value(
         double new_value_double;
         read_diffusion_double_value(new_event_value, &new_value_double, NULL);
         new_value_string = calloc(20, sizeof(char));
-        sprintf(new_value_string, "%g", new_value_double);
+        snprintf(new_value_string, 20, "%g", new_value_double);
 
         diffusion_time_series_event_free(new_event);
         diffusion_value_free(new_event_value);

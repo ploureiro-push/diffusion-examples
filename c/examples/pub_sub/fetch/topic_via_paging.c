@@ -91,10 +91,10 @@ void run_example(
 
     for (int i = 1; i <= 25; i++) {
         char *topic_path = calloc(100, sizeof(char));
-        sprintf(topic_path, "my/topic/path/%d", i);
+        snprintf(topic_path, 100, "my/topic/path/%d", i);
 
         char *value = calloc(100, sizeof(char));
-        sprintf(value, "diffusion data #%d", i);
+        snprintf(value, 100, "diffusion data #%d", i);
 
         utils_create_string_topic(g_session, topic_path, value);
 

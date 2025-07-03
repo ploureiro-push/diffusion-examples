@@ -37,7 +37,7 @@ function(add_example FOLDER_PATH FILE_NAME COPY_RESOURCES)
             )
 
             foreach(FILE IN ITEMS ${WINDOWS_PATH})
-                message("Copying ${FILE} to ${LIB_PATH}")
+                message(STATUS "Copying ${FILE} to ${LIB_PATH}")
                 add_custom_command(
                     TARGET ${EXAMPLE_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FILE}" "${LIB_PATH}/"

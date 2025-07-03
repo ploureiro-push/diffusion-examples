@@ -28,18 +28,20 @@ if(WIN32)
 
     include_directories(${zlib_INCLUDE_DIRECTORIES})
 
-    message("")
-    message("ZLIB has been imported from ${ZLIB_ROOT_PATH}")
-    message("    - ${zlib_INCLUDE_DIRECTORIES}")
-    message("")
+    message(STATUS "")
+    message(STATUS "ZLIB has been imported from ${ZLIB_ROOT_PATH}")
+    message(STATUS "    - ${zlib_INCLUDE_DIRECTORIES}")
+    message(STATUS "")
 
 elseif(UNIX)
     # Unix (MacOS or Linux)
 
     if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
         # MacOS
+        message(STATUS "HOMEBREW_ROOT_PATH is ${HOMEBREW_ROOT_PATH}")
+
         execute_process(
-            COMMAND brew --prefix zlib
+            COMMAND ${HOMEBREW_ROOT_PATH}/bin/brew --prefix zlib
             RESULT_VARIABLE BREW_ZLIB
             OUTPUT_VARIABLE BREW_ZLIB_PREFIX
             OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -59,11 +61,16 @@ elseif(UNIX)
                 INTERFACE_INCLUDE_DIRECTORIES ${ZLIB_INCLUDE_PATH}
             )
 
-            get_target_property(ZLIB_INTERFACE_INCLUDE_DIRECTORIES zlib INTERFACE_INCLUDE_DIRECTORIES)
+            get_target_property(zlib_INTERFACE_INCLUDE_DIRECTORIES zlib INTERFACE_INCLUDE_DIRECTORIES)
 
-            set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${ZLIB_INTERFACE_INCLUDE_DIRECTORIES})
+            set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${zlib_INTERFACE_INCLUDE_DIRECTORIES})
 
             set(DEPENDENCIES ${DEPENDENCIES} zlib)
+
+            message(STATUS "")
+            message(STATUS "ZLIB has been imported from ${BREW_ZLIB_PREFIX} for architecture ${ARCHITECTURE}")
+            message(STATUS "    - ${zlib_INTERFACE_INCLUDE_DIRECTORIES}")
+            message(STATUS "")
 
         else()
             message(STATUS "Unable to find ZLIB in this machine for architecture ${ARCHITECTURE}")

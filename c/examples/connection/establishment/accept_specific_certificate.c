@@ -63,7 +63,7 @@ void run_example(
     char *target_folder_path = utils_path_to_folder(executable_folder_path, "target");
 
     char *certificate_relative_path = calloc(strlen(target_folder_path) + 40, sizeof(char));
-    sprintf(certificate_relative_path, "%s/resources/DiffusionData_CA.crt", target_folder_path);
+    snprintf(certificate_relative_path, strlen(target_folder_path) + 40, "%s/resources/DiffusionData_CA.crt", target_folder_path);
 
     // Define system environment variable indicating to accept a specific certificate
     OS_SETENV("DIFFUSION_TRUST_SELF_SIGNED_CERTS", "true");

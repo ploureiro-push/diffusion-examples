@@ -74,10 +74,10 @@ void run_example(
 
     for (int i = 1; i <= 5; i++) {
         char *json_topic_path = calloc(100, sizeof(char));
-        sprintf(json_topic_path, "my/topic/path/with/properties/%d", i);
+        snprintf(json_topic_path, 100, "my/topic/path/with/properties/%d", i);
 
         char *json_value = calloc(100, sizeof(char));
-        sprintf(json_value, "{\"diffusion\": \"data #%d\" }", i);
+        snprintf(json_value, 100, "{\"diffusion\": \"data #%d\" }", i);
 
         utils_create_json_topic_with_properties(
             session, json_topic_path, json_value, properties
@@ -87,10 +87,10 @@ void run_example(
         free(json_topic_path);
 
         char *string_topic_path = calloc(100, sizeof(char));
-        sprintf(string_topic_path, "my/topic/path/with/default/properties/%d", i);
+        snprintf(string_topic_path, 100, "my/topic/path/with/default/properties/%d", i);
 
         char *string_value = calloc(100, sizeof(char));
-        sprintf(string_value, "diffusion data #%d", i);
+        snprintf(string_value, 100, "diffusion data #%d", i);
 
         utils_create_string_topic(session, string_topic_path, string_value);
 

@@ -34,6 +34,7 @@ using PushTechnology.ClientInterface.Examples.PubSub.JSONPatch;
 using PushTechnology.ClientInterface.Examples.TimeSeries;
 using PushTechnology.ClientInterface.Examples.Security;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics;
+using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.MetricAlerts;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.SessionMetricCollector;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.TopicMetricCollector;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServers;
@@ -385,6 +386,15 @@ namespace PushTechnology.ClientInterface.Examples
 
                 // Start the get metrics console example
                 //runner.Start(new GetMetricsConsole(), url);
+
+                // Start the set metric alert example
+                //runner.Start(new SetMetricAlert(), url);
+
+                // Start the list metric alerts example
+                //runner.Start(new ListMetricAlerts(), url);
+
+                // Start the remove metric alert example
+                //runner.Start(new RemoveMetricAlert(), url);
 
                 // Start the isolate path example
                 //runner.Start(new IsolatePath(), url);

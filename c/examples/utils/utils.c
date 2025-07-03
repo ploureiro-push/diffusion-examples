@@ -1354,7 +1354,7 @@ char *utils_list_to_string(LIST_T *list)
             result = new_ptr;
         }
         char *prefix = ((used == 0) ? "" : " ");
-        sprintf(result + used, "%s%s", prefix, entry);
+        snprintf(result + used, current_size, "%s%s", prefix, entry);
         used += required;
     }
     result[used] = 0;

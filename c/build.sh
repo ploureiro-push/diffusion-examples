@@ -40,11 +40,16 @@ function build_for_unix() {
 
         if $is_macos ; then
             if [[ "$architecture" == "x86_64" ]]; then
-                /usr/local/bin/brew shellenv
+                homebrew_root_path="/usr/local"
+
 
             elif [[ "$architecture" == "arm64" ]]; then
-                /opt/homebrew/bin/brew shellenv
+                homebrew_root_path="/opt/homebrew"
             fi
+
+            eval "${homebrew_root_path}/bin/brew shellenv"
+        else
+            homebrew_root_path=""
         fi
 
         cmake --fresh \
@@ -54,7 +59,8 @@ function build_for_unix() {
             -DOPERATING_SYSTEM="$operating_system" \
             -DARCHITECTURE="$architecture" \
             -DARCHFLAGS="-arch ${architecture}" \
-            -DCMAKE_OSX_ARCHITECTURES="${architecture}"
+            -DCMAKE_OSX_ARCHITECTURES="${architecture}" \
+            -DHOMEBREW_ROOT_PATH="${homebrew_root_path}"
 
         cmake --build "$cmake_dir"
         set +x
