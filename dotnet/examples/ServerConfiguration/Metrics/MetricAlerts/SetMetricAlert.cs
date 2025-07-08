@@ -38,7 +38,7 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.Me
 
             WriteLine("Alert created");
 
-            await Task.Delay(3000);
+            await Task.Delay(5000);
 
             var fetchResult = await session.Topics.FetchRequest.WithValues<IJSON>().FetchAsync("my/topic/path", cancellationToken);
             

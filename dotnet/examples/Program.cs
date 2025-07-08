@@ -153,6 +153,9 @@ namespace PushTechnology.ClientInterface.Examples
                 // Start the add and set topic with and constraint example
                 //runner.Start(new AddAndSetTopicAnd(), url);
 
+                // Start the add and set topic with or constraint example
+                //runner.Start(new AddAndSetTopicOr(), url);
+
                 // Start the subscribe to single topic using topic path example
                 //runner.Start(new SubscribeToSingleTopicUsingTopicPath(), url);
 
