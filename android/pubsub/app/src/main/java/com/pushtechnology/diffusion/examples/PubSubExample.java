@@ -85,7 +85,8 @@ public class PubSubExample extends Activity {
             if (ex != null) {
                 Log.e("diffusion", "Failed to connect to Diffusion server, is it running? Will retry.", ex);
                 executor.schedule(this::startSession, 10, TimeUnit.SECONDS);
-            } else {
+            }
+            else {
                 example(session);
             }
         });
@@ -141,7 +142,7 @@ public class PubSubExample extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        TextView valueView = (TextView)findViewById(R.id.value);
+                        final TextView valueView = (TextView)findViewById(R.id.value);
                         valueView.setText(String.format(Locale.getDefault(),
                             "Subscribed to 'counter' topic: %d", newValue));
                     }
