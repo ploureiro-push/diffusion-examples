@@ -121,7 +121,7 @@ public class PubSubExample extends Activity {
         final AtomicLong i = new AtomicLong(0);
 
         // Schedule a recurring task that increments the counter and updates the topic.
-        executor.scheduleAtFixedRate(
+        executor.scheduleWithFixedDelay(
             () -> topics.set("counter", Long.class, i.getAndIncrement()),
             1, 1, TimeUnit.SECONDS);
 
