@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 27
     defaultConfig {
         multiDexEnabled true
         applicationId "com.pushtechnology.examples"
         minSdkVersion 19
-        targetSdkVersion 34
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
