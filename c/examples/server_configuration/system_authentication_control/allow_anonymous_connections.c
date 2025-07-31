@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_system_authentication_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -47,7 +47,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
@@ -57,14 +57,18 @@ void run_example(
     SCRIPT_T *script = script_create();
     update_auth_store_allow_anonymous_connections(script, list_anonymous_roles);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SYSTEM_AUTHENTICATION_STORE_PARAMS_T params = {
         .on_update = on_system_authentication_store_updated,
         .on_error = on_error,
-        .update_script = script
+        .update_script = script,
+        .context = coordinator
     };
 
     update_system_authentication_store(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     script_free(script);
     list_free(list_anonymous_roles, NULL);
 
@@ -76,5 +80,6 @@ void run_example(
 
     session_close(anonymous_session, NULL);
     session_free(anonymous_session);
-    MUTEX_TERMINATE
-}
+
+    coordinator_free(coordinator);
+    }

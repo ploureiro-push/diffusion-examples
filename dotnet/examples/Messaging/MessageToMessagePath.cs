@@ -49,9 +49,6 @@ namespace PushTechnology.ClientInterface.Examples.Messaging
                 path, "Hello", cancellationToken);
             WriteLine($"Received response: {response}.");
 
-            await Task.Delay(5000);
-
-            await registration.CloseAsync();
             session.Close();
             session2.Close();
         }

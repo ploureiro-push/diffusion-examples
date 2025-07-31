@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_topic_views_list_received(
     const LIST_T *topic_views,
@@ -47,14 +47,14 @@ static int on_topic_views_list_received(
         set_free(roles_set);
     }
 
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
 static int on_topic_view_removed(
         void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -72,7 +72,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/topic/path";
 
     SESSION_T *session = session_create(
@@ -97,28 +97,33 @@ void run_example(
         "map my/topic/path/array to views/<path(0)>"
     );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_TOPIC_VIEWS_LIST_PARAMS_T list_topic_views_params = {
-        .on_topic_views_list = on_topic_views_list_received
+        .on_topic_views_list = on_topic_views_list_received,
+        .context = coordinator
     };
 
     printf("Listing topic views before removal\n");
     diffusion_topic_views_list_topic_views(session, list_topic_views_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     DIFFUSION_REMOVE_TOPIC_VIEW_PARAMS_T remove_params = {
         .view = "topic_view_1",
         .on_topic_view_removed = on_topic_view_removed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     diffusion_topic_views_remove_topic_view(session, remove_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     printf("Listing topic views after removal\n");
     diffusion_topic_views_list_topic_views(session, list_topic_views_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
+
+    coordinator_free(coordinator);
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
-}
+    }

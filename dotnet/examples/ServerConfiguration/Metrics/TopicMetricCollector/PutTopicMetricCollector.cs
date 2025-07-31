@@ -40,14 +40,13 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.To
             builder = (ITopicMetricCollectorBuilder)builder.ExportsToPrometheus(false);
             builder = builder.GroupByTopicType(true);
             builder = builder.GroupByTopicView(true);
+            builder = builder.GroupByPathPrefixParts(15);
             builder = (ITopicMetricCollectorBuilder)builder.MaximumGroups(10);
             var collector = builder.Create("Topic Metric Collector 1", topicSelector);
 
             await session.Metrics.PutTopicMetricCollectorAsync(collector, cancellationToken);
 
             WriteLine($"Topic metric collector '{collector.Name}' added.");
-
-            await Task.Delay(5000);
 
             session.Close();
         }

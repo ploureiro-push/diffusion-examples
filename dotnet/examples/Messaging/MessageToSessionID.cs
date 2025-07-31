@@ -56,10 +56,6 @@ namespace PushTechnology.ClientInterface.Examples.Messaging
                 session.SessionId, path, "Hello", cancellationToken);
             WriteLine($"Received response: {response}.");
 
-            await Task.Delay(5000);
-
-            session.Messaging.RemoveRequestStream(path);
-            session2.Messaging.RemoveRequestStream(path);
             session.Close();
             session2.Close();
             session3.Close();

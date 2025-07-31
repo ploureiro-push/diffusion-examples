@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 SESSION_T *g_session;
 
 static int on_connected(
@@ -31,7 +31,7 @@ static int on_connected(
     char *sid = session_id_to_string(session->id);
     printf("Connected. Session Identifier: %s\n", sid);
     free(sid);
-    MUTEX_BROADCAST
+
     return HANDLER_SUCCESS;
 }
 
@@ -50,7 +50,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     SESSION_CREATE_CALLBACK_T *callbacks = calloc(1, sizeof(SESSION_CREATE_CALLBACK_T));
     callbacks->on_connected = &on_connected;
     callbacks->on_error = &on_error;
@@ -59,7 +59,9 @@ void run_example(
     session_create_async(
         url, principal, credentials, NULL, NULL, callbacks, &error
     );
-    MUTEX_WAIT
+
+    // Wait for session to connect
+    sleep(3);
 
     // Insert work here
 
@@ -67,5 +69,4 @@ void run_example(
     session_free(g_session);
 
     free(callbacks);
-    MUTEX_TERMINATE
-}
+    }

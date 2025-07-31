@@ -38,7 +38,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
             string topic = "my/topic/path";
 
             string json = "{\"diffusion\":\"data\"}";
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
             var constraint = Diffusion.UpdateConstraints.NoTopic;
             var result = await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), constraint, cancellationToken);
 
@@ -50,8 +50,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
             {
                 WriteLine("Topic already exists.");
             }
-
-            await Task.Delay(5000);
 
             session.Close();
         }

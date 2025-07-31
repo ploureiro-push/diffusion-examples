@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_security_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -47,7 +47,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
@@ -56,22 +56,25 @@ void run_example(
     SCRIPT_T *script = script_create();
     update_security_store_isolate_path(script, topic_path);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SECURITY_STORE_PARAMS_T params = {
         .on_update = on_security_store_updated,
         .on_error = on_error,
-        .update_script = script
+        .update_script = script,
+        .context = coordinator
     };
 
     printf("\nIsolating %s permissions from parent and default path permissions.\n", topic_path);
     utils_print_script(script);
 
     update_security_store(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
 
     session_close(session, NULL);
     session_free(session);
 
     script_free(script);
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
 }

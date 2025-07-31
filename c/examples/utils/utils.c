@@ -1,5 +1,4 @@
 #include "utils.h"
-#include "regexp9.h"
 
 
 static int on_topic_update_add_and_set(
@@ -12,7 +11,8 @@ static int on_topic_update_add_and_set(
     else if (result == TOPIC_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -27,7 +27,7 @@ static int on_topic_added_with_specification(
     else if (result_code == TOPIC_ADD_RESULT_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -56,7 +56,7 @@ static int on_topic_view_created(
     char *name = diffusion_topic_view_get_name(topic_view);
     printf("Topic view %s was created.\n", name);
     free(name);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -88,6 +88,7 @@ static int on_unsubscription(
     char *unsubscription_reason = hash_num_get(unsubscription_reason_map, reason);
 
     printf("Unsubscribed from %s due to %s.\n", topic_path, unsubscription_reason);
+    hash_num_free(unsubscription_reason_map, NULL);
     return HANDLER_SUCCESS;
 }
 
@@ -186,11 +187,11 @@ static int on_string_value(
 }
 
 static int on_subscribe(
-    SESSION_T*session,
+    SESSION_T *session,
     void *context)
 {
     printf("Subscription request received and approved by the server.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -201,7 +202,8 @@ static int on_remote_server_created(
 {
     char *name = diffusion_remote_server_get_name(remote_server);
     printf("Remote server %s created.\n", name);
-    MUTEX_BROADCAST
+    free(name);
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -234,17 +236,17 @@ static int on_fetch_result_topic_properties(
             }
             free(keys);
         }
-        hash_free(properties, NULL, NULL);
+        hash_free(properties, free, free);
     }
     list_free(results, (void (*)(void *))diffusion_topic_result_free);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
 static int on_topic_update(
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -253,7 +255,7 @@ static int on_topic_removed(
     const DIFFUSION_TOPIC_REMOVAL_RESULT_T *response,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -284,7 +286,7 @@ static int on_range_query_result_int64(
 
         diffusion_value_free(value);
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     list_free(events, (void (*)(void *))diffusion_time_series_event_free);
     return HANDLER_SUCCESS;
 }
@@ -292,7 +294,7 @@ static int on_range_query_result_int64(
 static int on_branch_mapping_table_set(
         void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -301,26 +303,29 @@ static int on_session_properties(
     const SVC_GET_SESSION_PROPERTIES_RESPONSE_T *response,
     void *context)
 {
-    if (context != NULL)
+    COORDINATOR_T *coordinator = (COORDINATOR_T *) context;
+
+    if (coordinator->value != NULL)
     {
         printf(
             "Printing session properties that match '%s' pattern:\n",
-            (char *) context
+            (char *) coordinator->value
         );
     }
     else {
         printf("Received the following session properties:\n");
     }
     utils_print_hash(
-        response->properties, context, utils_print_string
+        response->properties, coordinator->value, utils_print_string, false
     );
-    MUTEX_BROADCAST
+
+    coordinator_broadcast(coordinator);
     return HANDLER_SUCCESS;
 }
 
 static int on_collector_removed(void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -329,55 +334,62 @@ static int on_get_security_store(
     const SECURITY_STORE_T store,
     void *context)
 {
-    if (context != NULL) {
-        SECURITY_STORE_T **store_ptr = (SECURITY_STORE_T **) context;
-        *store_ptr = security_store_dup(&store);
-    }
-    MUTEX_BROADCAST
+    COORDINATOR_T *coordinator = (COORDINATOR_T *)context;
+
+    SECURITY_STORE_T *store_copy = security_store_dup(&store);
+    coordinator->response = store_copy;
+
+    coordinator_broadcast(coordinator);
     return HANDLER_SUCCESS;
 }
 
 static int on_topic_view_removed(
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
 static int on_remote_server_removed(void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
-
 
 static int on_lock_released(
     bool lock_owned,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
-
 
 static int on_security_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
-
 
 static int on_system_authentication_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
+
+static int on_json_patch_result(
+    const DIFFUSION_JSON_PATCH_RESULT_T *result,
+    void *context)
+{
+    coordinator_broadcast((COORDINATOR_T *) context);
+    return HANDLER_SUCCESS;
+}
+
 
 SESSION_T *utils_open_session(
     const char *url,
@@ -405,14 +417,18 @@ void utils_remove_topic(
     SESSION_T *session,
     const char *topic_selector)
 {
+    COORDINATOR_T *coordinator = coordinator_init();
+
     TOPIC_REMOVAL_PARAMS_T remove_params = {
         .topic_selector = topic_selector,
         .on_removed = on_topic_removed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     topic_removal(session, remove_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+    coordinator_free(coordinator);
 }
 
 void utils_create_topic_with_properties(
@@ -424,6 +440,8 @@ void utils_create_topic_with_properties(
     HASH_T *properties)
 {
     printf("Creating %s\n", topic_path);
+
+    COORDINATOR_T *coordinator = coordinator_init();
 
     TOPIC_SPECIFICATION_T *topic_specification =
         (properties == NULL)
@@ -438,7 +456,8 @@ void utils_create_topic_with_properties(
             .topic_path = topic_path,
             .specification = topic_specification,
             .update = value,
-            .on_error = on_error
+            .on_error = on_error,
+            .context = coordinator
         };
         diffusion_topic_update_add_and_set(session, add_and_set_params);
     }
@@ -446,13 +465,16 @@ void utils_create_topic_with_properties(
         // Add only
         ADD_TOPIC_CALLBACK_T callback = {
             .on_topic_added_with_specification = on_topic_added_with_specification,
-            .on_topic_add_failed_with_specification = on_topic_add_failed_with_specification
+            .on_topic_add_failed_with_specification = on_topic_add_failed_with_specification,
+            .context = coordinator
         };
         add_topic_from_specification(
             session, topic_path, topic_specification, callback
         );
     }
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
     topic_specification_free(topic_specification);
 }
 
@@ -463,16 +485,33 @@ void utils_set_topic_value(
     DIFFUSION_DATATYPE datatype,
     BUF_T *value)
 {
-     DIFFUSION_TOPIC_UPDATE_SET_PARAMS_T params = {
+    COORDINATOR_T *coordinator = coordinator_init();
+    DIFFUSION_TOPIC_UPDATE_SET_PARAMS_T params = {
         .datatype = datatype,
         .on_topic_update = on_topic_update,
         .topic_path = topic_path,
         .update = value,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_topic_update_set(session, params);
-    MUTEX_WAIT
+
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
+}
+
+void utils_create_json_topic_with_topic_removal_policy(
+    SESSION_T *session,
+    const char *topic_path,
+    const char *topic_removal_policy)
+{
+    HASH_T *properties = hash_new(3);
+    hash_add(properties, DIFFUSION_REMOVAL, topic_removal_policy);
+
+    utils_create_json_topic_with_properties(session, topic_path, NULL, properties);
+    hash_free(properties, NULL, NULL);
 }
 
 
@@ -482,8 +521,11 @@ void utils_create_json_topic_with_properties(
     const char *json_string,
     HASH_T *properties)
 {
-    BUF_T *value = buf_create();
-    write_diffusion_json_value(json_string, value);
+    BUF_T *value = NULL;
+    if (json_string != NULL) {
+        value = buf_create();
+        write_diffusion_json_value(json_string, value);
+    }
 
     utils_create_topic_with_properties(
         session, topic_path, TOPIC_TYPE_JSON, DATATYPE_JSON, value, properties
@@ -581,14 +623,19 @@ void utils_create_topic_view(
     const char *name,
     const char *specification)
 {
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_CREATE_TOPIC_VIEW_PARAMS_T create_topic_view_params = {
         .view = name,
         .specification = specification,
         .on_topic_view_created = on_topic_view_created,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     diffusion_topic_views_create_topic_view(session, create_topic_view_params, NULL);
-    MUTEX_WAIT
+
+    coordinator_wait(coordinator);
+    coordinator_free(coordinator);
 }
 
 
@@ -611,6 +658,8 @@ void utils_create_remote_server(
     diffusion_remote_server_builder_credentials(builder, credentials);
     diffusion_remote_server_builder_connection_options(builder, connection_options);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_REMOTE_SERVER_T *remote_server =
         diffusion_remote_server_builder_create_secondary_initiator(
             builder, name, url, NULL
@@ -619,10 +668,14 @@ void utils_create_remote_server(
     DIFFUSION_CREATE_REMOTE_SERVER_PARAMS_T params = {
         .remote_server = remote_server,
         .on_remote_server_created = on_remote_server_created,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     diffusion_create_remote_server(session, params, NULL);
-    MUTEX_WAIT
+
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
     credentials_free(credentials);
     diffusion_remote_server_free(remote_server);
     diffusion_remote_server_builder_free(builder);
@@ -670,13 +723,17 @@ VALUE_STREAM_T *utils_subscribe(
         return  NULL;
     }
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     SUBSCRIPTION_PARAMS_T params = {
         .topic_selector = topic_selector,
-        .on_subscribe = on_subscribe
+        .on_subscribe = on_subscribe,
+        .context = coordinator
     };
-
     subscribe(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
     return value_stream;
 }
 
@@ -688,14 +745,19 @@ void utils_get_topic_properties(
     DIFFUSION_FETCH_REQUEST_T *fetch_request = diffusion_fetch_request_init(session);
     diffusion_fetch_request_with_properties(fetch_request, NULL);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_FETCH_REQUEST_PARAMS_T fetch_request_params = {
         .topic_selector = topic_selector,
         .fetch_request = fetch_request,
-        .on_fetch_result = on_fetch_result_topic_properties
+        .on_fetch_result = on_fetch_result_topic_properties,
+        .context = coordinator
     };
 
     diffusion_fetch_request_fetch(session, fetch_request_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
     diffusion_fetch_request_free(fetch_request);
 }
 
@@ -708,14 +770,19 @@ void utils_time_series_range_query_int64(
         diffusion_time_series_range_query();
     diffusion_time_series_range_query_for_values(range_query, NULL);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_TIME_SERIES_RANGE_QUERY_PARAMS_T query_params = {
         .topic_path = topic_path,
         .range_query = range_query,
-        .on_query_result = on_range_query_result_int64
+        .on_query_result = on_range_query_result_int64,
+        .context = coordinator
     };
 
     diffusion_time_series_select_from(session, query_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
     diffusion_time_series_range_query_free(range_query);
 }
 
@@ -743,15 +810,19 @@ void utils_build_branch_mapping_table(
             builder, (char *) topic_path
         );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_SESSION_TREES_PUT_BRANCH_MAPPING_TABLE_PARAMS_T params = {
         .on_table_set = on_branch_mapping_table_set,
         .on_error = on_error,
-        .table = table
+        .table = table,
+        .context = coordinator
     };
 
     diffusion_session_trees_put_branch_mapping_table(session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
+    coordinator_free(coordinator);
     diffusion_branch_mapping_table_free(table);
     diffusion_branch_mapping_table_builder_free(builder);
 }
@@ -774,20 +845,23 @@ void utils_print_session_properties(
     set_add(required_properties, PROPERTIES_SELECTOR_ALL_FIXED_PROPERTIES);
     set_add(required_properties, PROPERTIES_SELECTOR_ALL_USER_PROPERTIES);
 
-    char *regex_copy = (properties_regex == NULL) ? NULL : strdup(properties_regex);
+    COORDINATOR_T *coordinator = coordinator_init();
+    coordinator->value = (properties_regex == NULL) ? NULL : strdup(properties_regex);
 
     GET_SESSION_PROPERTIES_PARAMS_T get_session_properties_params = {
         .on_session_properties = on_session_properties,
         .on_error = on_error,
         .session_id = session_id,
         .required_properties = required_properties,
-        .context = regex_copy
+        .context = coordinator
     };
-
     get_session_properties(session, get_session_properties_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     set_free(required_properties);
-    free(regex_copy);
+
+    free(coordinator->value);
+    coordinator_free(coordinator);
 }
 
 
@@ -797,15 +871,19 @@ void utils_remove_session_metric_collector(
 {
     char *name_copy = strdup(name);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_METRICS_REMOVE_SESSION_METRIC_COLLECTOR_PARAMS_T remove_params = {
         .collector_name = name_copy,
         .on_collector_removed = on_collector_removed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_metrics_remove_session_metric_collector(session, remove_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
+    coordinator_free(coordinator);
     free(name_copy);
 }
 
@@ -816,15 +894,19 @@ void utils_remove_topic_metric_collector(
 {
     char *name_copy = strdup(name);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_METRICS_REMOVE_TOPIC_METRIC_COLLECTOR_PARAMS_T remove_params = {
         .collector_name = name_copy,
         .on_collector_removed = on_collector_removed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_metrics_remove_topic_metric_collector(session, remove_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
+    coordinator_free(coordinator);
     free(name_copy);
 }
 
@@ -832,16 +914,20 @@ void utils_remove_topic_metric_collector(
 SECURITY_STORE_T *utils_get_security_store(
     SESSION_T *session)
 {
-    SECURITY_STORE_T *store;
+    COORDINATOR_T *coordinator = coordinator_init();
 
     const GET_SECURITY_STORE_PARAMS_T params = {
         .on_get = on_get_security_store,
         .on_error = on_error,
-        .context = &store
+        .context = coordinator
     };
 
     get_security_store(session, params);
-    MUTEX_WAIT
+
+    coordinator_wait(coordinator);
+
+    SECURITY_STORE_T *store = coordinator->response;
+    coordinator_free(coordinator);
 
     return store;
 }
@@ -980,14 +1066,19 @@ void utils_remove_topic_view(
     SESSION_T *session,
     const char *topic_view_name)
 {
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_REMOVE_TOPIC_VIEW_PARAMS_T remove_params = {
         .view = topic_view_name,
         .on_topic_view_removed = on_topic_view_removed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_topic_views_remove_topic_view(session, remove_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
 }
 
 
@@ -995,41 +1086,56 @@ void utils_remove_remote_server(
     SESSION_T *session,
     const char *remote_server_name)
 {
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_REMOVE_REMOTE_SERVER_PARAMS_T params = {
         .name = (char *) remote_server_name,
         .on_remote_server_removed = on_remote_server_removed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_remove_remote_server(session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
 }
 
 void utils_release_lock(
     SESSION_T *session,
     DIFFUSION_SESSION_LOCK_T *lock)
 {
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_SESSION_LOCK_UNLOCK_PARAMS_T unlock_params = {
         .on_unlock = on_lock_released,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_session_lock_unlock(session, lock, unlock_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
 }
 
 void utils_update_security_store(
     SESSION_T *session,
     SCRIPT_T *script)
 {
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SECURITY_STORE_PARAMS_T params = {
         .on_update = on_security_store_updated,
         .on_error = on_error,
-        .update_script = script
+        .update_script = script,
+        .context = coordinator
     };
 
     update_security_store(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
 }
 
 
@@ -1037,15 +1143,42 @@ void utils_update_system_authentication_store(
     SESSION_T *session,
     SCRIPT_T *script)
 {
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SYSTEM_AUTHENTICATION_STORE_PARAMS_T params = {
         .on_update = on_system_authentication_store_updated,
         .on_error = on_error,
-        .update_script = script
+        .update_script = script,
+        .context = coordinator
     };
 
     update_system_authentication_store(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
 }
+
+
+void utils_apply_json_patch(
+    SESSION_T *session,
+    char *topic_path,
+    char *patch)
+{
+    COORDINATOR_T *coordinator = coordinator_init();
+
+    DIFFUSION_APPLY_JSON_PATCH_PARAMS_T patch_params = {
+        .topic_path = topic_path,
+        .patch = patch,
+        .on_json_patch_result = on_json_patch_result,
+        .context = coordinator
+    };
+
+    diffusion_apply_json_patch(session, patch_params, NULL);
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
+}
+
 
 double utils_random_double(void)
 {
@@ -1058,16 +1191,18 @@ double utils_random_double(void)
 
 const char *utils_print_global_permission(void *value)
 {
-    uint32_t *ptr = (uint32_t *) value;
-    GLOBAL_PERMISSIONS_T permission = *ptr;
-    return SECURITY_GLOBAL_PERMISSIONS_NAMES[permission];
+    if (value == NULL) {
+        return "Unknown value";
+    }
+    return SECURITY_GLOBAL_PERMISSIONS_NAMES[*((uint32_t *)value)];
 }
 
 const char *utils_print_path_permission(void *value)
 {
-    uint32_t *ptr = (uint32_t *) value;
-    PATH_PERMISSIONS_T permission = *ptr;
-    return SECURITY_PATH_PERMISSIONS_NAMES[permission];
+    if (value == NULL) {
+        return "Unknown value";
+    }
+    return SECURITY_PATH_PERMISSIONS_NAMES[*((uint32_t *)value)];
 }
 
 const char *utils_print_string(void *value)
@@ -1087,9 +1222,11 @@ LIST_T *utils_set_to_list(
     SET_T *set)
 {
     LIST_T *result = list_create();
-    for (void **entry = set_values(set); *entry != NULL; entry++ ) {
+    void *entries = set_values(set);
+    for (void **entry = entries; *entry != NULL; entry++ ) {
         list_append_last(result, *entry);
     }
+    free(entries);
     return result;
 }
 
@@ -1101,23 +1238,18 @@ char *utils_set_to_string(
     if (set == NULL) {
         return NULL;
     }
-    size_t current_size = set->size * 10;
-    size_t used = 0;
-    char *result = calloc(current_size, sizeof(char));
-    for (void **entry = set_values(set); *entry != NULL; entry++ ) {
+    BUF_T *buffer = buf_create();
+    void *entries = set_values(set);
+    for (void **entry = entries; *entry != NULL; entry++ ) {
         const char *entry_string = print_function(*entry);
-        size_t remaining = current_size - used - 1;
-        size_t required = strlen(entry_string) + ((used > 0) ? 1 : 0);
-        if (remaining < required ) {
-            // not enough space, realloc string
-            current_size += required;
-            result = realloc(result, current_size);
-        }
-        char *prefix = ((used == 0) ? "" : " ");
-        sprintf(result + used, "%s%s", prefix, entry_string);
-        used += required;
+        char *prefix = ((buffer->len == 0) ? "" : " ");
+        buf_sprintf(buffer, "%s%s", prefix, entry_string);
     }
-    result[used] = 0;
+    free(entries);
+
+    char *result = buf_as_string(buffer);
+    buf_free(buffer);
+
     return result;
 }
 
@@ -1159,7 +1291,7 @@ void utils_print_security_roles(
 
         printf("\t\tPath Permissions:\n");
         utils_print_hash(
-            role->path_permissions, NULL, utils_print_path_permission_set
+            role->path_permissions, NULL, utils_print_path_permission_set, true
         );
 
         printf("\t\tLocking Principal: %s\n", role->locking_principal);
@@ -1170,14 +1302,18 @@ void utils_print_security_roles(
 void utils_print_hash(
     HASH_T *hash,
     const char *pattern,
-    print_fn print_function)
+    print_fn print_function,
+    bool free_value_string)
 {
     char **keys = hash_keys(hash);
     for(char **ptr = keys; *ptr != NULL; ptr++) {
-        if (pattern == NULL || utils_string_matches_regex(pattern, *ptr)) {
+        if (pattern == NULL || strncmp(*ptr, pattern, strlen(pattern)) == 0) {
             void *value = hash_get(hash, *ptr);
-            const char *value_string = print_function(value);
+            char *value_string = (char *) print_function(value);
             printf("\t%s: %s\n", *ptr, value_string);
+            if (free_value_string) {
+                free(value_string);
+            }
         }
     }
     free(keys);
@@ -1194,16 +1330,6 @@ bool utils_string_starts_with(
 }
 
 
-bool utils_string_matches_regex(
-    const char *pattern,
-    const char *string)
-{
-    Resub rs[1];
-    Reprog *p = regcomp9((char *) pattern);
-    memset(rs, 0, sizeof(Resub));
-    return regexec9(p, (char *) string, rs, 1);
-}
-
 char *utils_list_to_string(LIST_T *list)
 {
     if (list == NULL) {
@@ -1212,7 +1338,7 @@ char *utils_list_to_string(LIST_T *list)
     int list_size = list_get_size(list);
     size_t current_size = list_size * 10;
     size_t used = 0;
-    char *result = calloc(current_size, sizeof(char));
+    char *result = calloc(current_size + 1, sizeof(char));
     for (int i = 0; i < list_size; i++) {
         char *entry = list_get_data_indexed(list, i);
         size_t remaining = current_size - used - 1;
@@ -1221,9 +1347,14 @@ char *utils_list_to_string(LIST_T *list)
             // not enough space, realloc string
             current_size += required;
             result = realloc(result, current_size);
+            char *new_ptr = realloc(result, current_size);
+            if (new_ptr == NULL) {
+                LOG("realloc failed to acquire memory");
+            }
+            result = new_ptr;
         }
         char *prefix = ((used == 0) ? "" : " ");
-        sprintf(result + used, "%s%s", prefix, entry);
+        snprintf(result + used, current_size, "%s%s", prefix, entry);
         used += required;
     }
     result[used] = 0;
@@ -1272,3 +1403,4 @@ char *utils_path_to_folder(
     }
     return result;
 }
+

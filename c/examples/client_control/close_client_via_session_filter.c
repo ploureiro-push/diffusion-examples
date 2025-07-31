@@ -21,13 +21,13 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_clients_closed(
     int selected,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -57,7 +57,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *admin_session = utils_open_session(url, "admin", "password");
 
@@ -72,22 +72,27 @@ void run_example(
         url, "client", client_credentials, &session_listener, NULL, NULL
     );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_CLIENT_CLOSE_WITH_FILTER_PARAMS_T params = {
         .filter = "$Principal is 'client'",
         .on_clients_closed = on_clients_closed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_client_close_with_filter(admin_session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     // Sleep for a bit to see the notifications
     sleep(2);
 
+    // session_close(client_session, NULL);
     session_free(client_session);
     credentials_free(client_credentials);
 
     session_close(admin_session, NULL);
     session_free(admin_session);
-    MUTEX_TERMINATE
+
+    coordinator_free(coordinator);
 }

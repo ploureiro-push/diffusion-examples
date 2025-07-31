@@ -68,8 +68,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.Se
                     $"{string.Join(",", sessionMetricCollector.GroupByProperties)})");
             }
 
-            await Task.Delay(5000);
-
             session.Close();
         }
 

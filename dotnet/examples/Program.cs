@@ -1,5 +1,5 @@
 ﻿/**
-* Copyright © 2023 - 2024 Diffusion Data Ltd.
+* Copyright © 2023 - 2025 Diffusion Data Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ using System.Threading;
 
 using PushTechnology.ClientInterface.Examples.Connection.Establishment;
 using PushTechnology.ClientInterface.Examples.Connection.Resilience;
-using PushTechnology.ClientInterface.Examples.MappingAndWrangling.TopicViews.API;
-using PushTechnology.ClientInterface.Examples.MappingAndWrangling.SessionTrees;
+using PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.API;
+using PushTechnology.ClientInterface.Examples.Wrangling.SessionTrees;
 using PushTechnology.ClientInterface.Examples.Messaging;
 using PushTechnology.ClientInterface.Examples.Monitoring;
 using PushTechnology.ClientInterface.Examples.Ping;
@@ -30,18 +30,19 @@ using PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics;
 using PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithConstraint;
 using PushTechnology.ClientInterface.Examples.PubSub.RemovingTopics;
 using PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics;
+using PushTechnology.ClientInterface.Examples.PubSub.JSONPatch;
 using PushTechnology.ClientInterface.Examples.TimeSeries;
 using PushTechnology.ClientInterface.Examples.Security;
+using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics;
+using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.MetricAlerts;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.SessionMetricCollector;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.TopicMetricCollector;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServers;
-using PushTechnology.ClientInterface.Examples.ServerConfiguration;
+using PushTechnology.ClientInterface.Examples.ServerConfiguration.SystemAuthenticationControl;
 using PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityControl;
 using PushTechnology.ClientInterface.Examples.SessionManagement;
 using PushTechnology.ClientInterface.Examples.SessionManagement.ClientControl;
-using PushTechnology.ClientInterface.Examples.MappingAndWrangling.TopicViews.DSL;
-using NUnit.Framework;
-
+using PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL;
 
 namespace PushTechnology.ClientInterface.Examples
 {
@@ -63,331 +64,424 @@ namespace PushTechnology.ClientInterface.Examples
             using (var runner = new ExampleRunner())
             {
                 // Start the connect synchronously example
-                runner.Start(new ConnectSynchronously(), url);
+                //runner.Start(new ConnectSynchronously(), url);
+
+                // Start the connect synchronously without URL example
+                //runner.Start(new ConnectSynchronouslyWithoutURL(), url);
+
+                // Start the connect asynchronously example
+                //runner.Start(new ConnectAsynchronously(), url);
+
+                // Start the connect asynchronously without URL example
+                //runner.Start(new ConnectAsynchronouslyWithoutURL(), url);
+
+                // Start the connect using a session factory example
+                //runner.Start(new ConnectUsingASessionFactory(), url);
 
                 // Start the connect securely example
-                runner.Start(new ConnectSecurelyAcceptingAllServerCertificates(), secureUrl);
+                //runner.Start(new ConnectSecurelyAcceptingAllServerCertificates(), secureUrl);
 
                 // Start the session state listener example
-                runner.Start(new SessionStateListener(), url);
+                //runner.Start(new SessionStateListener(), url);
 
                 // Start the reconnection strategy example
-                runner.Start(new ReconnectionStrategy(), url);
+                //runner.Start(new ReconnectionStrategy(), url);
 
                 // Start the initial session establishment retry mechanism example
-                runner.Start(new InitialSessionEstablishmentRetryMechanism(), url);
+                //runner.Start(new InitialSessionEstablishmentRetryMechanism(), url);
 
                 // Start the ping server example
-                runner.Start(new PingServer(), url);
+                //runner.Start(new PingServer(), url);
 
-                // Start the change principal example
-                runner.Start(new ChangePrincipal(), url);
+                // Start the reauthenticate example
+                //runner.Start(new Reauthenticate(), url);
 
                 // Start the get global permissions example
-                runner.Start(new GetGlobalPermissions(), url);
+                //runner.Start(new GetGlobalPermissions(), url);
 
                 // Start the get path permissions example
-                runner.Start(new GetPathPermissions(), url);
+                //runner.Start(new GetPathPermissions(), url);
 
                 // Start the add topic example
-                runner.Start(new AddTopic(), url);
+                //runner.Start(new AddTopic(), url);
 
                 // Start the add topic with custom topic properties example
-                runner.Start(new AddTopicWithCustomTopicProperties(), url);
+                //runner.Start(new AddTopicWithCustomTopicProperties(), url);
 
                 // Start the add and set topic example
-                runner.Start(new AddAndSetTopic(), url);
+                //runner.Start(new AddAndSetTopic(), url);
 
                 // Start the set topic example
-                runner.Start(new SetTopic(), url);
+                //runner.Start(new SetTopic(), url);
 
                 // Start the add and set topic using update stream example
-                runner.Start(new AddAndSetTopicUsingUpdateStream(), url);
+                //runner.Start(new AddAndSetTopicUsingUpdateStream(), url);
 
                 // Start the set topic using update stream example
-                runner.Start(new SetTopicUsingUpdateStream(), url);
+                //runner.Start(new SetTopicUsingUpdateStream(), url);
 
                 // Start the add and set topic with no topic constraint example
-                runner.Start(new AddAndSetTopicNoTopic(), url);
+                //runner.Start(new AddAndSetTopicNoTopic(), url);
 
                 // Start the add and set topic with session lock constraint example
-                runner.Start(new AddAndSetTopicSessionLock(), url);
+                //runner.Start(new AddAndSetTopicSessionLock(), url);
 
                 // Start the add and set topic with value constraint example
-                runner.Start(new AddAndSetTopicValue(), url);
+                //runner.Start(new AddAndSetTopicValue(), url);
 
                 // Start the add and set topic with JSON value with constraint example
-                runner.Start(new AddAndSetTopicJSONValueWith(), url);
+                //runner.Start(new AddAndSetTopicJSONValueWith(), url);
 
                 // Start the add and set topic with JSON value without constraint example
-                runner.Start(new AddAndSetTopicJSONValueWithout(), url);
+                //runner.Start(new AddAndSetTopicJSONValueWithout(), url);
 
                 // Start the set topic with no value constraint example
-                runner.Start(new SetTopicNoValue(), url);
+                //runner.Start(new SetTopicNoValue(), url);
 
                 // Start the set topic with session lock constraint example
-                runner.Start(new SetTopicSessionLock(), url);
+                //runner.Start(new SetTopicSessionLock(), url);
 
                 // Start the set topic with value constraint example
-                runner.Start(new SetTopicValue(), url);
+                //runner.Start(new SetTopicValue(), url);
 
                 // Start the set topic with JSON value with constraint example
-                runner.Start(new SetTopicJSONValueWith(), url);
+                //runner.Start(new SetTopicJSONValueWith(), url);
 
                 // Start the set topic with JSON value without constraint example
-                runner.Start(new SetTopicJSONValueWithout(), url);
+                //runner.Start(new SetTopicJSONValueWithout(), url);
+
+                // Start the add and set topic with and constraint example
+                //runner.Start(new AddAndSetTopicAnd(), url);
+
+                // Start the add and set topic with or constraint example
+                //runner.Start(new AddAndSetTopicOr(), url);
 
                 // Start the subscribe to single topic using topic path example
-                runner.Start(new SubscribeToSingleTopicUsingTopicPath(), url);
+                //runner.Start(new SubscribeToSingleTopicUsingTopicPath(), url);
 
                 // Start the subscribe to multiple topics using topic selector example
-                runner.Start(new SubscribeToMultipleTopicsUsingTopicSelector(), url);
+                //runner.Start(new SubscribeToMultipleTopicsUsingTopicSelector(), url);
 
                 // Start the subscribe using fallback streams example
-                runner.Start(new SubscribeUsingFallbackStreams(), url);
+                //runner.Start(new SubscribeUsingFallbackStreams(), url);
 
                 // Start the subscribe with cross compatible value stream example
-                runner.Start(new SubscribeWithCrossCompatibleValueStream(), url);
+                //runner.Start(new SubscribeWithCrossCompatibleValueStream(), url);
+
+                // Start the subscribe using selection scopes example
+                //runner.Start(new SubscribeUsingSelectionScopes(), url);
 
                 // Start the removing a single topic using topic path example
-                runner.Start(new RemovingASingleTopicUsingTopicPath(), url);
+                //runner.Start(new RemovingASingleTopicUsingTopicPath(), url);
 
                 // Start the removing multiple topics using a topic selector example
-                runner.Start(new RemovingMultipleTopicsUsingATopicSelector(), url);
+                //runner.Start(new RemovingMultipleTopicsUsingATopicSelector(), url);
+
+                // Start the removing topics with automatic topic removal example
+                //runner.Start(new RemovingTopicsWithAutomaticTopicRemoval(), url);
 
                 // Start the fetch topic properties example
-                runner.Start(new FetchTopicProperties(), url);
+                //runner.Start(new FetchTopicProperties(), url);
 
                 // Start the fetch multiple topics by iterating through paging example
-                runner.Start(new FetchMultipleTopicsByIteratingThroughPaging(), url);
+                //runner.Start(new FetchMultipleTopicsByIteratingThroughPaging(), url);
+
+                // Start the json patch add example
+                //runner.Start(new JSONPatchAdd(), url);
+
+                // Start the json patch copy example
+                //runner.Start(new JSONPatchCopy(), url);
+
+                // Start the json patch move example
+                //runner.Start(new JSONPatchMove(), url);
+
+                // Start the json patch remove example
+                //runner.Start(new JSONPatchRemove(), url);
+
+                // Start the json patch replace example
+                //runner.Start(new JSONPatchReplace(), url);
+
+                // Start the json patch test example
+                //runner.Start(new JSONPatchTest(), url);
 
                 // Start the create timeSeries topic example
-                runner.Start(new CreateTimeSeriesTopic(), url);
+                //runner.Start(new CreateTimeSeriesTopic(), url);
 
                 // Start the append to timeSeries topic example
-                runner.Start(new AppendToTimeSeriesTopic(), url);
+                //runner.Start(new AppendToTimeSeriesTopic(), url);
 
                 // Start the subscribe to timeSeries topics example
-                runner.Start(new SubscribeToTimeSeriesTopics(), url);
+                //runner.Start(new SubscribeToTimeSeriesTopics(), url);
 
                 // Start the append to timeSeries topic with user supplied timestamp example
-                runner.Start(new AppendToTimeSeriesTopicWithUserSuppliedTimestamp(), url);
+                //runner.Start(new AppendToTimeSeriesTopicWithUserSuppliedTimestamp(), url);
 
                 // Start the append to timeSeries topic via update stream example
-                runner.Start(new AppendToTimeSeriesTopicViaUpdateStream(), url);
+                //runner.Start(new AppendToTimeSeriesTopicViaUpdateStream(), url);
 
                 // Start the edit timeSeries topic example
-                runner.Start(new EditTimeSeriesTopic(), url);
+                //runner.Start(new EditTimeSeriesTopic(), url);
 
                 // Start the range query a timeSeries topic example
-                runner.Start(new RangeQueryATimeSeriesTopic(), url);
+                //runner.Start(new RangeQueryATimeSeriesTopic(), url);
 
                 // Start the timeSeries cross compatible datatypes example
-                runner.Start(new TimeSeriesCrossCompatibleDatatypes(), url);
+                //runner.Start(new TimeSeriesCrossCompatibleDatatypes(), url);
 
                 // Start the message to messagePath example
-                runner.Start(new MessageToMessagePath(), url);
+                //runner.Start(new MessageToMessagePath(), url);
 
                 // Start the message to session ID example
-                runner.Start(new MessageToSessionID(), url);
+                //runner.Start(new MessageToSessionID(), url);
 
                 // Start the message to session filter example
-                runner.Start(new MessageToSessionFilter(), url);
+                //runner.Start(new MessageToSessionFilter(), url);
 
                 // Start the add topic view example
-                runner.Start(new AddTopicView(), url);
+                //runner.Start(new AddTopicView(), url);
 
                 // Start the list topic views example
-                runner.Start(new ListTopicViews(), url);
+                //runner.Start(new ListTopicViews(), url);
 
                 // Start the remove topic views example
-                runner.Start(new RemoveTopicViews(), url);
+                //runner.Start(new RemoveTopicViews(), url);
 
                 // Start the source path directive example
-                runner.Start(new SourcePathDirective(), url);
+                //runner.Start(new SourcePathDirective(), url);
 
                 // Start the remote topic views example
-                runner.Start(new RemoteTopicViews(), url);
+                //runner.Start(new RemoteTopicViews(), url);
 
                 // Start the scalar directive example
-                runner.Start(new ScalarDirective(), url);
+                //runner.Start(new ScalarDirective(), url);
 
                 // Start the expand value example
-                runner.Start(new ExpandValue(), url);
+                //runner.Start(new ExpandValue(), url);
 
                 // Start the process transformations set example
-                runner.Start(new ProcessTransformationsSet(), url);
+                //runner.Start(new ProcessTransformationsSet(), url);
 
                 // Start the process transformations remove example
-                runner.Start(new ProcessTransformationsRemove(), url);
+                //runner.Start(new ProcessTransformationsRemove(), url);
 
                 // Start the process transformations continue example
-                runner.Start(new ProcessTransformationsContinue(), url);
+                //runner.Start(new ProcessTransformationsContinue(), url);
 
                 // Start the patch transformations add example
-                runner.Start(new PatchTransformationsAdd(), url);
+                //runner.Start(new PatchTransformationsAdd(), url);
 
                 // Start the patch transformations remove example
-                runner.Start(new PatchTransformationsRemove(), url);
+                //runner.Start(new PatchTransformationsRemove(), url);
 
                 // Start the patch transformations replace example
-                runner.Start(new PatchTransformationsReplace(), url);
+                //runner.Start(new PatchTransformationsReplace(), url);
 
                 // Start the patch transformations move example
-                runner.Start(new PatchTransformationsMove(), url);
+                //runner.Start(new PatchTransformationsMove(), url);
 
                 // Start the patch transformations copy example
-                runner.Start(new PatchTransformationsCopy(), url);
+                //runner.Start(new PatchTransformationsCopy(), url);
 
                 // Start the patch transformations test example
-                runner.Start(new PatchTransformationsTest(), url);
+                //runner.Start(new PatchTransformationsTest(), url);
 
                 // Start the insert transformations example
-                runner.Start(new InsertTransformations(), url);
+                //runner.Start(new InsertTransformations(), url);
 
                 // Start the options topic property mapping example
-                runner.Start(new OptionsTopicPropertyMapping(), url);
+                //runner.Start(new OptionsTopicPropertyMapping(), url);
 
                 // Start the options topic value example
-                runner.Start(new OptionsTopicValue(), url);
+                //runner.Start(new OptionsTopicValue(), url);
 
                 // Start the options throttle example
-                runner.Start(new OptionsThrottle(), url);
+                //runner.Start(new OptionsThrottle(), url);
 
                 // Start the options delay example
-                runner.Start(new OptionsDelay(), url);
+                //runner.Start(new OptionsDelay(), url);
 
                 // Start the options separator example
-                runner.Start(new OptionsSeparator(), url);
+                //runner.Start(new OptionsSeparator(), url);
 
                 // Start the options preserve topics example
-                runner.Start(new OptionsPreserveTopics(), url);
+                //runner.Start(new OptionsPreserveTopics(), url);
 
                 // Start the options topic type example
-                runner.Start(new OptionsTopicType(), url);
+                //runner.Start(new OptionsTopicType(), url);
 
                 // Start the put branch mapping table example
-                runner.Start(new PutBranchMappingTable(), url);
+                //runner.Start(new PutBranchMappingTable(), url);
 
                 // Start the list session tree branches with mappings example
-                runner.Start(new ListSessionTreeBranchesWithMappings(), url);
+                //runner.Start(new ListSessionTreeBranchesWithMappings(), url);
 
                 // Start the get branch mapping table example
-                runner.Start(new GetBranchMappingTable(), url);
+                //runner.Start(new GetBranchMappingTable(), url);
 
                 // Start the session trees use case example
-                runner.Start(new UseCase(), url);
+                //runner.Start(new UseCase(), url);
+
+                // Start the put and remove branch mapping table example
+                //runner.Start(new PutAndRemoveBranchMappingTable(), url);
 
                 // Start the missing topic notifications example
-                runner.Start(new MissingTopicNotifications(), url);
+                //runner.Start(new MissingTopicNotifications(), url);
 
                 // Start the topic notifications example
-                runner.Start(new TopicNotifications(), url);
+                //runner.Start(new TopicNotifications(), url);
 
-                // Start the session properties listener example
-                runner.Start(new SessionPropertiesListener(), url);
+                // Start the session event listener example
+                //runner.Start(new SessionEventListener(), url);
 
                 // Start the subscription control example
-                runner.Start(new SubscriptionControl(), url);
+                //runner.Start(new SubscriptionControl(), url);
 
                 // Start the authentication control example
-                runner.Start(new AuthenticationControl(), url);
+                //runner.Start(new AuthenticationControl(), url);
 
                 // Start the get session properties via session ID example
-                runner.Start(new GetSessionPropertiesViaSessionID(), url);
+                //runner.Start(new GetSessionPropertiesViaSessionID(), url);
 
                 // Start the set session properties via session ID example
-                runner.Start(new SetSessionPropertiesViaSessionID(), url);
+                //runner.Start(new SetSessionPropertiesViaSessionID(), url);
 
                 // Start the set session properties via session filter example
-                runner.Start(new SetSessionPropertiesViaSessionFilter(), url);
+                //runner.Start(new SetSessionPropertiesViaSessionFilter(), url);
 
                 // Start the close client via session ID example
-                runner.Start(new CloseClientViaSessionID(), url);
+                //runner.Start(new CloseClientViaSessionID(), url);
 
                 // Start the close client via session filter example
-                runner.Start(new CloseClientViaSessionFilter(), url);
+                //runner.Start(new CloseClientViaSessionFilter(), url);
 
                 // Start the change roles via session ID example
-                runner.Start(new ChangeRolesViaSessionID(), url);
+                //runner.Start(new ChangeRolesViaSessionID(), url);
 
                 // Start the change roles via session filter example
-                runner.Start(new ChangeRolesViaSessionFilter(), url);
+                //runner.Start(new ChangeRolesViaSessionFilter(), url);
 
                 // Start the control client queue conflation via session ID example
-                runner.Start(new ControlClientQueueConflationViaSessionID(), url);
+                //runner.Start(new ControlClientQueueConflationViaSessionID(), url);
 
                 // Start the control client queue conflation via session filter example
-                runner.Start(new ControlClientQueueConflationViaSessionFilter(), url);
+                //runner.Start(new ControlClientQueueConflationViaSessionFilter(), url);
 
                 // Start the put session metric collector example
-                runner.Start(new PutSessionMetricCollector(), url);
+                //runner.Start(new PutSessionMetricCollector(), url);
 
                 // Start the list session metric collectors example
-                runner.Start(new ListSessionMetricCollectors(), url);
+                //runner.Start(new ListSessionMetricCollectors(), url);
 
                 // Start the remove session metric collector example
-                runner.Start(new RemoveSessionMetricCollector(), url);
+                //runner.Start(new RemoveSessionMetricCollector(), url);
 
                 // Start the put topic metric collector example
-                runner.Start(new PutTopicMetricCollector(), url);
+                //runner.Start(new PutTopicMetricCollector(), url);
 
                 // Start the list topic metric collectors example
-                runner.Start(new ListTopicMetricCollectors(), url);
+                //runner.Start(new ListTopicMetricCollectors(), url);
 
                 // Start the remove topic metric collector example
-                runner.Start(new RemoveTopicMetricCollector(), url);
+                //runner.Start(new RemoveTopicMetricCollector(), url);
+
+                // Start the get outbound bytes example
+                //runner.Start(new GetOutboundBytes(), url);
+
+                // Start the get metrics console example
+                //runner.Start(new GetMetricsConsole(), url);
+
+                // Start the set metric alert example
+                //runner.Start(new SetMetricAlert(), url);
+
+                // Start the list metric alerts example
+                //runner.Start(new ListMetricAlerts(), url);
+
+                // Start the remove metric alert example
+                //runner.Start(new RemoveMetricAlert(), url);
 
                 // Start the isolate path example
-                runner.Start(new IsolatePath(), url);
+                //runner.Start(new IsolatePath(), url);
 
                 // Start the deisolate path example
-                runner.Start(new DeisolatePath(), url);
+                //runner.Start(new DeisolatePath(), url);
 
                 // Start the set path permissions example
-                runner.Start(new SetPathPermissions(), url);
+                //runner.Start(new SetPathPermissions(), url);
 
                 // Start the remove path permissions example
-                runner.Start(new RemovePathPermissions(), url);
+                //runner.Start(new RemovePathPermissions(), url);
 
                 // Start the set default path permissions example
-                runner.Start(new SetDefaultPathPermissions(), url);
+                //runner.Start(new SetDefaultPathPermissions(), url);
 
                 // Start the set global permissions example
-                runner.Start(new SetGlobalPermissions(), url);
+                //runner.Start(new SetGlobalPermissions(), url);
 
                 // Start the define roles hierarchy example
-                runner.Start(new DefineRolesHierarchy(), url);
+                //runner.Start(new DefineRolesHierarchy(), url);
 
                 // Start the restrict role edit permissions example
-                runner.Start(new RestrictRoleEditPermissions(), url);
+                //runner.Start(new RestrictRoleEditPermissions(), url);
 
                 // Start the set default roles for anonymous sessions example
-                runner.Start(new SetDefaultRolesForAnonymousSessions(), url);
+                //runner.Start(new SetDefaultRolesForAnonymousSessions(), url);
 
                 // Start the set default roles for named sessions example
-                runner.Start(new SetDefaultRolesForNamedSessions(), url);
+                //runner.Start(new SetDefaultRolesForNamedSessions(), url);
 
-                // Start the system authentication control example
-                runner.Start(new SystemAuthenticationControl(), url);
+                // Start the deny anonymous connections example
+                //runner.Start(new DenyAnonymousConnections(), url);
+
+                // Start the abstain anonymous connections example
+                //runner.Start(new AbstainAnonymousConnections(), url);
+
+                // Start the allow anonymous connections example
+                //runner.Start(new AllowAnonymousConnections(), url);
+
+                // Start the add principal example
+                //runner.Start(new AddPrincipal(), url);
+
+                // Start the add locked principal example
+                //runner.Start(new AddLockedPrincipal(), url);
+
+                // Start the remove principal example
+                //runner.Start(new RemovePrincipal(), url);
+
+                // Start the assign roles example
+                //runner.Start(new AssignRoles(), url);
+
+                // Start the change principal's password example
+                //runner.Start(new ChangePrincipalPassword(), url);
+
+                // Start the verify principal's password example
+                //runner.Start(new VerifyPrincipalPassword(), url);
+
+                // Start the trust client proposed property value from allowed value example
+                //runner.Start(new TrustClientProposedPropertyIn(), url);
+
+                // Start the trust client proposed property value that matches regular expression example
+                //runner.Start(new TrustClientProposedPropertyMatches(), url);
+
+                // Start the ignore client proposed property example
+                //runner.Start(new IgnoreClientProposedProperty(), url);
 
                 // Start the create primary initiator remote server example
-                runner.Start(new CreatePrimaryInitiatorRemoteServer(), url);
+                //runner.Start(new CreatePrimaryInitiatorRemoteServer(), url);
 
                 // Start the create secondary initiator remote server example
-                runner.Start(new CreateSecondaryInitiatorRemoteServer(), url);
+                //runner.Start(new CreateSecondaryInitiatorRemoteServer(), url);
 
                 // Start the create secondary acceptor remote server example
-                runner.Start(new CreateSecondaryAcceptorRemoteServer(), url);
+                //runner.Start(new CreateSecondaryAcceptorRemoteServer(), url);
 
                 // Start the list remote servers example
-                runner.Start(new ListRemoteServers(), url);
+                //runner.Start(new ListRemoteServers(), url);
 
                 // Start the check remote servers example
-                runner.Start(new CheckRemoteServers(), url);
+                //runner.Start(new CheckRemoteServers(), url);
 
                 // Start the remove remote servers example
-                runner.Start(new RemoveRemoteServers(), url);
+                //runner.Start(new RemoveRemoteServers(), url);
             }
         }
 
@@ -417,7 +511,7 @@ namespace PushTechnology.ClientInterface.Examples
 
             public async Task RunWrapper(CancellationToken cancel, string[] args)
             {
-                await Run(cancel, args).ConfigureAwait(false);
+                await Run(cancel, args);
                 CompletedEvent.Set();
             }
 
@@ -453,7 +547,7 @@ namespace PushTechnology.ClientInterface.Examples
                 });
                 runningExamples.Add(task);
 
-                example.CompletedEvent.WaitOne(50000);
+                Assert.IsTrue(example.CompletedEvent.WaitOne(50000));
             }
 
             /// <summary>

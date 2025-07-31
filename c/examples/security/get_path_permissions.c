@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_path_permissions_received(
     const SET_T *path_permissions,
@@ -43,18 +43,21 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
     SESSION_T *session = session_create(url, principal, credentials, NULL, NULL, NULL);
+
+    COORDINATOR_T *coordinator = coordinator_init();
 
     DIFFUSION_GET_PATH_PERMISSIONS_PARAMS_T params = {
         .path = ".*//",
-        .on_path_permissions = on_path_permissions_received
+        .on_path_permissions = on_path_permissions_received,
+        .context = coordinator
     };
 
     diffusion_get_path_permissions(session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
+
+    coordinator_free(coordinator);
 }

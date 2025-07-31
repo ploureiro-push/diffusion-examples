@@ -17,6 +17,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using PushTechnology.ClientInterface.Client.Factories;
+using PushTechnology.ClientInterface.Client.Session;
 using static System.Console;
 using static PushTechnology.ClientInterface.Examples.Program;
 
@@ -24,6 +25,11 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement.ClientContro
 {
     public sealed class CloseClientViaSessionFilter : Example
     {
+        private void OnSessionStateChanged(object sender, SessionListenerEventArgs e)
+        {
+            WriteLine($"State changed from {e.OldState} to {e.NewState}.");
+        }
+
         public override async Task Run(CancellationToken cancellationToken, string[] args)
         {
             string serverUrl = args[0];
@@ -36,14 +42,12 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement.ClientContro
             var session2 = Diffusion.Sessions
                 .Principal("client")
                 .Credentials(Diffusion.Credentials.Password("password"))
+                .SessionStateChangedHandler(OnSessionStateChanged)
                 .Open(serverUrl);
 
             int result = await session.ClientControl.CloseAsync("$Principal is 'client'", cancellationToken);
             WriteLine($"Number of sessions closed: {result}.");
 
-            await Task.Delay(5000);
-
-            session2.Close();
             session.Close();
         }
     }

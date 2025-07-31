@@ -17,6 +17,14 @@ cmake_path(SET CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TARGET}/lib/${ARCHITECTURE})
 cmake_path(SET CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TARGET}/bin/${ARCHITECTURE})
 cmake_path(SET CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TARGET}/bin/${ARCHITECTURE})
 
+
+# =============================================================================
+# Debug
+
+add_compile_options(-fsanitize=undefined -fsanitize=address)
+add_link_options(-fsanitize=undefined -fsanitize=address)
+
+
 # =============================================================================
 # Dependencies
 

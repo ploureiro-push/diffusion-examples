@@ -14,39 +14,45 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.remoteservers;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.control.RemoteServers;
-import com.pushtechnology.diffusion.client.session.Session;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.features.control.RemoteServers;
+import com.pushtechnology.diffusion.client.session.Session;
 
+/**
+ * This example demonstrates how to create a secondary initiator remote server in Diffusion.
+ *
+ * @author DiffusionData Limited
+ */
 public class CreateSecondaryInitiatorExample {
+
     private static final Logger LOG = LoggerFactory.getLogger(
         CreateSecondaryInitiatorExample.class);
 
     public static void main(String[] args) {
-        Session adminSession = Diffusion.sessions()
+
+        final Session adminSession = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        RemoteServers remoteServersControl =
+        final RemoteServers remoteServersControl =
             adminSession.feature(RemoteServers.class);
 
-        RemoteServers.SecondaryInitiator.SecondaryInitiatorBuilder builder =
+        final RemoteServers.SecondaryInitiator.SecondaryInitiatorBuilder builder =
             Diffusion.newRemoteServerBuilder(
                 RemoteServers.SecondaryInitiator.SecondaryInitiatorBuilder.class);
 
-        Map<RemoteServers.RemoteServer.ConnectionOption, String>
-            myConnectionOptions = new HashMap<RemoteServers.RemoteServer.ConnectionOption, String>(){{
-            put(RemoteServers.RemoteServer.ConnectionOption.RECONNECTION_TIMEOUT, "120000");
-            put(RemoteServers.RemoteServer.ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
-            put(RemoteServers.RemoteServer.ConnectionOption.CONNECTION_TIMEOUT, "15000");
-        }};
+        final Map<RemoteServers.RemoteServer.ConnectionOption, String>
+            myConnectionOptions = new HashMap<>();
+        myConnectionOptions.put(RemoteServers.RemoteServer.ConnectionOption.RECONNECTION_TIMEOUT, "120000");
+        myConnectionOptions.put(RemoteServers.RemoteServer.ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
+        myConnectionOptions.put(RemoteServers.RemoteServer.ConnectionOption.CONNECTION_TIMEOUT, "15000");
 
         remoteServersControl.createRemoteServer(
             builder

@@ -14,18 +14,27 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.establishment;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.session.SessionException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to establish a synchronous connection
+ * to a Diffusion server using a try-with-resources statement.
+ * <P>
+ * The use of try-with-resources ensures that the session is automatically closed.
+ *
+ * @author DiffusionData Limited
+ */
 public class ConnectSyncTryWithResourcesExample {
-    private static final Logger LOG = LoggerFactory.getLogger(ConnectSyncTryWithResourcesExample.class);
 
-    public static void main(String[] args)
-        throws Throwable {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(ConnectSyncTryWithResourcesExample.class);
+
+    public static void main(String[] args) {
 
         final String serverUrl = args.length == 1 ? args[0] : "ws://localhost:8080";
 
@@ -37,12 +46,9 @@ public class ConnectSyncTryWithResourcesExample {
             LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
 
             // Insert work here
-
         }
         catch (SessionException e) {
             LOG.error("An exception occurred attempting to open or close a session.", e);
-
-            throw e.getCause();
         }
     }
 }

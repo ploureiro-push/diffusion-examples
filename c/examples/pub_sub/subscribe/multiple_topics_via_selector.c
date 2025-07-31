@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_subscription(
     const char *const topic_path,
@@ -86,7 +86,7 @@ static int on_subscribe(
     void *context)
 {
     printf("Subscription request received and approved by the server.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -96,7 +96,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
@@ -124,13 +124,16 @@ void run_example(
     const char *topic_selector = "?my//";
     add_stream(session, topic_selector, &value_stream);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     SUBSCRIPTION_PARAMS_T params = {
             .topic_selector = topic_selector,
-            .on_subscribe = on_subscribe
+            .on_subscribe = on_subscribe,
+            .context = coordinator
     };
 
     subscribe(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     // Sleep for a bit to see the notifications
     sleep(2);
@@ -144,8 +147,8 @@ void run_example(
     // Sleep for a bit to see the notifications
     sleep(2);
 
-
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
+
+    coordinator_free(coordinator);
 }

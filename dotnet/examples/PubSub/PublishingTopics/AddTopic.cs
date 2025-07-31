@@ -37,7 +37,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics
 
             string topic = "my/topic/path";
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             var result = await session.TopicControl.AddTopicAsync(topic, topicSpecification, cancellationToken);
 
@@ -49,8 +49,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics
             {
                 WriteLine("Topic already exists.");
             }
-
-            await Task.Delay(5000);
 
             session.Close();
         }

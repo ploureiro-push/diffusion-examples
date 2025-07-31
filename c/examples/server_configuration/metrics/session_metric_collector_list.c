@@ -21,11 +21,11 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_collector_set(void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -94,7 +94,7 @@ static int on_session_metric_collectors_received(
         free(session_filter);
         free(name);
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -104,7 +104,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
@@ -121,14 +121,17 @@ void run_example(
             builder, "Session Metric Collector 1", "$Principal is 'control'", NULL
         );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_METRICS_PUT_SESSION_METRIC_COLLECTOR_PARAMS_T put_params_1 = {
         .collector = collector_1,
         .on_collector_set = on_collector_set,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_metrics_put_session_metric_collector(session, put_params_1, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     diffusion_session_metric_collector_builder_export_to_prometheus(builder, true);
     diffusion_session_metric_collector_builder_maximum_groups(builder, 250);
@@ -142,25 +145,29 @@ void run_example(
     DIFFUSION_METRICS_PUT_SESSION_METRIC_COLLECTOR_PARAMS_T put_params_2 = {
         .collector = collector_2,
         .on_collector_set = on_collector_set,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_metrics_put_session_metric_collector(session, put_params_2, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     diffusion_session_metric_collector_builder_free(builder);
 
     DIFFUSION_METRICS_LIST_SESSION_METRIC_COLLECTORS_PARAMS_T list_params = {
         .on_collectors_received = on_session_metric_collectors_received,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_metrics_list_session_metric_collectors(session, list_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
 
     session_close(session, NULL);
     session_free(session);
 
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
+    diffusion_session_metric_collector_free(collector_1);
+    diffusion_session_metric_collector_free(collector_2);
 }

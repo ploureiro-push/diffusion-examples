@@ -16,6 +16,11 @@ package com.pushtechnology.client.sdk.example.timeseries;
 
 import static com.pushtechnology.diffusion.datatype.DataTypes.DOUBLE_DATATYPE_NAME;
 
+import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.TimeSeries;
 import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
@@ -23,17 +28,17 @@ import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Random;
-
+/**
+ * This example demonstrates how to edit a time series topic by modifying a specific event.
+ *
+ * @author DiffusionData Limited
+ */
 public class TimeSeriesEditValueExample {
     private static final Logger LOG =
         LoggerFactory.getLogger(TimeSeriesEditValueExample.class);
 
     public static void main(String[] args) {
-        Session session = Diffusion.sessions()
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");

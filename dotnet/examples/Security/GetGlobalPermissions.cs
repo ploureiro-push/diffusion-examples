@@ -42,8 +42,6 @@ namespace PushTechnology.ClientInterface.Examples.Security
             {
                 WriteLine($"{permission}");
             }
-
-            await Task.Delay(5000);
             
             session.Close();
         }

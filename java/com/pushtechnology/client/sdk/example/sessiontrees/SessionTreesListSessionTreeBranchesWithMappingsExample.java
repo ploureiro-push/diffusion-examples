@@ -14,17 +14,25 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.sessiontrees;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.topics.SessionTrees;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to list session tree branches with mappings in Diffusion.
+ *
+ * @author DiffusionData Limited
+ */
 public class SessionTreesListSessionTreeBranchesWithMappingsExample {
-    private static final Logger LOG = LoggerFactory.getLogger(SessionTreesListSessionTreeBranchesWithMappingsExample.class);
+
+    private static final Logger LOG =
+        LoggerFactory.getLogger(SessionTreesListSessionTreeBranchesWithMappingsExample.class);
 
     public static void main(String[] args) {
+
         try (Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")

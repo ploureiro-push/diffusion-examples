@@ -21,13 +21,13 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_session_properties_set(
     const HASH_T *properties,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -45,7 +45,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *admin_session = utils_open_session(url, "admin", "password");
 
@@ -57,15 +57,18 @@ void run_example(
     HASH_T *new_session_properties = hash_new(2);
     hash_add(new_session_properties, "$Language", "en-gb");
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_SET_SESSION_PROPERTIES_PARAMS_T params = {
         .session_id = client_session->id,
         .properties = new_session_properties,
         .on_session_properties_set = on_session_properties_set,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_set_session_properties(admin_session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     printf("\nChanged session properties\n");
     utils_print_session_properties(admin_session, client_session->id, NULL);
@@ -76,5 +79,6 @@ void run_example(
     session_close(admin_session, NULL);
     session_free(admin_session);
 
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
+    hash_free(new_session_properties, NULL, NULL);
 }

@@ -14,18 +14,23 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.sessionmanagement.clientcontrol;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.ClientControl;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.session.SessionId;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-
+/**
+ * This example demonstrates how to get a sessions properties using its ID.
+ *
+ * @author DiffusionData Limited
+ */
 public class GetSessionPropertiesViaSessionIdExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
@@ -33,24 +38,23 @@ public class GetSessionPropertiesViaSessionIdExample {
 
     public static void main(String[] args) throws Exception {
 
-        Session adminSession = Diffusion.sessions()
+        final Session adminSession = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        Session clientSession = Diffusion.sessions()
+        final Session clientSession = Diffusion.sessions()
             .principal("client")
             .password("password")
             .open("ws://localhost:8080");
 
-        SessionId clientSessionID = clientSession.getSessionId();
-        Collection<String> requiredProperties = Collections.singleton(Session.ALL_FIXED_PROPERTIES);
-        ClientControl clientControl = adminSession.feature(ClientControl.class);
+        final SessionId clientSessionID = clientSession.getSessionId();
+        final Collection<String> requiredProperties = Collections.singleton(Session.ALL_FIXED_PROPERTIES);
+        final ClientControl clientControl = adminSession.feature(ClientControl.class);
 
-        Map<String, String> sessionProperties = clientControl
+        final Map<String, String> sessionProperties = clientControl
             .getSessionProperties(clientSessionID, requiredProperties).join();
 
-        System.out.printf("<%s>\n", clientSessionID);
         sessionProperties.forEach((key, value) -> System.out.printf("  <%s> : <%s>\n", key, value));
 
         adminSession.close();

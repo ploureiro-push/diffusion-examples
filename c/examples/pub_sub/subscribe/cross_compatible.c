@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_topic_update_add_and_set(
     DIFFUSION_TOPIC_CREATION_RESULT_T result,
@@ -33,7 +33,7 @@ static int on_topic_update_add_and_set(
     else if (result == TOPIC_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -158,7 +158,7 @@ static int on_subscribe(
     void *context)
 {
     printf("Subscription request received and approved by the server.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -176,7 +176,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/int/topic/path";
 
     SESSION_T *session = session_create(
@@ -187,16 +187,20 @@ void run_example(
     BUF_T *value = buf_create();
     write_diffusion_int64_value(123, value);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_TOPIC_UPDATE_ADD_AND_SET_PARAMS_T add_and_set_params = {
         .datatype = DATATYPE_INT64,
         .on_topic_update_add_and_set = on_topic_update_add_and_set,
         .topic_path = topic_path,
         .specification = topic_specification,
         .update = value,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     diffusion_topic_update_add_and_set(session, add_and_set_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     buf_free(value);
     topic_specification_free(topic_specification);
 
@@ -225,18 +229,19 @@ void run_example(
     add_stream(session, topic_path, &string_value_stream);
 
     SUBSCRIPTION_PARAMS_T params = {
-            .topic_selector = topic_path,
-            .on_subscribe = on_subscribe
+        .topic_selector = topic_path,
+        .on_subscribe = on_subscribe,
+        .context = coordinator
     };
 
     subscribe(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     // Sleep for a bit to see the notifications
     sleep(2);
 
-
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
-}
+
+    coordinator_free(coordinator);
+    }

@@ -29,27 +29,33 @@ import com.pushtechnology.diffusion.client.features.control.RemoteServers.Remote
 import com.pushtechnology.diffusion.client.features.control.RemoteServers.SecondaryInitiator.SecondaryInitiatorBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
 
+/**
+ * This example demonstrates how to list remote servers in Diffusion.
+ *
+ * @author DiffusionData Limited
+ */
 public class ListRemoteServersExample {
+
     private static final Logger LOG = LoggerFactory.getLogger(
         ListRemoteServersExample.class);
 
     public static void main(String[] args) throws Exception {
-        Session adminSession = Diffusion.sessions()
+
+        final Session adminSession = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        RemoteServers remoteServersControl =
+        final RemoteServers remoteServersControl =
             adminSession.feature(RemoteServers.class);
 
-        SecondaryInitiatorBuilder builder =
+        final SecondaryInitiatorBuilder builder =
             Diffusion.newRemoteServerBuilder(SecondaryInitiatorBuilder.class);
 
-        Map<ConnectionOption, String> myConnectionOptions = new HashMap<ConnectionOption, String>(){{
-            put(ConnectionOption.RECONNECTION_TIMEOUT, "120000");
-            put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
-            put(ConnectionOption.CONNECTION_TIMEOUT, "15000");
-        }};
+        final Map<ConnectionOption, String> myConnectionOptions = new HashMap<>();
+        myConnectionOptions.put(ConnectionOption.RECONNECTION_TIMEOUT, "120000");
+        myConnectionOptions.put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
+        myConnectionOptions.put(ConnectionOption.CONNECTION_TIMEOUT, "15000");
 
         remoteServersControl.createRemoteServer(
             builder
@@ -61,11 +67,10 @@ public class ListRemoteServersExample {
 
         builder.reset();
 
-        Map<ConnectionOption, String> myOtherConnectionOptions = new HashMap<ConnectionOption, String>(){{
-            put(ConnectionOption.RECONNECTION_TIMEOUT, "6000");
-            put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "10000");
-            put(ConnectionOption.CONNECTION_TIMEOUT, "5000");
-        }};
+        final Map<ConnectionOption, String> myOtherConnectionOptions = new HashMap<>();
+        myOtherConnectionOptions.put(ConnectionOption.RECONNECTION_TIMEOUT, "6000");
+        myOtherConnectionOptions.put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "10000");
+        myOtherConnectionOptions.put(ConnectionOption.CONNECTION_TIMEOUT, "5000");
 
         remoteServersControl.createRemoteServer(
             builder
@@ -79,8 +84,7 @@ public class ListRemoteServersExample {
                 .listRemoteServers()
                 .join();
 
-        servers.forEach(server -> System.out.printf(
-            "<%s>\n", server.getName()));
+        servers.forEach(server -> System.out.printf("<%s>\n", server.getName()));
 
         remoteServersControl.removeRemoteServer("Remote Server 1").join();
         remoteServersControl.removeRemoteServer("Remote Server 2").join();

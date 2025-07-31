@@ -16,20 +16,30 @@ package com.pushtechnology.client.sdk.example.messaging;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
 import com.pushtechnology.diffusion.client.callbacks.Registration;
 import com.pushtechnology.diffusion.client.features.Messaging;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to send and receive messages to and from a
+ * specific path using the Diffusion messaging feature.
+ * <P>
+ * The example registers a request handler for a specified path and processes incoming messages.
+ * Another session sends a request to this path and receives a response.
+ *
+ * @author DiffusionData Limited
+ */
 public class MessagingSendToPathExample {
-    private static final Logger LOG = LoggerFactory.getLogger(MessagingSendToPathExample.class);
 
-    public static void main(String[] args)
-        throws Exception {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(MessagingSendToPathExample.class);
+
+    public static void main(String[] args) throws Exception {
 
         final String serverUrl = "ws://localhost:8080";
 

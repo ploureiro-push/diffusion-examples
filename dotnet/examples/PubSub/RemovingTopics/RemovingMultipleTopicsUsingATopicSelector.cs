@@ -21,6 +21,7 @@ using PushTechnology.ClientInterface.Client.Features.Control.Topics;
 using PushTechnology.ClientInterface.Client.Session;
 using PushTechnology.ClientInterface.Client.Topics;
 using PushTechnology.ClientInterface.Client.Topics.Details;
+using PushTechnology.ClientInterface.Data.JSON;
 using static System.Console;
 using static PushTechnology.ClientInterface.Examples.Program;
 
@@ -37,23 +38,21 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.RemovingTopics
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
-            await AddTopic(session, "this/topic1", topicSpecification, cancellationToken);
-            await AddTopic(session, "this/topic2", topicSpecification, cancellationToken);
-            await AddTopic(session, "my/topic/path/to/be/removed", topicSpecification, cancellationToken);
-            await AddTopic(session, "my/topic/path/to/be/also/removed", topicSpecification, cancellationToken);
+            await AddAndSetTopic(session, "my/topic/path/to/be/removed", topicSpecification, "{\"diffusion\":[\"data\", \"more data\"]}", cancellationToken);
+            await AddAndSetTopic(session, "my/topic/path/to/be/also/removed", topicSpecification, "{\"diffusion\":[\"data\", \"also more data\"]}", cancellationToken);
+            await AddAndSetTopic(session, "my/topic/path/will/not/be/removed", topicSpecification, "{\"diffusion\":[\"no data\"]}", cancellationToken);
+            await AddAndSetTopic(session, "my/topic/path/will/not/be/removed/either", topicSpecification, "{\"diffusion\":[\"no data either\"]}", cancellationToken);
 
             var result = await session.TopicControl.RemoveTopicsAsync("?my/topic/path/to/be//", cancellationToken);
 
             WriteLine($"{result.RemovedCount} topics have been removed.");
 
-            await Task.Delay(5000);
-
             session.Close();
         }
 
-        private async Task AddTopic(ISession session, string topic, ITopicSpecification topicSpecification, CancellationToken cancellationToken)
+        private async Task AddAndSetTopic(ISession session, string topic, ITopicSpecification topicSpecification, string json, CancellationToken cancellationToken)
         {
             var result = await session.TopicControl.AddTopicAsync(topic, topicSpecification, cancellationToken);
 
@@ -65,6 +64,8 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.RemovingTopics
             {
                 WriteLine("Topic already exists.");
             }
+
+            await session.TopicUpdate.SetAsync<IJSON>(topic, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
         }
     }
 }

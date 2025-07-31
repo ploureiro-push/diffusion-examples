@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_session_properties(
     SESSION_T *session,
@@ -30,9 +30,9 @@ static int on_session_properties(
 {
     printf("Received the following session properties:\n");
     utils_print_hash(
-        response->properties, context, utils_print_string
+        response->properties, context, utils_print_string, false
     );
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -50,7 +50,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *admin_session = utils_open_session(url, "admin", "password");
 
@@ -59,15 +59,18 @@ void run_example(
     SET_T *required_properties = set_new(1);
     set_add(required_properties, PROPERTIES_SELECTOR_ALL_FIXED_PROPERTIES);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     GET_SESSION_PROPERTIES_PARAMS_T get_session_properties_params = {
         .on_session_properties = on_session_properties,
         .on_error = on_error,
         .session_id = client_session->id,
-        .required_properties = required_properties
+        .required_properties = required_properties,
+        .context = coordinator
     };
 
     get_session_properties(admin_session, get_session_properties_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(client_session, NULL);
     session_free(client_session);
@@ -75,6 +78,6 @@ void run_example(
     session_close(admin_session, NULL);
     session_free(admin_session);
 
+    coordinator_free(coordinator);
     set_free(required_properties);
-    MUTEX_TERMINATE
 }

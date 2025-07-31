@@ -14,16 +14,22 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.establishment;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.session.Session;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.session.Session;
+
+/**
+ * This example demonstrates how to establish an asynchronous connection
+ * to a Diffusion server.
+ *
+ * @author DiffusionData Limited
+ */
 public class ConnectAsyncExample {
-    
+
     private static final Logger LOG =
-        LoggerFactory.getLogger(ConnectAsyncExample.class);
+       LoggerFactory.getLogger(ConnectAsyncExample.class);
 
     public static void main(String[] args) {
 
@@ -33,12 +39,10 @@ public class ConnectAsyncExample {
             .openAsync("ws://localhost:8080")
             .join();
 
-        System.out.printf("Connected, session identifier: '%s'.\n", session.getSessionId());
+        LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
 
         // Insert work here
 
         session.close();
-
-        LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
     }
 }

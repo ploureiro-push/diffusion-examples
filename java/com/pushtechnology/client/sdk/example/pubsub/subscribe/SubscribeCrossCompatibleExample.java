@@ -16,20 +16,34 @@ package com.pushtechnology.client.sdk.example.pubsub.subscribe;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
+import com.pushtechnology.diffusion.client.features.TopicUpdate;
 import com.pushtechnology.diffusion.client.features.Topics;
-import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates subscribing to a topic in Diffusion and observing its
+ * values across compatible data types.
+ * <P>
+ * The example creates an INT64 topic, subscribes to it using a topic selector,
+ * and sets up value streams of type JSON and String.
+ * <P>
+ * In accordance with the Diffusion type hierarchy, the JSON stream is able to receive
+ * data from the INT64 topic while the String stream is not.
+ *
+ * @author DiffusionData Limited
+ */
 public class SubscribeCrossCompatibleExample {
-    private static final Logger LOG = LoggerFactory.getLogger(SubscribeCrossCompatibleExample.class);
+
+    private static final Logger LOG =
+        LoggerFactory.getLogger(SubscribeCrossCompatibleExample.class);
 
     public static void main(String[] args)
         throws Exception {
@@ -41,9 +55,9 @@ public class SubscribeCrossCompatibleExample {
 
             final String topicPath = "my/int/topic/path";
 
-            session.feature(TopicControl.class).addTopic(
-                    topicPath, Diffusion.newTopicSpecification(TopicType.INT64))
-                .join();
+            session.feature(TopicUpdate.class).addAndSet(
+                topicPath, Diffusion.newTopicSpecification(TopicType.INT64), Long.class, 123L
+            );
 
             final Topics topics = session.feature(Topics.class);
 
@@ -66,7 +80,7 @@ public class SubscribeCrossCompatibleExample {
             topics.removeStream(jsonValueStream);
             topics.removeStream(stringValueStream);
 
-            SECONDS.sleep(2); // Wait long enough for logging to be output
+            SECONDS.sleep(2);
         }
     }
 
@@ -80,8 +94,7 @@ public class SubscribeCrossCompatibleExample {
             JSON oldValue,
             JSON newValue) {
 
-            LOG.info("JSON stream '{}' changed from '{}' to '{}}'.",
-                topicPath, oldValue, newValue);
+            LOG.info("JSON value '{}'.", newValue.toJsonString());
         }
 
         @Override
@@ -123,8 +136,7 @@ public class SubscribeCrossCompatibleExample {
             String oldValue,
             String newValue) {
 
-            LOG.info("String stream '{}' changed from '{}' to '{}}'.",
-                topicPath, oldValue, newValue);
+            LOG.info("String value '{}'.", newValue);
         }
 
         @Override

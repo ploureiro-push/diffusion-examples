@@ -13,6 +13,8 @@
 #include "apr_thread_cond.h"
 #include <time.h>
 
+#include "coordinator.h"
+
 extern apr_pool_t *g_pool;
 extern apr_thread_cond_t *g_cond;
 extern apr_thread_mutex_t *g_mutex;
@@ -154,6 +156,12 @@ void utils_create_json_topic(
     const char *json_string
 );
 
+void utils_create_json_topic_with_topic_removal_policy(
+    SESSION_T *session,
+    const char *topic_path,
+    const char *topic_removal_policy
+);
+
 void utils_create_json_topic_with_properties(
     SESSION_T *session,
     const char *topic_path,
@@ -290,6 +298,12 @@ void utils_update_system_authentication_store(
     SCRIPT_T *script
 );
 
+void utils_apply_json_patch(
+    SESSION_T *session,
+    char *topic_path,
+    char *patch
+);
+
 double utils_random_double(void);
 
 LIST_T *utils_set_to_list(
@@ -309,7 +323,8 @@ void utils_print_security_roles(
 void utils_print_hash(
     HASH_T *hash,
     const char *pattern,
-    print_fn print_function
+    print_fn print_function,
+    bool free_value_string
 );
 
 bool utils_string_starts_with(
@@ -336,5 +351,7 @@ char *utils_path_to_folder(
     const char *path,
     const char *folder
 );
+
+
 
 #endif

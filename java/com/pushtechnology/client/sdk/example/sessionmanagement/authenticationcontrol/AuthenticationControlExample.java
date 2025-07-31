@@ -14,6 +14,11 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.sessionmanagement.authenticationcontrol;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
 import com.pushtechnology.diffusion.client.features.control.clients.AuthenticationControl;
@@ -23,11 +28,17 @@ import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.session.SessionFactory;
 import com.pushtechnology.diffusion.client.types.Credentials;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-
+/**
+ * This example demonstrates how to implement and use a custom authentication handler.
+ * <P>
+ * The custom authenticator defines rules for accepting or rejecting session
+ * establishment based on the principal.
+ * <P>
+ * Anonymous connections and connections with principals not starting with a
+ * specific prefix are rejected, while others are allowed.
+ *
+ * @author DiffusionData Limited
+ */
 public class AuthenticationControlExample {
 
     private static final Logger LOG =
@@ -62,7 +73,7 @@ public class AuthenticationControlExample {
             LOG.info(e.getMessage());
         }
 
-        Session session = sessions
+        final Session session = sessions
             .principal("diffusion_client")
             .password("password")
             .open("ws://localhost:8080");
@@ -75,7 +86,7 @@ public class AuthenticationControlExample {
         LOG.info(session.getState().toString());
     }
 
-    private static class MyAuthenticator implements ControlAuthenticator {
+    private static final class MyAuthenticator implements ControlAuthenticator {
 
         @Override
         public void authenticate(String principal, Credentials credentials,
@@ -84,25 +95,25 @@ public class AuthenticationControlExample {
             Callback callback) {
 
             if ("".equals(principal)) {
-                System.out.println("Anonymous connection attempt detected. Connection Rejected.");
+                System.out.println("Anonymous connection attempt detected. Session establishment Rejected.");
                 callback.deny();
                 return;
             }
 
             if (!principal.startsWith("diffusion_")) {
-                System.out.println("Principal does not begin with diffusion_ prefix. Connection Rejected.");
+                System.out.println("Principal does not begin with diffusion_ prefix. Session establishment Rejected.");
                 callback.deny();
                 return;
             }
 
-            System.out.println("Principal begins with diffusion_ prefix. Connection Accepted.");
+            System.out.println("Principal begins with diffusion_ prefix. Session establishment Accepted.");
             callback.allow();
         }
 
         @Override
-        public void onClose() {}
+        public void onClose() { }
 
         @Override
-        public void onError(ErrorReason errorReason) {}
+        public void onError(ErrorReason errorReason) { }
     }
 }

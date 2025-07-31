@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_change_success(
     SESSION_T * session,
     void *context)
 {
     printf("Principal has been changed to control.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -46,20 +46,24 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     SESSION_T *session = session_create(url, principal, credentials, NULL, NULL, NULL);
+
+    COORDINATOR_T *coordinator = coordinator_init();
 
     CHANGE_PRINCIPAL_PARAMS_T params = {
         .principal = "control",
         .credentials = credentials,
         .on_change_principal = on_change_success,
-        .on_change_principal_failure = on_change_success
+        .on_change_principal_failure = on_change_success,
+        .context = coordinator
     };
 
     change_principal(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
+
+    coordinator_free(coordinator);
 }

@@ -16,22 +16,29 @@ package com.pushtechnology.client.sdk.example.pubsub.remove;
 
 import static java.lang.String.format;
 
+import java.util.concurrent.CompletionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.CompletionException;
-
+/**
+ * This example demonstrates how to remove a single topic in Diffusion using the
+ * topic's path.
+ *
+ * @author DiffusionData Limited
+ */
 public class RemoveSingleTopicViaPathExample {
-    private static final Logger LOG = LoggerFactory.getLogger(RemoveSingleTopicViaPathExample.class);
 
-    public static void main(String[] args)
-        throws Throwable {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(RemoveSingleTopicViaPathExample.class);
+
+    public static void main(String[] args) throws Throwable {
 
         try (Session session = Diffusion.sessions()
             .principal("admin")

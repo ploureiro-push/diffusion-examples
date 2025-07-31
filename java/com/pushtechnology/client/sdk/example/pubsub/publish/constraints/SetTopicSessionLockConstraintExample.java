@@ -28,26 +28,36 @@ import com.pushtechnology.diffusion.client.session.Session.SessionLock;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
+/**
+ * This example demonstrates how to set a topic in Diffusion using the
+ * 'locked' constraint.
+ * <P>
+ * The example creates a topic and uses an update constraint to ensure updates
+ * are only allowed when the session holds a lock on the topic path.
+ *
+ * @author DiffusionData Limited
+ */
 public class SetTopicSessionLockConstraintExample {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SetTopicSessionLockConstraintExample.class);
+    private static final Logger LOG =
+        LoggerFactory.getLogger(SetTopicSessionLockConstraintExample.class);
 
     public static void main(String[] args) {
 
-        Session session = Diffusion.sessions()
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        JSON value = Diffusion.dataTypes().json()
+        final JSON value = Diffusion.dataTypes().json()
             .fromJsonString("{ \"diffusion\": \"data\" }");
 
         session.feature(TopicControl.class).addTopic("my/topic/path", TopicType.JSON).join();
 
-        SessionLock lock = session.lock("my/topic/path").join();
+        final SessionLock lock = session.lock("my/topic/path").join();
 
         // only allow updates if the caller has the given lock
-        UpdateConstraint constraint = Diffusion.updateConstraints().locked(lock);
+        final UpdateConstraint constraint = Diffusion.updateConstraints().locked(lock);
 
         // update the topic with the constraint, this works as we have the lock
         session.feature(TopicUpdate.class)
@@ -63,10 +73,9 @@ public class SetTopicSessionLockConstraintExample {
                 .set("my/topic/path", JSON.class, value, constraint).join();
         }
         catch (CompletionException e) {
-            LOG.info("Update failed: " + e.getCause().getMessage());
+            LOG.info("Update failed: {}", e.getCause().getMessage());
         }
 
         session.close();
-
     }
 }

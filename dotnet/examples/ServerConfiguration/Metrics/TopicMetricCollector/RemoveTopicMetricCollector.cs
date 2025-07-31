@@ -41,18 +41,15 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.To
             builder = (ITopicMetricCollectorBuilder)builder.ExportsToPrometheus(false);
             builder = builder.GroupByTopicType(true);
             builder = builder.GroupByTopicView(true);
+            builder = builder.GroupByPathPrefixParts(15);
             builder = (ITopicMetricCollectorBuilder)builder.MaximumGroups(10);
             collector = builder.Create("Topic Metric Collector 1", topicSelector);
 
             await session.Metrics.PutTopicMetricCollectorAsync(collector, cancellationToken);
 
-            await Task.Delay(5000);
-
             await session.Metrics.RemoveTopicMetricCollectorAsync(collector.Name, cancellationToken);
 
             WriteLine($"{collector.Name} has been removed.");
-
-            await Task.Delay(5000);
 
             session.Close();
         }

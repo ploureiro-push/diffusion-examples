@@ -14,13 +14,19 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.establishment;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.session.SessionFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to establish multiple connections
+ * to a Diffusion server using a shared SessionFactory.
+ *
+ * @author DiffusionData Limited
+ */
 public class ConnectViaSessionFactoryExample {
 
     private static final Logger LOG =
@@ -35,12 +41,14 @@ public class ConnectViaSessionFactoryExample {
             .password("password");
 
         final Session session = sessionFactory.open("ws://localhost:8080");
-        System.out.printf("Connected with id: %s\n", session.getSessionId());
+        final Session anotherSession = sessionFactory.open("ws://localhost:8080");
+
+        LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
+        LOG.info("Connected, session identifier: '{}'.", anotherSession.getSessionId());
 
         // Insert work here
 
         session.close();
-
-        LOG.info("session state: {}", session.getState());
+        anotherSession.close();
     }
 }

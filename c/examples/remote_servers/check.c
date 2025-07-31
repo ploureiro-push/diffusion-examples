@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 LIST_T *g_remote_server_names;
 
@@ -30,7 +30,7 @@ static int on_remote_server_created(
     LIST_T *errors,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -39,8 +39,6 @@ static int on_remote_servers_listed(
         LIST_T *remote_servers,
         void *context)
 {
-    g_remote_server_names = list_create();
-
     int size = list_get_size(remote_servers);
 
     for (int i = 0; i < size; i++) {
@@ -55,7 +53,7 @@ static int on_remote_servers_listed(
         list_append_last(g_remote_server_names, name);
         free(url);
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -88,7 +86,7 @@ static int on_remote_server_checked(
             break;
     }
 
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -107,8 +105,6 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
-
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
     CREDENTIALS_T *server_credentials = credentials_create_password("password");
@@ -137,14 +133,17 @@ void run_example(
             NULL
         );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_CREATE_REMOTE_SERVER_PARAMS_T params_create_1 = {
         .remote_server = remote_server_1,
         .on_remote_server_created = on_remote_server_created,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_create_remote_server(session, params_create_1, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     diffusion_remote_server_builder_reset(builder);
     diffusion_remote_server_builder_principal(builder, "control");
@@ -171,19 +170,23 @@ void run_example(
     DIFFUSION_CREATE_REMOTE_SERVER_PARAMS_T params_create_2 = {
         .remote_server = remote_server_2,
         .on_remote_server_created = on_remote_server_created,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_create_remote_server(session, params_create_2, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    g_remote_server_names = list_create();
 
     DIFFUSION_LIST_REMOTE_SERVERS_PARAMS_T params_list = {
         .on_remote_servers_listed = on_remote_servers_listed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_list_remote_servers(session, params_list, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     int size = list_get_size(g_remote_server_names);
     for (int i = 0; i < size; i++) {
@@ -194,18 +197,24 @@ void run_example(
         DIFFUSION_CHECK_REMOTE_SERVER_PARAMS_T params_check = {
             .name = remote_server_name,
             .on_remote_server_checked = on_remote_server_checked,
-            .on_error = on_error
+            .on_error = on_error,
+            .context = coordinator
         };
 
         diffusion_check_remote_server(session, params_check, NULL);
-        MUTEX_WAIT
+        coordinator_wait(coordinator);
     }
     list_free(g_remote_server_names, free);
 
 
     session_close(session, NULL);
     session_free(session);
-    credentials_free(server_credentials);
 
-    MUTEX_TERMINATE
+    credentials_free(server_credentials);
+    coordinator_free(coordinator);
+
+    diffusion_remote_server_free(remote_server_1);
+    diffusion_remote_server_free(remote_server_2);
+
+    diffusion_remote_server_builder_free(builder);
 }

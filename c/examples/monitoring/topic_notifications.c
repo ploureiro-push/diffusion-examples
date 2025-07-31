@@ -21,7 +21,6 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
 
 DIFFUSION_REGISTRATION_T *g_registration;
 
@@ -55,7 +54,7 @@ static int on_listener_registered(
     void *context)
 {
     g_registration = diffusion_registration_dup(registration);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -66,7 +65,7 @@ static int on_topic_notification(
     void *context)
 {
     print_topic_notification(topic_path, type, false);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -76,28 +75,27 @@ static int on_descendant_notification(
     void *context)
 {
     print_topic_notification(topic_path, type, true);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
 static int on_selected(void *context)
 {
     printf("Topic notification is now selected.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
 static int on_deselected(void *context)
 {
     printf("Topic notification has been deselected.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
 static void on_close(void)
 {
     printf("Topic notification listener has been closed.\n");
-    MUTEX_BROADCAST
 }
 
 
@@ -106,30 +104,30 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
-
     SESSION_T *session = utils_open_session(url, "admin", "password");
+
+    COORDINATOR_T *coordinator = coordinator_init();
 
     DIFFUSION_TOPIC_NOTIFICATION_LISTENER_T listener = {
         .on_registered = on_listener_registered,
         .on_topic_notification = on_topic_notification,
         .on_descendant_notification = on_descendant_notification,
-        .on_close = on_close
+        .on_close = on_close,
+        .context = coordinator
     };
-
     diffusion_topic_notification_add_listener(session, listener, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     DIFFUSION_TOPIC_NOTIFICATION_REGISTRATION_PARAMS_T params = {
         .on_selected = on_selected,
         .on_deselected = on_deselected,
         .on_error = on_error,
         .registration = g_registration,
-        .selector = ">my/topic/path"
+        .selector = ">my/topic/path",
+        .context = coordinator
     };
-
     diffusion_topic_notification_registration_select(session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     utils_create_string_topic(
         session, "my/topic/path", "Good morning"
@@ -148,11 +146,10 @@ void run_example(
     );
 
     diffusion_topic_notification_registration_deselect(session, params, NULL);
-    MUTEX_WAIT
 
     session_close(session, NULL);
     session_free(session);
 
-
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
+    diffusion_registration_free(g_registration);
 }

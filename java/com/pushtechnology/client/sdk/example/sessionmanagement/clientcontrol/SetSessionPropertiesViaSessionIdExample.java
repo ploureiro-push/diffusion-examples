@@ -14,16 +14,21 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.sessionmanagement.clientcontrol;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.control.clients.ClientControl;
-import com.pushtechnology.diffusion.client.session.Session;
+import java.util.Collections;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Map;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.features.control.clients.ClientControl;
+import com.pushtechnology.diffusion.client.session.Session;
 
+/**
+ * This example demonstrates how to set a sessions properties using its ID.
+ *
+ * @author DiffusionData Limited
+ */
 public class SetSessionPropertiesViaSessionIdExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
@@ -31,23 +36,36 @@ public class SetSessionPropertiesViaSessionIdExample {
 
     public static void main(String[] args) {
 
-        Session adminSession = Diffusion.sessions()
+        final Session adminSession = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        Session clientSession = Diffusion.sessions()
+        final Session clientSession = Diffusion.sessions()
             .principal("client")
             .password("password")
             .open("ws://localhost:8080");
 
-        ClientControl clientControl = adminSession.feature(ClientControl.class);
-        Map<String, String> myProperties = Collections.singletonMap("$Country", "CA");
+        final ClientControl clientControl = adminSession.feature(ClientControl.class);
 
-        Map<String, String> result = clientControl
+        Map<String, String> sessionProperties = clientControl
+            .getSessionProperties(clientSession.getSessionId(),
+                Collections.singleton(Session.ALL_FIXED_PROPERTIES)).join();
+
+        sessionProperties.forEach((key, value) -> System.out.printf("  <%s> : <%s>\n", key, value));
+
+        final Map<String, String> myProperties = Collections.singletonMap("$Country", "CA");
+
+        final Map<String, String> result = clientControl
             .setSessionProperties(clientSession.getSessionId(), myProperties).join();
 
         System.out.printf("Properties changed: %d", result.size());
+
+        sessionProperties = clientControl
+            .getSessionProperties(clientSession.getSessionId(),
+                Collections.singleton(Session.ALL_FIXED_PROPERTIES)).join();
+
+        sessionProperties.forEach((key, value) -> System.out.printf("  <%s> : <%s>\n", key, value));
 
         adminSession.close();
         clientSession.close();

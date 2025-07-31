@@ -14,89 +14,113 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.topicviews.dsl;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
 import com.pushtechnology.diffusion.client.features.Topics;
-import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
+import com.pushtechnology.diffusion.client.features.control.topics.views.TopicView;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to use the topic view preserve topics clause.
+ * <P>
+ * A topic view is created with and without the `preserve topics` clause. When applied,
+ * the derived topics persist even when the source topic changes.
+ *
+ * @author DiffusionData Limited
+ */
 public class TopicViewsDslOptionsPreserveTopicsExample {
+
     private static final Logger LOG =
         LoggerFactory.getLogger(TopicViewsDslOptionsPreserveTopicsExample.class);
 
-    public static void main(String[] args) {
-        Session session = Diffusion.sessions()
+    public static void main(String[] args) throws Exception {
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
         final Topics topics = session.feature(Topics.class);
-        final JSON jsonValue = Diffusion.dataTypes().json()
-            .fromJsonString("[" +
-                "\"Fred Flintstone\", " +
-                "\"Wilma Flintstone\", " +
-                "\"Barney Rubble\", " +
-                "\"Betty Rubble\"" +
-                "]");
+        final String topicPath = "my/topic/path";
+        final String viewSelector = "?views//";
 
-        topics.addAndSet(
-                "my/topic/path",
-                Diffusion.newTopicSpecification(TopicType.JSON), JSON.class, jsonValue)
+        final JSON value1 = Diffusion.dataTypes().json()
+            .fromJsonString("{\"name\":\"Fred Flintstone\"}");
+
+        final JSON value2 = Diffusion.dataTypes().json()
+            .fromJsonString("{\"name\":\"Wilma Flintstone\"}");
+
+        final JSON value3 = Diffusion.dataTypes().json()
+            .fromJsonString("{\"name\":\"Pebbles Flintstone\"}");
+
+        topics.addAndSet(topicPath,
+                Diffusion.newTopicSpecification(TopicType.JSON),
+                JSON.class, value1)
             .join();
 
-        topics.addFallbackStream(JSON.class, new MyFallbackStream());
-        topics.subscribe("?views//").join();
+        final Topics.ValueStream<JSON> valueStream = new MyStream();
+        topics.addStream(viewSelector, JSON.class, valueStream);
+        topics.subscribe(viewSelector).join();
 
-        topics.createTopicView("topic_view_1",
-                "map my/topic/path to views/preserved preserve topics")
-            .join();
+        final TopicView view1 = topics.createTopicView("topic_view_1",
+                "map my/topic/path to views/preserved/<scalar(/name)> preserve topics").join();
 
-        System.out.println("topic_view_1 has been created");
+        LOG.info("Topic view created: {}", view1.getName());
 
-        topics.createTopicView("topic_view_2",
-                "map my/topic/path to views/not_preserved")
-            .join();
+        final TopicView view2 = topics.createTopicView("topic_view_2",
+                "map my/topic/path to views/not_preserved/<scalar(/name)>").join();
 
-        System.out.println("topic_view_2 has been created");
+        LOG.info("Topic view created: {}", view2.getName());
 
-        topics.removeTopicView("topic_view_1").join();
-        topics.removeTopicView("topic_view_2").join();
-        session.feature(TopicControl.class).removeTopics("?.*//").join();
+        topics.set(topicPath, JSON.class, value2).join();
+        topics.set(topicPath, JSON.class, value3).join();
+
+        SECONDS.sleep(1);
+
+        topics.removeStream(valueStream);
         session.close();
-
-
-        LOG.info("Topic View created");
     }
 
-    public static class MyFallbackStream implements Topics.ValueStream<JSON> {
-
-        @Override
-        public void onSubscription(String topicPath,
-            TopicSpecification topicSpecification) {
-            System.out.printf("Subscribed to %s\n", topicPath);
-        }
+    static class MyStream implements Topics.ValueStream<JSON> {
 
         @Override
         public void onValue(
             String topicPath,
-            TopicSpecification topicSpecification, JSON oldValue, JSON newValue) {}
-
-        @Override
-        public void onUnsubscription(
-            String topicPath,
             TopicSpecification topicSpecification,
-            Topics.UnsubscribeReason unsubscribeReason) {}
+            JSON oldValue,
+            JSON newValue) {
+            LOG.info("{} new value {}", topicPath, newValue.toJsonString());
+        }
 
         @Override
-        public void onClose() {}
+        public void onSubscription(String topicPath,
+            TopicSpecification topicSpecification) {
+            LOG.info("Subscribed to {}", topicPath);
+        }
 
         @Override
-        public void onError(ErrorReason errorReason) {}
+        public void onUnsubscription(String topicPath,
+            TopicSpecification topicSpecification,
+            Topics.UnsubscribeReason unsubscribeReason) {
+            LOG.info("Unsubscribed from {}", topicPath);
+        }
+
+        @Override
+        public void onClose() {
+            LOG.info("stream closed");
+        }
+
+        @Override
+        public void onError(ErrorReason errorReason) {
+            LOG.error("stream error: {}", errorReason);
+        }
     }
 }

@@ -48,8 +48,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.Se
 
             WriteLine($"Session metric collector '{collector.Name}' added.");
 
-            await Task.Delay(5000);
-
             session.Close();
         }
     }

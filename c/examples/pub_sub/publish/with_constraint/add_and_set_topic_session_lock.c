@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 DIFFUSION_SESSION_LOCK_T *g_session_lock;
 
 static int on_topic_update_add_and_set(
@@ -34,7 +34,7 @@ static int on_topic_update_add_and_set(
     else if (result == TOPIC_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -62,7 +62,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/topic/path ";
 
     SESSION_T *session = session_create(
@@ -70,12 +70,16 @@ void run_example(
     );
 
     char *lock_name = "session_lock_1";
+
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_SESSION_LOCK_PARAMS_T lock_params = {
         .on_lock_acquired = on_lock_acquired,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     diffusion_session_lock(session, lock_name, lock_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     TOPIC_SPECIFICATION_T *topic_specification = topic_specification_init(TOPIC_TYPE_JSON);
     BUF_T *value = buf_create();
@@ -90,16 +94,19 @@ void run_example(
         .topic_path = topic_path,
         .specification = topic_specification,
         .update = value,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_topic_update_add_and_set_with_constraint(session, constraint, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
+
+    coordinator_free(coordinator);
     diffusion_topic_update_constraint_free(constraint);
+
     buf_free(value);
     topic_specification_free(topic_specification);
-    MUTEX_TERMINATE
 }

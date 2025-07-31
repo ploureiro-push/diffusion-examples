@@ -16,13 +16,18 @@ package com.pushtechnology.client.sdk.example.sessionmanagement.clientcontrol;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.ClientControl;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to close a session using its ID.
+ *
+ * @author DiffusionData Limited
+ */
 public class CloseClientViaSessionIdExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
@@ -30,23 +35,21 @@ public class CloseClientViaSessionIdExample {
 
     public static void main(String[] args) throws Exception {
 
-        Session adminSession = Diffusion.sessions()
+        final Session adminSession = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        Session clientSession = Diffusion.sessions()
+        final Session clientSession = Diffusion.sessions()
             .principal("client")
             .password("password")
             .open("ws://localhost:8080");
 
-        ClientControl clientControl = adminSession.feature(ClientControl.class);
+        final ClientControl clientControl = adminSession.feature(ClientControl.class);
         clientControl.close(clientSession.getSessionId()).join();
         MILLISECONDS.sleep(500);
 
-        System.out.printf("Client session state: <%s>\n", clientSession.getState());
-        adminSession.close();
-
         LOG.info("Client session state: {}", clientSession.getState());
+        adminSession.close();
     }
 }

@@ -43,7 +43,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
             await AddTopic(session, "my/topic/path", topicSpecification, cancellationToken);
             await AddTopic(session, "my/other/topic/path", topicSpecification, cancellationToken);
@@ -55,16 +55,9 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
 
             await session.Topics.SubscribeAsync(topicSelector, cancellationToken);
 
-            await Task.Delay(5000);
-
             WriteLine("Creating my/additional/topic/path");
 
             await AddTopic(session, "my/additional/topic/path", topicSpecification, cancellationToken);
-
-            await Task.Delay(5000);
-
-            await session.Topics.UnsubscribeAsync(topicSelector, cancellationToken);
-            session.Topics.RemoveStream(jsonStream);
 
             session.Close();
         }

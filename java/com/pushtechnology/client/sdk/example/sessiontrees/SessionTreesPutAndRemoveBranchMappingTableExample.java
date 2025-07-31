@@ -14,17 +14,28 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.sessiontrees;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.topics.SessionTrees;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to add and remove a session tree branch mapping table in Diffusion.
+ * <P>
+ * The branch mapping table is first created and applied, then later replaced with an empty table
+ * to remove all mappings.
+ *
+ * @author DiffusionData Limited
+ */
 public class SessionTreesPutAndRemoveBranchMappingTableExample {
-    private static final Logger LOG = LoggerFactory.getLogger(SessionTreesPutAndRemoveBranchMappingTableExample.class);
+
+    private static final Logger LOG =
+        LoggerFactory.getLogger(SessionTreesPutAndRemoveBranchMappingTableExample.class);
 
     public static void main(String[] args) {
+
         try (Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")

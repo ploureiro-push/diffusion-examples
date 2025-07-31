@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_topic_removed(
     SESSION_T *session,
@@ -30,7 +30,7 @@ static int on_topic_removed(
 {
     int removal_count = diffusion_topic_removal_result_removed_count(response);
     printf("Removed %d topic(s).\n", removal_count);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -48,7 +48,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
@@ -80,17 +80,20 @@ void run_example(
 
     const char *topic_selector = "?my/topic/path/to/be//";
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     TOPIC_REMOVAL_PARAMS_T remove_params = {
         .topic_selector = topic_selector,
         .on_removed = on_topic_removed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     topic_removal(session, remove_params);
-    MUTEX_WAIT
-
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
+
+    coordinator_free(coordinator);
 }

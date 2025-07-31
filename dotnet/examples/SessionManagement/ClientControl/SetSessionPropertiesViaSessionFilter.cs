@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using PushTechnology.ClientInterface.Client.Factories;
+using PushTechnology.ClientInterface.Client.Session;
 using static System.Console;
 using static PushTechnology.ClientInterface.Examples.Program;
 
@@ -39,12 +40,27 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement.ClientContro
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            var properties = new Dictionary<string, string> { { "$Language", "French" } };
-            int numberOfChangedProperties = await session.ClientControl.SetSessionPropertiesAsync("$Principal is 'client'", properties, cancellationToken);
+            var requiredProperties = new List<string> { SessionProperty.ALL_FIXED_PROPERTIES };
 
-            WriteLine($"Number of session properties changed: {numberOfChangedProperties}.");
+            var properties = await session.ClientControl.GetSessionPropertiesAsync(session2.SessionId, requiredProperties, cancellationToken);
 
-            await Task.Delay(5000);
+            WriteLine("Original session properties:");
+
+            foreach (var property in properties)
+            {
+                WriteLine($"{property.Key}: {property.Value}");
+            }
+
+            await session.ClientControl.SetSessionPropertiesAsync("$Principal is 'client'", new Dictionary<string, string> { { "$Language", "en-gb" } }, cancellationToken);
+
+            properties = await session.ClientControl.GetSessionPropertiesAsync(session2.SessionId, requiredProperties, cancellationToken);
+
+            WriteLine("Changed session properties:");
+
+            foreach (var property in properties)
+            {
+                WriteLine($"{property.Key}: {property.Value}");
+            }
 
             session2.Close();
             session.Close();

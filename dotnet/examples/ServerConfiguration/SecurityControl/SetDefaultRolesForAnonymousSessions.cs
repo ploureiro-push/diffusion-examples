@@ -41,11 +41,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityCo
 
             await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
 
-            await Task.Delay(5000);
-
-            script = session.SecurityControl.Script.SetRolesForAnonymousSessions(new[] { "CLIENT" }).ToScript();
-            await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
-
             session.Close();
         }
     }

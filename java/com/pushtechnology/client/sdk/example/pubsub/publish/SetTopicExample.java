@@ -14,6 +14,9 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.pubsub.publish;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.Topics;
 import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
@@ -21,13 +24,20 @@ import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to set the value of a topic in Diffusion.
+ * <P>
+ * The example creates a JSON topic at a specified path and sets its value.
+ *
+ * @author DiffusionData Limited
+ */
 public class SetTopicExample {
-    private static final Logger LOG = LoggerFactory.getLogger(SetTopicExample.class);
+
+    private static final Logger LOG =
+        LoggerFactory.getLogger(SetTopicExample.class);
 
     public static void main(String[] args) {
+
         try (Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
@@ -35,14 +45,17 @@ public class SetTopicExample {
 
             final String topicPath = "my/topic/path";
 
+            final JSON data = Diffusion.dataTypes().json()
+                .fromJsonString("{ \"diffusion\": [\"data\", \"more data\"] }");
+
             final TopicControl.AddTopicResult addTopicResult =
-                session.feature(TopicControl.class).addTopic(topicPath, Diffusion.newTopicSpecification(TopicType.JSON))
+                session.feature(TopicControl.class)
+                    .addTopic(topicPath, Diffusion.newTopicSpecification(TopicType.JSON))
                     .join();
 
             LOG.info("Topic: {}.", addTopicResult);
 
-            session.feature(Topics.class).set(topicPath, JSON.class,
-                    Diffusion.dataTypes().json().fromJsonString("{ \"diffusion\": [\"data\", \"more data\"] }"))
+            session.feature(Topics.class).set(topicPath, JSON.class, data)
                 .join();
 
             LOG.info("Value set.");

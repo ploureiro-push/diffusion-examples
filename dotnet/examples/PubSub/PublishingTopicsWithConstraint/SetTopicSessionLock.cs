@@ -40,7 +40,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
 
                 string topic = "my/topic/path";
 
-                var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+                var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
                 var result = await session.TopicControl.AddTopicAsync(topic, topicSpecification, cancellationToken);
 
@@ -60,10 +60,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
                 await session.TopicUpdate.SetAsync<IJSON>(topic, Diffusion.DataTypes.JSON.FromJSONString(json), constraint, cancellationToken);
 
                 WriteLine("Topic value has been set.");
-
-                await Task.Delay(5000);
-
-                await sessionLock.UnlockAsync(cancellationToken);
 
                 session.Close();
             }

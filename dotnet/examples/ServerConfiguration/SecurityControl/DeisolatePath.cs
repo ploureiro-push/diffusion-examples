@@ -41,8 +41,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityCo
 
             await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
 
-            await Task.Delay(5000);
-
             script = session.SecurityControl.Script.DeisolatePath("my/topic/path").ToScript();
 
             WriteLine($"Removing my/topic/path permission isolation.");
@@ -50,8 +48,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityCo
             WriteLine($"{script}");
 
             await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
-
-            await Task.Delay(5000);
 
             session.Close();
         }

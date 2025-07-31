@@ -16,22 +16,32 @@ package com.pushtechnology.client.sdk.example.pubsub.remove;
 
 import static java.lang.String.format;
 
+import java.util.concurrent.CompletionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.CompletionException;
-
+/**
+ * This example demonstrates how to remove multiple topics in Diffusion using a
+ * topic selector.
+ * <P>
+ * The example creates a set of topics and then uses a selector to remove topics
+ * that match the specified path pattern.
+ *
+ * @author DiffusionData Limited
+ */
 public class RemoveMultipleTopicsViaSelectorExample {
-    private static final Logger LOG = LoggerFactory.getLogger(RemoveMultipleTopicsViaSelectorExample.class);
 
-    public static void main(String[] args)
-        throws Throwable {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(RemoveMultipleTopicsViaSelectorExample.class);
+
+    public static void main(String[] args) throws Throwable {
 
         try (Session session = Diffusion.sessions()
             .principal("admin")

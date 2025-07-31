@@ -14,48 +14,54 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl.ScriptBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.types.PathPermission;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
-
+/**
+ * This example demonstrates how to set path-specific permissions for a role using
+ * the security control feature in Diffusion.
+ * <P>
+ * The example grants the `CLIENT` role the `UPDATE_TOPIC` and `MODIFY_TOPIC`
+ * permissions for the given path.
+ *
+ * @author DiffusionData Limited
+ */
 public class SetPathPermissionsExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
         SetPathPermissionsExample.class);
 
     public static void main(String[] args) throws Exception {
-        Session session = Diffusion.sessions()
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        SecurityControl securityControl = session.feature(SecurityControl.class);
-        ScriptBuilder builder = securityControl.scriptBuilder();
+        final SecurityControl securityControl = session.feature(SecurityControl.class);
+        final ScriptBuilder builder = securityControl.scriptBuilder();
 
-        Set<PathPermission> myPermissions = new HashSet<PathPermission>(){{
-            add(PathPermission.UPDATE_TOPIC);
-            add(PathPermission.MODIFY_TOPIC);
-            add(PathPermission.READ_TOPIC);
-            add(PathPermission.SELECT_TOPIC);
-        }};
-
-        System.out.println("Allowing Role CLIENT to update and modify my/topic/path");
+        final Set<PathPermission> myPermissions = new HashSet<>();
+        myPermissions.add(PathPermission.UPDATE_TOPIC);
+        myPermissions.add(PathPermission.MODIFY_TOPIC);
 
         builder.setPathPermissions("CLIENT", "my/topic/path", myPermissions);
-        String script = builder.script();
-        System.out.println(script);
+        final String script = builder.script();
 
-        securityControl.updateStore(script).join();
+        LOG.info("Allowing Role CLIENT to update and modify my/topic/path");
+
+        securityControl.updateStore(script)
+            .whenComplete((r, ex) -> LOG.info(script));
+
         session.close();
-
-        LOG.info(script);
     }
 }

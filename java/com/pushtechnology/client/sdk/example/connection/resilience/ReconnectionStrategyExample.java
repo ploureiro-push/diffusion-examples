@@ -14,50 +14,60 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.resilience;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.session.Session;
-import com.pushtechnology.diffusion.client.session.reconnect.ReconnectionStrategy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.session.Session;
+import com.pushtechnology.diffusion.client.session.reconnect.ReconnectionStrategy;
+
+/**
+ * This example demonstrates how to implement a custom reconnection strategy
+ * for a Diffusion session.
+ * <P>
+ * The example defines a custom ReconnectionStrategy that limits the number of
+ * reconnection attempts and schedules each attempt with a fixed delay.
+ *
+ * @author DiffusionData Limited
+ */
 public class ReconnectionStrategyExample {
+
     private static final Logger LOG =
         LoggerFactory.getLogger(ReconnectionStrategyExample.class);
 
-    public static void main(String[] args) throws Exception{
-
-        final ReconnectionStrategy reconnectionStrategy = new ReconnectionStrategy() {
-            private int retries = 0;
-            private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            @Override
-            public void performReconnection(ReconnectionAttempt reconnectionAttempt) {
-                if (retries < 10) {
-                    retries++;
-                    scheduler.schedule(reconnectionAttempt::start, 3000, TimeUnit.MILLISECONDS);
-                }
-                else {
-                    reconnectionAttempt.abort();
-                }
-            }
-        };
+    public static void main(String[] args) throws Exception {
 
         final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
-            .reconnectionStrategy(reconnectionStrategy)
+            .reconnectionStrategy(new MyReconnectionStrategy())
             .open("ws://localhost:8080");
 
-        System.out.printf("Connected, session identifier: '%s'.\n", session.getSessionId());
+        LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
 
         // Insert work here
 
         session.close();
+    }
 
-        LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
+    static class MyReconnectionStrategy implements ReconnectionStrategy {
+
+        private int retries = 0;
+        private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        @Override
+        public void performReconnection(ReconnectionAttempt reconnectionAttempt) {
+            if (retries < 10) {
+                retries++;
+                scheduler.schedule(reconnectionAttempt::start, 3000, TimeUnit.MILLISECONDS);
+            }
+            else {
+                reconnectionAttempt.abort();
+            }
+        }
     }
 }

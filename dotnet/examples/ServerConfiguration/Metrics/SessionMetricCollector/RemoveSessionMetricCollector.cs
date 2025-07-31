@@ -47,13 +47,9 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.Se
 
             await session.Metrics.PutSessionMetricCollectorAsync(collector, cancellationToken);
 
-            await Task.Delay(5000);
-
             await session.Metrics.RemoveSessionMetricCollectorAsync(collector.Name, cancellationToken);
 
             WriteLine($"{collector.Name} has been removed.");
-
-            await Task.Delay(5000);
 
             session.Close();
         }

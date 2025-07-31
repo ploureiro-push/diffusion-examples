@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_topic_update_add_and_set(
     DIFFUSION_TOPIC_CREATION_RESULT_T result,
@@ -33,7 +33,7 @@ static int on_topic_update_add_and_set(
     else if (result == TOPIC_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -51,16 +51,19 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/topic/path/with/update/stream";
 
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
     );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_TOPIC_UPDATE_STREAM_PARAMS_T update_stream_params = {
         .on_topic_creation_result = on_topic_update_add_and_set,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     TOPIC_SPECIFICATION_T *topic_specification = topic_specification_init(TOPIC_TYPE_JSON);
@@ -78,13 +81,16 @@ void run_example(
     BUF_T *value = buf_create();
     write_diffusion_json_value("{\"diffusion\": \"data\"}", value);
     diffusion_topic_update_stream_set(session, update_stream, value, update_stream_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
+
+    coordinator_free(coordinator);
     buf_free(value);
+
     diffusion_topic_update_stream_free(update_stream);
     diffusion_update_stream_builder_free(builder);
+
     topic_specification_free(topic_specification);
-    MUTEX_TERMINATE
 }

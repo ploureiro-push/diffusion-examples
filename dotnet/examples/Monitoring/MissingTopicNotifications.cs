@@ -60,10 +60,6 @@ namespace PushTechnology.ClientInterface.Examples.Monitoring
 
             await session2.Topics.SubscribeAsync("my/topic/path/does/not/exist/yet", cancellationToken);
 
-            await Task.Delay(5000);
-
-            await registration.CloseAsync();
-
             session.Close();
             session2.Close();
         }
@@ -81,7 +77,7 @@ namespace PushTechnology.ClientInterface.Examples.Monitoring
             {
                 WriteLine($"Topic '{notification.TopicPath}' does not exist.");
 
-                session.TopicControl.AddTopicAsync(notification.TopicPath, session.TopicControl.NewSpecification(TopicType.STRING));
+                session.TopicControl.AddTopicAsync(notification.TopicPath, Diffusion.NewSpecification(TopicType.STRING));
             }
         }
 

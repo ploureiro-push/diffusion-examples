@@ -21,13 +21,13 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_branch_mapping_table_set(
         void *context)
 {
     printf("Session tree mapping table and mappings removed.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -45,7 +45,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     // Administrator
     SESSION_T *session = session_create(
@@ -72,15 +72,21 @@ void run_example(
             builder, (char *) topic_path
         );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_SESSION_TREES_PUT_BRANCH_MAPPING_TABLE_PARAMS_T params = {
         .on_table_set = on_branch_mapping_table_set,
         .on_error = on_error,
-        .table = table
+        .table = table,
+        .context = coordinator
     };
     diffusion_session_trees_put_branch_mapping_table(session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
-}
+
+    coordinator_free(coordinator);
+    diffusion_branch_mapping_table_free(table);
+    diffusion_branch_mapping_table_builder_free(builder);
+    }

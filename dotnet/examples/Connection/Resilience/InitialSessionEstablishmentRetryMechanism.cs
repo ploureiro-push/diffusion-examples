@@ -43,8 +43,6 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Resilience
 
             // Insert work here...
 
-            await Task.Delay(5000);
-
             session.Close();
         }
     }

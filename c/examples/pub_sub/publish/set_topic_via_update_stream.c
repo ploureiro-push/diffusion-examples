@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_topic_update(
     DIFFUSION_TOPIC_CREATION_RESULT_T result,
@@ -33,7 +33,7 @@ static int on_topic_update(
     else if (result == TOPIC_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -56,7 +56,7 @@ static int on_topic_added(
     else if (result_code == TOPIC_ADD_RESULT_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -76,7 +76,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/topic/path/with/update/stream";
 
     SESSION_T *session = session_create(
@@ -84,21 +84,21 @@ void run_example(
     );
 
     TOPIC_SPECIFICATION_T *topic_specification = topic_specification_init(TOPIC_TYPE_JSON);
+
+    COORDINATOR_T *coordinator = coordinator_init();
+
     ADD_TOPIC_CALLBACK_T create_topic_params = {
         .on_topic_added_with_specification = on_topic_added,
         .on_topic_add_failed_with_specification = on_topic_add_failed_with_specification,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     add_topic_from_specification(
         session, topic_path, topic_specification, create_topic_params
     );
-    MUTEX_WAIT
-    topic_specification_free(topic_specification);
+    coordinator_wait(coordinator);
 
-    DIFFUSION_TOPIC_UPDATE_STREAM_PARAMS_T update_stream_params = {
-        .on_topic_creation_result = on_topic_update,
-        .on_error = on_error
-    };
+    topic_specification_free(topic_specification);
 
     DIFFUSION_UPDATE_STREAM_BUILDER_T *builder = diffusion_update_stream_builder_init();
 
@@ -112,13 +112,21 @@ void run_example(
 
     BUF_T *value = buf_create();
     write_diffusion_json_value("{\"diffusion\": [ \"data\", \"more data\" ] }", value);
+
+    DIFFUSION_TOPIC_UPDATE_STREAM_PARAMS_T update_stream_params = {
+        .on_topic_creation_result = on_topic_update,
+        .on_error = on_error,
+        .context = coordinator
+    };
+
     diffusion_topic_update_stream_set(session, update_stream, value, update_stream_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
+
+    coordinator_free(coordinator);
     buf_free(value);
     diffusion_topic_update_stream_free(update_stream);
     diffusion_update_stream_builder_free(builder);
-    MUTEX_TERMINATE
 }

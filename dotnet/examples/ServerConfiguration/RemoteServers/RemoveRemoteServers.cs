@@ -52,8 +52,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
 
             server = await session.RemoteServers.CreateRemoteServerAsync(initiator, cancellationToken);
 
-            await Task.Delay(5000);
-
             await session.RemoteServers.RemoveRemoteServerAsync(server.Name, cancellationToken);
 
             WriteLine($"Remote Server 1 has been removed.");

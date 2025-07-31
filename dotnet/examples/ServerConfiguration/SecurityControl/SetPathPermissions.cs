@@ -44,11 +44,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityCo
 
             await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
 
-            await Task.Delay(5000);
-
-            script = session.SecurityControl.Script.RemovePathPermissions("CLIENT", "my/topic/path").ToScript();
-            await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
-
             session.Close();
         }
     }

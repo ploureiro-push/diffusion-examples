@@ -14,10 +14,12 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using PushTechnology.ClientInterface.Client.Factories;
+using PushTechnology.ClientInterface.Client.Session;
 using static System.Console;
 using static PushTechnology.ClientInterface.Examples.Program;
 
@@ -39,10 +41,17 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement.ClientContro
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            await session.ClientControl.ChangeRolesAsync(session2.SessionId, new Collection<string>(), new Collection<string>() { "TOPIC_CONTROL" }, cancellationToken);
-            WriteLine("Roles were updated.");
+            var requiredProperties = new List<string> { SessionProperty.ALL_FIXED_PROPERTIES };
 
-            await Task.Delay(5000);
+            var properties = await session.ClientControl.GetSessionPropertiesAsync(session2.SessionId, requiredProperties, cancellationToken);
+
+            WriteLine($"Original value {properties["$Roles"]}");
+
+            await session.ClientControl.ChangeRolesAsync(session2.SessionId, new Collection<string>(), new Collection<string>() { "TOPIC_CONTROL" }, cancellationToken);
+
+            properties = await session.ClientControl.GetSessionPropertiesAsync(session2.SessionId, requiredProperties, cancellationToken);
+
+            WriteLine($"Changed value {properties["$Roles"]}");
 
             session2.Close();
             session.Close();

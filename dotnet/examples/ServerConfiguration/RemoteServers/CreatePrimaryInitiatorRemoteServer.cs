@@ -47,8 +47,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
 
             WriteLine($"Remote server '{server.Name}' was created.");
 
-            await Task.Delay(5000);
-
             session.Close();
         }
     }

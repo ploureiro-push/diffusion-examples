@@ -14,24 +14,34 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.pubsub.publish;
 
+import java.util.concurrent.CompletionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.TopicCreationResult;
 import com.pushtechnology.diffusion.client.features.TopicUpdate;
 import com.pushtechnology.diffusion.client.features.UpdateStream;
 import com.pushtechnology.diffusion.client.session.Session;
+import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.CompletionException;
-
+/**
+ * This example demonstrates how to add and set a topic using an update stream
+ * in Diffusion.
+ * <P>
+ * The example creates a JSON topic using an update stream and sets its initial value.
+ *
+ * @author DiffusionData Limited
+ */
 public class AddAndSetTopicViaUpdateStreamExample {
-    private static final Logger LOG = LoggerFactory.getLogger(AddAndSetTopicViaUpdateStreamExample.class);
 
-    public static void main(String[] args)
-        throws Throwable {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(AddAndSetTopicViaUpdateStreamExample.class);
+
+    public static void main(String[] args) throws Throwable {
 
         try (Session session = Diffusion.sessions()
             .principal("admin")
@@ -39,9 +49,10 @@ public class AddAndSetTopicViaUpdateStreamExample {
             .open("ws://localhost:8080")) {
 
             final TopicUpdate topicUpdate = session.feature(TopicUpdate.class);
+            final TopicSpecification spec = Diffusion.newTopicSpecification(TopicType.JSON);
 
             final UpdateStream<JSON> updateStream = topicUpdate.newUpdateStreamBuilder()
-                .specification(Diffusion.newTopicSpecification(TopicType.JSON))
+                .specification(spec)
                 .build("my/topic/path/with/update/stream", JSON.class);
 
             final JSON jsonValue = Diffusion.dataTypes().json()

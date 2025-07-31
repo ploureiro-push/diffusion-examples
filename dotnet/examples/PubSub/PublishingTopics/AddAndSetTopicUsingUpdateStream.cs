@@ -36,10 +36,13 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON);
+            var topic = "my/topic/path/with/update/stream";
+
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
+
             var updateStream = session.TopicUpdate.NewUpdateStreamBuilder()
                 .Specification(topicSpecification)
-                .Build<IJSON>("my/topic/path/with/update/stream");
+                .Build<IJSON>(topic);
 
             var result = await updateStream.SetAsync(Diffusion.DataTypes.JSON.FromJSONString("{\"diffusion\":\"data\"}"), cancellationToken);
 
@@ -51,8 +54,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics
             {
                 WriteLine("Topic already exists.");
             }
-
-            await Task.Delay(5000);
 
             session.Close();
         }

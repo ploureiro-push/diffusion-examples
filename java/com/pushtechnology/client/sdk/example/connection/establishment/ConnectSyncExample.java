@@ -14,17 +14,25 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.establishment;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.session.Session;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.session.Session;
+
+/**
+ * This example demonstrates how to establish a synchronous connection
+ * to a Diffusion server.
+ *
+ * @author DiffusionData Limited
+ */
 public class ConnectSyncExample {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ConnectSyncExample.class);
+    private static final Logger LOG =
+        LoggerFactory.getLogger(ConnectSyncExample.class);
 
     public static void main(String[] args) {
+
         final String serverUrl = args.length == 1 ? args[0] : "ws://localhost:8080";
 
         final Session session = Diffusion.sessions()

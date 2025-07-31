@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_fetch_result(
         const DIFFUSION_FETCH_RESULT_T *fetch_result,
@@ -49,10 +49,10 @@ static int on_fetch_result(
             }
             free(keys);
         }
-        hash_free(properties, NULL, NULL);
+        hash_free(properties, free, free);
     }
     list_free(results, (void (*)(void *))diffusion_topic_result_free);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -62,7 +62,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
     );
@@ -74,10 +74,10 @@ void run_example(
 
     for (int i = 1; i <= 5; i++) {
         char *json_topic_path = calloc(100, sizeof(char));
-        sprintf(json_topic_path, "my/topic/path/with/properties/%d", i);
+        snprintf(json_topic_path, 100, "my/topic/path/with/properties/%d", i);
 
         char *json_value = calloc(100, sizeof(char));
-        sprintf(json_value, "{\"diffusion\": \"data #%d\" }", i);
+        snprintf(json_value, 100, "{\"diffusion\": \"data #%d\" }", i);
 
         utils_create_json_topic_with_properties(
             session, json_topic_path, json_value, properties
@@ -87,10 +87,10 @@ void run_example(
         free(json_topic_path);
 
         char *string_topic_path = calloc(100, sizeof(char));
-        sprintf(string_topic_path, "my/topic/path/with/default/properties/%d", i);
+        snprintf(string_topic_path, 100, "my/topic/path/with/default/properties/%d", i);
 
         char *string_value = calloc(100, sizeof(char));
-        sprintf(string_value, "diffusion data #%d", i);
+        snprintf(string_value, 100, "diffusion data #%d", i);
 
         utils_create_string_topic(session, string_topic_path, string_value);
 
@@ -110,13 +110,17 @@ void run_example(
         diffusion_fetch_request_topic_types(json_fetch_request, json_topic_type_set, NULL);
     diffusion_fetch_request_with_properties(json_fetch_request, NULL);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_FETCH_REQUEST_PARAMS_T json_fetch_request_params = {
         .topic_selector = topic_selector,
         .fetch_request = json_fetch_request,
-        .on_fetch_result = on_fetch_result
+        .on_fetch_result = on_fetch_result,
+        .context = coordinator
     };
     diffusion_fetch_request_fetch(session, json_fetch_request_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     diffusion_fetch_request_free(json_fetch_request);
     set_free(json_topic_type_set);
 
@@ -132,16 +136,18 @@ void run_example(
     DIFFUSION_FETCH_REQUEST_PARAMS_T string_fetch_request_params = {
         .topic_selector = topic_selector,
         .fetch_request = string_fetch_request,
-        .on_fetch_result = on_fetch_result
+        .on_fetch_result = on_fetch_result,
+        .context = coordinator
     };
-    set_free(string_topic_type_set);
-
     diffusion_fetch_request_fetch(session, string_fetch_request_params);
+    coordinator_wait(coordinator);
+
+    set_free(string_topic_type_set);
     diffusion_fetch_request_free(string_fetch_request);
-    MUTEX_WAIT
 
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
+
+    coordinator_free(coordinator);
 }

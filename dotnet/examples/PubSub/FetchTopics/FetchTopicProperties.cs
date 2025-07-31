@@ -43,7 +43,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.FetchTopics
                         { TopicSpecificationProperty.PublishValuesOnly, "true" }
                     };
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.JSON)
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON)
                 .WithProperties(topicProperties);
 
             for (int i = 1; i <= 5; i++)
@@ -52,7 +52,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.FetchTopics
                 await session.TopicUpdate.AddAndSetAsync("my/topic/path/with/properties/" + i, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString("{" + jsonValue + "}"), cancellationToken);
             }
 
-            topicSpecification = session.TopicControl.NewSpecification(TopicType.STRING)
+            topicSpecification = Diffusion.NewSpecification(TopicType.STRING)
                 .WithProperties(topicProperties);
 
             for (int i = 1; i <= 5; i++)
@@ -88,8 +88,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.FetchTopics
                     WriteLine($"{property.Key}: {property.Value}");
                 }
             }
-
-            await Task.Delay(5000);
 
             session.Close();
         }

@@ -121,12 +121,13 @@ void run_example(
     CREDENTIALS_T *anonymous_credentials =
         credentials_create_none();
 
-    DIFFUSION_ERROR_T error = { 0 };
+    DIFFUSION_ERROR_T *error = calloc(1, sizeof(DIFFUSION_ERROR_T));
     SESSION_T *anonymous_session = session_create(
-        url, "", anonymous_credentials, NULL, NULL, &error
+        url, "", anonymous_credentials, NULL, NULL, error
     );
     printf("Error while attempting to establish anonymous session:\n");
-    printf("\t%d: %s\n", error.code, error.message);
+    printf("\t%d: %s\n", error->code, error->message);
+    diffusion_error_free(error);
 
 
     session_close(admin_session, NULL);

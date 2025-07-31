@@ -45,7 +45,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
             string topic = "my/int/topic/path";
             string topicSelector = ">my/int/topic/path";
 
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.INT64);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.INT64);
             var result = await session.TopicControl.AddTopicAsync(topic, topicSpecification, cancellationToken);
 
             if (result == AddTopicResult.CREATED)
@@ -65,18 +65,11 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
 
             await session.Topics.SubscribeAsync(topicSelector, cancellationToken);
 
-            await Task.Delay(5000);
-            
-            await session.Topics.UnsubscribeAsync(topicSelector, cancellationToken);
-            session.Topics.RemoveStream(jsonStream);
-            session.Topics.RemoveStream(stringStream);
-
             session.Close();
         }
 
         private sealed class JSONStream : IValueStream<IJSON>
         {
-
             public void OnClose() {}
 
             public void OnError(ErrorReason errorReason) {}
@@ -99,7 +92,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
 
         private sealed class StringStream : IValueStream<string>
         {
-
             public void OnClose() {}
 
             public void OnError(ErrorReason errorReason) {}

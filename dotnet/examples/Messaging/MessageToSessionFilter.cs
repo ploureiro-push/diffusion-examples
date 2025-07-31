@@ -56,16 +56,12 @@ namespace PushTechnology.ClientInterface.Examples.Messaging
             var requestCallback = new RequestCallback();
 
             int requestsSent = await session3.Messaging.SendRequestToFilterAsync(
-                "$Principal is 'admin'",
+                "$Principal EQ 'admin'",
                 path,
                 "Hello",
                 requestCallback,
                 cancellationToken);
 
-            await Task.Delay(5000);
-
-            session.Messaging.RemoveRequestStream(path);
-            session2.Messaging.RemoveRequestStream(path);
             session.Close();
             session2.Close();
             session3.Close();

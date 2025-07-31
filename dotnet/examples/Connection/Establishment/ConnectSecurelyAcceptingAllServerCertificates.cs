@@ -40,8 +40,6 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Establishment
 
             // Insert work here...
 
-            await Task.Delay(5000);
-
             session.Close();
         }
     }

@@ -28,27 +28,36 @@ import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
+/**
+ * This example demonstrates how to use addAndSet with the 'locked' constraint.
+ * <P>
+ * The example uses an update constraint to ensure that addAndSet is only allowed
+ * when the session holds a lock on the topic path.
+ *
+ * @author DiffusionData Limited
+ */
 public class AddAndSetSessionLockConstraintExample {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AddAndSetSessionLockConstraintExample.class);
+    private static final Logger LOG =
+        LoggerFactory.getLogger(AddAndSetSessionLockConstraintExample.class);
 
     public static void main(String[] args) {
 
-        Session session = Diffusion.sessions()
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        TopicSpecification specification = Diffusion.newTopicSpecification(TopicType.JSON);
+        final TopicSpecification specification = Diffusion.newTopicSpecification(TopicType.JSON);
 
-        JSON value = Diffusion.dataTypes().json()
+        final JSON value = Diffusion.dataTypes().json()
             .fromJsonString("{ \"diffusion\": \"data\" }");
 
-        // lock the path and create a constraint the requires the lock
-        SessionLock lock = session.lock("my/topic/path").join();
-        UpdateConstraint constraint = Diffusion.updateConstraints().locked(lock);
+        // lock the path and create a constraint that requires the lock
+        final SessionLock lock = session.lock("my/topic/path").join();
+        final UpdateConstraint constraint = Diffusion.updateConstraints().locked(lock);
 
-        // update the topic with the constraint, this works as we have the lock
+        // add and set the topic with the constraint, this works as we have the lock
         session.feature(TopicUpdate.class)
             .addAndSet("my/topic/path", specification, JSON.class, value, constraint).join();
         LOG.info("Topic updated");
@@ -63,10 +72,9 @@ public class AddAndSetSessionLockConstraintExample {
                 .addAndSet("my/topic/path", specification, JSON.class, value, constraint).join();
         }
         catch (CompletionException e) {
-            LOG.info("Update failed: " + e.getCause().getMessage());
+            LOG.info("Update failed: {}", e.getCause().getMessage());
         }
 
         session.close();
-
     }
 }

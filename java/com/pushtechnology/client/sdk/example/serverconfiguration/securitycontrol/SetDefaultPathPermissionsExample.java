@@ -14,47 +14,53 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl.ScriptBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.types.PathPermission;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
-
+/**
+ * This example demonstrates how to set default path permissions for a role using
+ * the security control feature in Diffusion.
+ * <P>
+ * The example assigns `UPDATE_TOPIC` and `MODIFY_TOPIC` permissions to the
+ * `CLIENT` role as default path permissions.
+ *
+ * @author DiffusionData Limited
+ */
 public class SetDefaultPathPermissionsExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
         SetDefaultPathPermissionsExample.class);
 
     public static void main(String[] args) {
-        Session session = Diffusion.sessions()
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        SecurityControl securityControl = session.feature(SecurityControl.class);
-        ScriptBuilder builder = securityControl.scriptBuilder();
+        final  SecurityControl securityControl = session.feature(SecurityControl.class);
+        final ScriptBuilder builder = securityControl.scriptBuilder();
 
-        Set<PathPermission> myPermissions = new HashSet<PathPermission>(){{
-            add(PathPermission.UPDATE_TOPIC);
-            add(PathPermission.MODIFY_TOPIC);
-        }};
-
-        System.out.println("Adding the following permissions to the default path permissions " +
-            "of Role CLIENT: MODIFY_TOPIC and UPDATE_TOPIC");
+        final Set<PathPermission> myPermissions = new HashSet<>();
+        myPermissions.add(PathPermission.UPDATE_TOPIC);
+        myPermissions.add(PathPermission.MODIFY_TOPIC);
 
         builder.setDefaultPathPermissions("CLIENT", myPermissions);
-        String script = builder.script();
-        System.out.println(script);
+        final  String script = builder.script();
 
-        securityControl.updateStore(script).join();
+        LOG.info("Updating default permissions");
+        securityControl.updateStore(script)
+            .whenComplete((r, ex) -> LOG.info(script));
+
         session.close();
-
-        LOG.info(script);
     }
 }

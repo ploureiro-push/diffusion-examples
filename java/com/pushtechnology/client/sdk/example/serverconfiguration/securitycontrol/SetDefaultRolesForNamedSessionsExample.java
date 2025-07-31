@@ -14,39 +14,44 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
-import com.pushtechnology.diffusion.client.session.Session;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
+import com.pushtechnology.diffusion.client.session.Session;
 
+/**
+ * This example demonstrates how to set default roles for named sessions using the
+ * security control feature in Diffusion.
+ * <P>
+ * The example assigns the `ADMINISTRATOR` role to all named sessions.
+ *
+ * @author DiffusionData Limited
+ */
 public class SetDefaultRolesForNamedSessionsExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
         SetDefaultRolesForNamedSessionsExample.class);
 
     public static void main(String[] args) throws Exception {
-        Session session = Diffusion.sessions()
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        SecurityControl securityControl = session.feature(SecurityControl.class);
-        SecurityControl.ScriptBuilder builder = securityControl.scriptBuilder();
-
-        System.out.println("All anonymous sessions now have ADMINISTRATOR privileges.");
+        final SecurityControl securityControl = session.feature(SecurityControl.class);
+        final SecurityControl.ScriptBuilder builder = securityControl.scriptBuilder();
 
         builder.setRolesForNamedSessions(Collections.singleton("ADMINISTRATOR"));
 
-        String script = builder.script();
-        System.out.println(script);
-        securityControl.updateStore(script).join();
+        securityControl.updateStore(builder.script())
+            .whenComplete((r, ex) ->
+                LOG.info("All named sessions now have ADMINISTRATOR privileges."));
 
         session.close();
-
-        LOG.info(script);
     }
 }

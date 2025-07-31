@@ -21,13 +21,13 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_clients_conflated_set(
     int selected,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -45,20 +45,23 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *admin_session = utils_open_session(url, "admin", "password");
 
     SESSION_T *client_session = utils_open_session(url, "client", "password");
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_CLIENT_SET_CONFLATED_WITH_FILTER_PARAMS_T params = {
         .filter = "$Principal is 'client'",
         .on_clients_conflated_set = on_clients_conflated_set,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_client_set_conflated_with_filter(admin_session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(client_session, NULL);
     session_free(client_session);
@@ -66,5 +69,5 @@ void run_example(
     session_close(admin_session, NULL);
     session_free(admin_session);
 
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
 }

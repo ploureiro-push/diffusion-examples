@@ -36,8 +36,6 @@ namespace PushTechnology.ClientInterface.Examples.Ping
             var pingDetails = await session.Ping.PingServerAsync(cancellationToken);
             WriteLine($"Server Ping: {pingDetails.RoundTripTimeSpan}ms.");
 
-            await Task.Delay(5000);
-
             session.Close();
         }
     }

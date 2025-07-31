@@ -39,15 +39,26 @@ static int on_missing_topic(
     void *context)
 {
     printf("Received missing topic notification:\n");
-
     char *session_id = session_id_to_string(request->session_id);
     printf("\tSession ID: %s\n", session_id);
     free(session_id);
 
     printf("\tTopic Selector: %s\n", request->topic_selector);
 
+    char *topic_path;
+    size_t topic_name_length = strlen(request->topic_selector);
+    if (request->topic_selector[0] == '>') {
+        topic_path = calloc(topic_name_length, sizeof(char));
+        strncpy(topic_path, request->topic_selector + 1, topic_name_length - 1);
+    }
+    else {
+        topic_path = strdup(request->topic_selector);
+    }
+
     utils_create_string_topic(
-        g_control_session, "my/topic/path/does/not/exist/yet", "Hello");
+        g_control_session, topic_path, "Hello");
+
+    free(topic_path);
 
     MUTEX_BROADCAST
     return HANDLER_SUCCESS;
@@ -64,12 +75,13 @@ void run_example(
     SESSION_T *admin_session = utils_open_session(url, "admin", "password");
 
     const char *topic_path_root = "my/topic/path";
-    MISSING_TOPIC_PARAMS_T missing_topic_params = {
 
+    MISSING_TOPIC_PARAMS_T missing_topic_params = {
         .topic_path = topic_path_root,
         .on_missing_topic = on_missing_topic,
         .on_error = on_error
     };
+
     CONVERSATION_ID_T *missing_topic_cid =
         missing_topic_register_handler(admin_session, missing_topic_params);
 
@@ -83,6 +95,7 @@ void run_example(
     // Sleep for a bit to see the notifications
     sleep(2);
 
+
     missing_topic_deregister_handler(admin_session, missing_topic_cid);
 
     // Sleep for a bit to see the notifications
@@ -90,10 +103,11 @@ void run_example(
 
     session_close(g_control_session, NULL);
     session_free(g_control_session);
-    free(value_stream_ptr);
 
     session_close(admin_session, NULL);
     session_free(admin_session);
 
+    conversation_id_free(missing_topic_cid);
+    free(value_stream_ptr);
     MUTEX_TERMINATE
 }

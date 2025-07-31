@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_topic_update_add_and_set(
     DIFFUSION_TOPIC_CREATION_RESULT_T result,
@@ -33,7 +33,7 @@ static int on_topic_update_add_and_set(
     else if (result == TOPIC_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -51,7 +51,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/topic/path ";
 
     SESSION_T *session = session_create(
@@ -62,17 +62,20 @@ void run_example(
     BUF_T *value = buf_create();
     write_diffusion_json_value("{\"diffusion\": \"bar\"}", value);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_TOPIC_UPDATE_ADD_AND_SET_PARAMS_T params = {
         .datatype = DATATYPE_JSON,
         .on_topic_update_add_and_set = on_topic_update_add_and_set,
         .topic_path = topic_path,
         .specification = topic_specification,
         .update = value,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_topic_update_add_and_set(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     DIFFUSION_UPDATE_CONSTRAINT_VALUE_T *constraint_value =
         diffusion_update_constraint_value_from_string("bar");
@@ -91,18 +94,22 @@ void run_example(
         .topic_path = topic_path,
         .specification = topic_specification,
         .update = new_value,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_topic_update_add_and_set_with_constraint(session, constraint, new_set_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
+
+    coordinator_free(coordinator);
     buf_free(new_value);
+
     diffusion_topic_update_constraint_free(constraint);
     diffusion_update_constraint_value_free(constraint_value);
+
     buf_free(value);
     topic_specification_free(topic_specification);
-    MUTEX_TERMINATE
 }

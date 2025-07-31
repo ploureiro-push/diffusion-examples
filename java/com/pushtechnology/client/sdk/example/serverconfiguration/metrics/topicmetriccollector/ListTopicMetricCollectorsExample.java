@@ -14,16 +14,22 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.metrics.topicmetriccollector;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.Metrics;
 import com.pushtechnology.diffusion.client.features.control.Metrics.TopicMetricCollector;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
-
+/**
+ * This example demonstrates how to list metric collectors using the Metrics
+ * feature in Diffusion.
+ *
+ * @author DiffusionData Limited
+ */
 public class ListTopicMetricCollectorsExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
@@ -31,7 +37,7 @@ public class ListTopicMetricCollectorsExample {
 
     public static void main(String[] args) {
 
-        Session session = Diffusion.sessions()
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
@@ -58,7 +64,7 @@ public class ListTopicMetricCollectorsExample {
         metricsControl.putTopicMetricCollector(
             builder.create("Topic Metric Collector 2", "?/my/topic//")).join();
 
-        List<TopicMetricCollector> metricCollectorList =
+        final List<TopicMetricCollector> metricCollectorList =
             metricsControl.listTopicMetricCollectors().join();
 
         metricCollectorList.forEach(collector -> {

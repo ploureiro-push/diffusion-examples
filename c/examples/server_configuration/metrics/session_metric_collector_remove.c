@@ -21,17 +21,17 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_collector_set(void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
 static int on_collector_removed(void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -49,7 +49,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
@@ -68,27 +68,33 @@ void run_example(
 
     diffusion_session_metric_collector_builder_free(builder);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_METRICS_PUT_SESSION_METRIC_COLLECTOR_PARAMS_T params = {
         .collector = collector,
         .on_collector_set = on_collector_set,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_metrics_put_session_metric_collector(session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
      DIFFUSION_METRICS_REMOVE_SESSION_METRIC_COLLECTOR_PARAMS_T remove_params = {
         .collector_name = "Session Metric Collector 1",
         .on_collector_removed = on_collector_removed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_metrics_remove_session_metric_collector(session, remove_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     printf("Session Metric Collector 1 has been removed.\n");
 
     session_close(session, NULL);
     session_free(session);
 
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
+    diffusion_session_metric_collector_free(collector);
 }

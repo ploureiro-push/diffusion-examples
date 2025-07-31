@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_security_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -47,7 +47,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
@@ -59,17 +59,21 @@ void run_example(
     SCRIPT_T *isolate_path_script = script_create();
     update_security_store_isolate_path(isolate_path_script, topic_path);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SECURITY_STORE_PARAMS_T isolate_path_params = {
         .on_update = on_security_store_updated,
         .on_error = on_error,
-        .update_script = isolate_path_script
+        .update_script = isolate_path_script,
+        .context = coordinator
     };
 
     printf("\nIsolating %s permissions from parent and default path permissions.\n", topic_path);
     utils_print_script(isolate_path_script);
 
     update_security_store(session, isolate_path_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     script_free(isolate_path_script);
 
     SCRIPT_T *deisolate_path_script = script_create();
@@ -78,18 +82,20 @@ void run_example(
     const UPDATE_SECURITY_STORE_PARAMS_T deisolate_path_params = {
         .on_update = on_security_store_updated,
         .on_error = on_error,
-        .update_script = deisolate_path_script
+        .update_script = deisolate_path_script,
+        .context = coordinator
     };
 
     printf("\nRemoving %s permission isolation.\n", topic_path);
     utils_print_script(deisolate_path_script);
 
     update_security_store(session, deisolate_path_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     script_free(deisolate_path_script);
 
     session_close(session, NULL);
     session_free(session);
 
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
 }

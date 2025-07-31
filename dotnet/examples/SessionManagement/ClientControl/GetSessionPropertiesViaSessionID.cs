@@ -40,18 +40,16 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement.ClientContro
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            var requiredProperties = new List<string> { SessionProperty.ALL_FIXED_PROPERTIES, SessionProperty.ALL_USER_PROPERTIES };
+            var requiredProperties = new List<string> { SessionProperty.ALL_FIXED_PROPERTIES };
 
             var properties = await session.ClientControl.GetSessionPropertiesAsync(session2.SessionId, requiredProperties, cancellationToken);
 
-            WriteLine($"{session.SessionId}:");
+            WriteLine("Received the following session properties:");
 
             foreach (var property in properties)
             {
                 WriteLine($"{property.Key}: {property.Value}");
             }
-
-            await Task.Delay(5000);
 
             session2.Close();
             session.Close();

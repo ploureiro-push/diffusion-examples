@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_subscription(
     const char *const topic_path,
@@ -52,7 +52,7 @@ static int on_json_value(
 {
     char *old_value_string;
     if (old_value == NULL) {
-        old_value_string = "NULL";
+        old_value_string = strdup("NULL");
     }
     else {
         DIFFUSION_TIME_SERIES_EVENT_T *old_event;
@@ -62,11 +62,14 @@ static int on_json_value(
              diffusion_time_series_event_get_value(old_event);
 
         to_diffusion_json_string(old_event_value, &old_value_string, NULL);
+
+        diffusion_time_series_event_free(old_event);
+        diffusion_value_free(old_event_value);
     }
 
     char *new_value_string;
     if (new_value == NULL) {
-        new_value_string = "NULL";
+        new_value_string = strdup("NULL");
     }
     else {
         DIFFUSION_TIME_SERIES_EVENT_T *new_event;
@@ -76,6 +79,9 @@ static int on_json_value(
              diffusion_time_series_event_get_value(new_event);
 
         to_diffusion_json_string(new_event_value, &new_value_string, NULL);
+
+        diffusion_time_series_event_free(new_event);
+        diffusion_value_free(new_event_value);
     }
 
     printf(
@@ -83,13 +89,9 @@ static int on_json_value(
         topic_path, old_value_string, new_value_string
     );
 
-    if (old_value != NULL) {
-        free(old_value_string);
-    }
+    free(old_value_string);
+    free(new_value_string);
 
-    if (new_value != NULL) {
-        free(new_value_string);
-    }
     return HANDLER_SUCCESS;
 }
 
@@ -98,7 +100,7 @@ static int on_subscribe(
     void *context)
 {
     printf("Subscription request received and approved by the server.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -116,7 +118,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/time/series/topic/path";
 
     SESSION_T *session = session_create(
@@ -147,13 +149,16 @@ void run_example(
 
     add_time_series_stream(session, topic_path, &value_stream);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     SUBSCRIPTION_PARAMS_T params = {
             .topic_selector = "?/my/time/series//",
-            .on_subscribe = on_subscribe
+            .on_subscribe = on_subscribe,
+            .context = coordinator
     };
 
     subscribe(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     for (int i = 0; i < 25; i++) {
         double random_value = utils_random_double();
@@ -165,11 +170,12 @@ void run_example(
                 .on_append = on_append,
                 .topic_path = topic_path,
                 .datatype = DATATYPE_DOUBLE,
-                .value = value
+                .value = value,
+                .context = coordinator
         };
 
         diffusion_time_series_append(session, params, NULL);
-        MUTEX_WAIT
+        coordinator_wait(coordinator);
         buf_free(value);
     }
 
@@ -178,5 +184,6 @@ void run_example(
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
-}
+
+    coordinator_free(coordinator);
+    }

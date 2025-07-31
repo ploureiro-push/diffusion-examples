@@ -100,7 +100,6 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
             session3?.Close();
             session2?.Close();
             session1.Close();
-
         }
 
         private sealed class Authenticator : IControlAuthenticator
@@ -115,13 +114,20 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
             {
                 if (principal.StartsWith("diffusion_"))
                 {
-                    WriteLine("Principal begins with diffusion_ prefix. Connection Accepted.");
+                    WriteLine("Principal begins with diffusion_ prefix. Session establishment Accepted.");
 
                     callback.Allow();
                 }
                 else
                 {
-                    WriteLine("Principal does not begins with diffusion_ prefix. Connection Rejected.");
+                    if (string.IsNullOrEmpty(principal))
+                    {
+                        WriteLine("Anonymous connection attempt detected. Session establishment Rejected.");
+                    }
+                    else
+                    {
+                        WriteLine("Principal does not begins with diffusion_ prefix. Session establishment Rejected.");
+                    }
 
                     callback.Deny();
                 }

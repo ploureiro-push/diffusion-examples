@@ -16,6 +16,9 @@ package com.pushtechnology.client.sdk.example.pubsub.subscribe;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
 import com.pushtechnology.diffusion.client.features.Topics;
@@ -25,14 +28,21 @@ import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates subscribing to multiple JSON topics in Diffusion
+ * using both specific and fallback value streams.
+ * <P>
+ * The example shows how to set up a specific value stream for selected topics and a fallback
+ * stream to handle any other matching topics.
+ *
+ * @author DiffusionData Limited
+ */
 public class SubscribeFallbackStreamExample {
-    private static final Logger LOG = LoggerFactory.getLogger(SubscribeFallbackStreamExample.class);
 
-    public static void main(String[] args)
-        throws Exception {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(SubscribeFallbackStreamExample.class);
+
+    public static void main(String[] args) throws Exception {
 
         try (Session session = Diffusion.sessions()
             .principal("admin")

@@ -76,8 +76,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
                 WriteLine($"{remoteServer.Name} ({remoteServer.ServerUrl}): {result.ConnectionState} ({result.FailureMessage})");
             }
 
-            await Task.Delay(5000);
-
             session.Close();
         }
     }

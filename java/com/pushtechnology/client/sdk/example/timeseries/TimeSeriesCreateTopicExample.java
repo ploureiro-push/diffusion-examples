@@ -16,15 +16,23 @@ package com.pushtechnology.client.sdk.example.timeseries;
 
 import static com.pushtechnology.diffusion.datatype.DataTypes.DOUBLE_DATATYPE_NAME;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to create a time series topic in Diffusion.
+ * <P>
+ * A time series topic is created with a specified event value type, retained range,
+ * and subscription range.
+ *
+ * @author DiffusionData Limited
+ */
 public class TimeSeriesCreateTopicExample {
     private static final Logger LOG = LoggerFactory.getLogger(TimeSeriesCreateTopicExample.class);
 

@@ -40,24 +40,16 @@ namespace PushTechnology.ClientInterface.Examples.Monitoring
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            string topicSelector = "?my/topic/path//";
-
             var topicNotificationListener = new TopicNotificationListener();
             var registration = await session.TopicNotifications.AddListenerAsync(topicNotificationListener, cancellationToken);
-            await registration.SelectAsync(topicSelector, cancellationToken);
+            await registration.SelectAsync(">my/topic/path", cancellationToken);
 
-            var specification = session.TopicControl.NewSpecification(TopicType.STRING);
+            var specification = Diffusion.NewSpecification(TopicType.STRING);
 
             await session.TopicUpdate.AddAndSetAsync("my/topic/path", specification, "Good morning", cancellationToken);
             await session.TopicUpdate.AddAndSetAsync("my/topic/path/descendant", specification, "Good afternoon", cancellationToken);
             await session.TopicUpdate.AddAndSetAsync("other/path/of/the/topic/tree", specification, "This will not generate a notification", cancellationToken);
             await session.TopicControl.RemoveTopicsAsync("my/topic/path/descendant", cancellationToken);
-
-            await registration.DeselectAsync(topicSelector, cancellationToken);
-
-            await Task.Delay(5000);
-
-            await registration.CloseAsync();
 
             session.Close();
         }
@@ -90,16 +82,20 @@ namespace PushTechnology.ClientInterface.Examples.Monitoring
 
             public void OnTopicNotification(string topicPath, ITopicSpecification specification, NotificationType type)
             {
-                if (type == NotificationType.ADDED) {
+                if (type == NotificationType.ADDED) 
+                {
                     WriteLine($"Topic {topicPath} has been added.");
                 }
-                if (type == NotificationType.SELECTED) {
+                if (type == NotificationType.SELECTED) 
+                {
                     WriteLine($"Topic {topicPath} has been selected.");
                 }
-                if (type == NotificationType.DESELECTED) {
+                if (type == NotificationType.DESELECTED) 
+                {
                     WriteLine($"Topic {topicPath} has been deselected.");
                 }
-                if (type == NotificationType.REMOVED) {
+                if (type == NotificationType.REMOVED) 
+                {
                     WriteLine($"Topic {topicPath} has been removed.");
                 }
             }

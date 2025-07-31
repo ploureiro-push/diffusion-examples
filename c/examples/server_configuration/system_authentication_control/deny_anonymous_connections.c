@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_system_authentication_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -47,32 +47,38 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
     SCRIPT_T *script = script_create();
     update_auth_store_deny_anonymous_connections(script);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SYSTEM_AUTHENTICATION_STORE_PARAMS_T params = {
         .on_update = on_system_authentication_store_updated,
         .on_error = on_error,
-        .update_script = script
+        .update_script = script,
+        .context = coordinator
     };
 
     update_system_authentication_store(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
     script_free(script);
 
     CREDENTIALS_T *anonymous_credentials =
         credentials_create_none();
 
-    DIFFUSION_ERROR_T error = { 0 };
+    DIFFUSION_ERROR_T *error = calloc(1, sizeof(DIFFUSION_ERROR_T));
     SESSION_T *anonymous_session = session_create(
-        url, "", anonymous_credentials, NULL, NULL, &error
+        url, "", anonymous_credentials, NULL, NULL, error
     );
     printf("Error while attempting to establish anonymous session:\n");
-    printf("\t%d: %s\n", error.code, error.message);
+    printf("\t%d: %s\n", error->code, error->message);
+    diffusion_error_free(error);
 
 
     session_close(session, NULL);
@@ -80,5 +86,4 @@ void run_example(
 
 
     credentials_free(anonymous_credentials);
-    MUTEX_TERMINATE
-}
+    }

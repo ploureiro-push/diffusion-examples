@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 DIFFUSION_SESSION_LOCK_T *g_session_lock;
 
 static int on_topic_update(
     void *context)
 {
     printf("Topic has been updated.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -51,7 +51,7 @@ static int on_topic_added(
     else if (result_code == TOPIC_ADD_RESULT_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -80,7 +80,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/topic/path";
 
     SESSION_T *session = session_create(
@@ -88,23 +88,29 @@ void run_example(
     );
 
     char *lock_name = "session_lock_1";
+
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_SESSION_LOCK_PARAMS_T lock_params = {
         .on_lock_acquired = on_lock_acquired,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     diffusion_session_lock(session, lock_name, lock_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     TOPIC_SPECIFICATION_T *topic_specification = topic_specification_init(TOPIC_TYPE_JSON);
     ADD_TOPIC_CALLBACK_T create_topic_params = {
         .on_topic_added_with_specification = on_topic_added,
         .on_topic_add_failed_with_specification = on_topic_add_failed_with_specification,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     add_topic_from_specification(
         session, topic_path, topic_specification, create_topic_params
     );
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     topic_specification_free(topic_specification);
 
     DIFFUSION_TOPIC_UPDATE_CONSTRAINT_T *constraint =
@@ -118,15 +124,17 @@ void run_example(
         .on_topic_update = on_topic_update,
         .topic_path = topic_path,
         .update = value,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_topic_update_set_with_constraint(session, constraint, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
+
+    coordinator_free(coordinator);
     diffusion_topic_update_constraint_free(constraint);
     buf_free(value);
-    MUTEX_TERMINATE
 }

@@ -61,8 +61,8 @@ static int on_response(
     read_diffusion_string_value(response, &response_string_value, NULL);
     printf("Received response: %s\n", response_string_value);
     free(response_string_value);
-    MUTEX_BROADCAST
 
+    MUTEX_BROADCAST
     return HANDLER_SUCCESS;
 }
 
@@ -107,8 +107,9 @@ void run_example(
         .response_datatype = DATATYPE_STRING
     };
     send_request(sending_session, send_request_params);
-    buf_free(request);
     MUTEX_WAIT
+
+    buf_free(request);
 
     session_close(receiving_session, NULL);
     session_free(receiving_session);

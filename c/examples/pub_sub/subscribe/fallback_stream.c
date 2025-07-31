@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_subscription(
     const char *const topic_path,
@@ -52,7 +52,7 @@ static int on_value(
 {
     char *old_value_json_string;
     if (old_value == NULL) {
-        old_value_json_string = "NULL";
+        old_value_json_string = strdup("NULL");
     }
     else {
         to_diffusion_json_string(old_value, &old_value_json_string, NULL);
@@ -60,7 +60,7 @@ static int on_value(
 
     char *new_value_json_string;
     if (new_value == NULL) {
-        new_value_json_string = "NULL";
+        new_value_json_string = strdup("NULL");
     }
     else {
         to_diffusion_json_string(new_value, &new_value_json_string, NULL);
@@ -71,13 +71,9 @@ static int on_value(
         topic_path, old_value_json_string, new_value_json_string
     );
 
-    if (old_value != NULL) {
-        free(old_value_json_string);
-    }
+    free(old_value_json_string);
+    free(new_value_json_string);
 
-    if (new_value != NULL) {
-        free(new_value_json_string);
-    }
     return HANDLER_SUCCESS;
 }
 
@@ -86,7 +82,7 @@ static int on_subscribe(
     void *context)
 {
     printf("Subscription request received and approved by the server.\n");
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -96,7 +92,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
@@ -125,13 +121,16 @@ void run_example(
 
     const char *topic_selector = "?my//";
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     SUBSCRIPTION_PARAMS_T params = {
-            .topic_selector = topic_selector,
-            .on_subscribe = on_subscribe
+        .topic_selector = topic_selector,
+        .on_subscribe = on_subscribe,
+        .context = coordinator
     };
 
     subscribe(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     // Sleep for a bit to see the notifications
     sleep(2);
@@ -154,5 +153,6 @@ void run_example(
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
+
+    coordinator_free(coordinator);
 }

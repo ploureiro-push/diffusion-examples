@@ -6,7 +6,7 @@ function(add_example FOLDER_PATH FILE_NAME COPY_RESOURCES)
         "${EXAMPLES_SOURCE_FOLDER}/main.c"
         "${EXAMPLES_SOURCE_FOLDER}/${FOLDER_PATH}/${FILE_NAME}.c"
         "${EXAMPLES_SOURCE_FOLDER}/utils/utils.c"
-        "${EXAMPLES_SOURCE_FOLDER}/utils/regexp9.c"
+        "${EXAMPLES_SOURCE_FOLDER}/utils/coordinator.c"
     )
     target_link_libraries(${EXAMPLE_NAME} PRIVATE ${DEPENDENCIES} Threads::Threads ${ADDITIONAL_LD_FLAGS})
     target_include_directories(${EXAMPLE_NAME} PUBLIC ${INCLUDE_DIRECTORIES})
@@ -37,7 +37,7 @@ function(add_example FOLDER_PATH FILE_NAME COPY_RESOURCES)
             )
 
             foreach(FILE IN ITEMS ${WINDOWS_PATH})
-                message("Copying ${FILE} to ${LIB_PATH}")
+                message(STATUS "Copying ${FILE} to ${LIB_PATH}")
                 add_custom_command(
                     TARGET ${EXAMPLE_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FILE}" "${LIB_PATH}/"
@@ -67,6 +67,7 @@ add_example("connection/resilience" "reconnection_strategy" "false")
 add_example("ping" "ping_server" "false")
 
 add_example("security" "change_principal" "false")
+add_example("security" "reauthenticate" "false")
 add_example("security" "get_global_permissions" "false")
 add_example("security" "get_path_permissions" "false")
 
@@ -82,22 +83,32 @@ add_example("pub_sub/publish/with_constraint" "add_and_set_topic_session_lock" "
 add_example("pub_sub/publish/with_constraint" "add_and_set_topic_json_value_with" "false")
 add_example("pub_sub/publish/with_constraint" "add_and_set_topic_json_value_without" "false")
 add_example("pub_sub/publish/with_constraint" "add_and_set_topic_and" "false")
+add_example("pub_sub/publish/with_constraint" "add_and_set_topic_or" "false")
 add_example("pub_sub/publish/with_constraint" "set_topic_no_value" "false")
 add_example("pub_sub/publish/with_constraint" "set_topic_value" "false")
 add_example("pub_sub/publish/with_constraint" "set_topic_session_lock" "false")
 add_example("pub_sub/publish/with_constraint" "set_topic_json_value_with" "false")
 add_example("pub_sub/publish/with_constraint" "set_topic_json_value_without" "false")
 
-add_example("pub_sub/subscribe" "single_topic_via_path" "false")
-add_example("pub_sub/subscribe" "multiple_topics_via_selector" "false")
-add_example("pub_sub/subscribe" "fallback_stream" "false")
 add_example("pub_sub/subscribe" "cross_compatible" "false")
+add_example("pub_sub/subscribe" "fallback_stream" "false")
+add_example("pub_sub/subscribe" "multiple_topics_via_selector" "false")
+add_example("pub_sub/subscribe" "selection_scopes" "false")
+add_example("pub_sub/subscribe" "single_topic_via_path" "false")
 
 add_example("pub_sub/remove" "multiple_topics_via_selector" "false")
 add_example("pub_sub/remove" "single_topic_via_path" "false")
+add_example("pub_sub/remove" "automatic_topic_removal" "false")
 
 add_example("pub_sub/fetch" "topic_properties" "false")
 add_example("pub_sub/fetch" "topic_via_paging" "false")
+
+add_example("pub_sub/json_patch" "add" "false")
+add_example("pub_sub/json_patch" "copy" "false")
+add_example("pub_sub/json_patch" "move" "false")
+add_example("pub_sub/json_patch" "remove" "false")
+add_example("pub_sub/json_patch" "replace" "false")
+add_example("pub_sub/json_patch" "test" "false")
 
 add_example("time_series" "append_user_supplied_timestamp" "false")
 add_example("time_series" "append_value_via_update_stream" "false")

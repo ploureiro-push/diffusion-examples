@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_branch_mapping_table_received(
     const DIFFUSION_BRANCH_MAPPING_TABLE_T *table,
@@ -51,7 +51,7 @@ static int on_branch_mapping_table_received(
         free(topic_tree_branch);
     }
     diffusion_branch_mapping_table_free_branch_mappings(branch_mappings);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -70,7 +70,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
@@ -96,25 +96,30 @@ void run_example(
         session, "my/alternate/path", 3, mappings_2
     );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_SESSION_TREES_GET_BRANCH_MAPPING_TABLE_PARAMS_T get_table_params_1 = {
         .on_table_received = on_branch_mapping_table_received,
         .on_error = on_error,
-        .session_tree_branch = "my/personal/path"
+        .session_tree_branch = "my/personal/path",
+        .context = coordinator
     };
 
     diffusion_session_trees_get_branch_mapping_table(session, get_table_params_1, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     DIFFUSION_SESSION_TREES_GET_BRANCH_MAPPING_TABLE_PARAMS_T get_table_params_2 = {
         .on_table_received = on_branch_mapping_table_received,
         .on_error = on_error,
-        .session_tree_branch = "my/alternate/path"
+        .session_tree_branch = "my/alternate/path",
+        .context = coordinator
     };
 
     diffusion_session_trees_get_branch_mapping_table(session, get_table_params_2, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
-}
+
+    coordinator_free(coordinator);
+    }

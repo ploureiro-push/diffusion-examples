@@ -44,8 +44,6 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Resilience
 
             // Insert work here...
 
-            await Task.Delay(5000);
-
             session.Close();
         }
 
@@ -60,7 +58,8 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Resilience
 
             public async Task PerformReconnection(IReconnectionAttempt reconnection)
             {
-                if (Retries > 10) {
+                if (Retries > 10) 
+                {
                     // Abort after 10 attempts.
                     throw new Exception();
                 }

@@ -14,37 +14,43 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl.ScriptBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to isolate a topic path using the security
+ * control feature in Diffusion.
+ *
+ * @author DiffusionData Limited
+ */
 public class IsolatePathExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
         IsolatePathExample.class);
 
-    public static void main(String[] args) throws Exception{
-        Session session = Diffusion.sessions()
+    public static void main(String[] args) throws Exception {
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        SecurityControl securityControl = session.feature(SecurityControl.class);
-        ScriptBuilder builder = securityControl.scriptBuilder();
+        final SecurityControl securityControl = session.feature(SecurityControl.class);
+        final ScriptBuilder builder = securityControl.scriptBuilder();
 
         builder.isolatePath("my/topic/path");
-        System.out.println("Isolating my/topic/path permissions from parent and default path permissions");
+        final String script = builder.script();
 
-        String script = builder.script();
-        System.out.println(script);
+        LOG.info("Isolating my/topic/path permissions from parent and default path permissions");
 
-        securityControl.updateStore(script).join();
+        securityControl.updateStore(script)
+            .whenComplete((r, ex) ->   LOG.info(script));
 
         session.close();
-        LOG.info(script);
     }
 }

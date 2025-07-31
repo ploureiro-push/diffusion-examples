@@ -27,20 +27,30 @@ import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
+/**
+ * This example demonstrates how to update a JSON topic in Diffusion using the
+ * 'without' constraint.
+ * <P>
+ * The example creates a JSON topic and uses an update constraint to restrict updates
+ * if a specific JSON path is already present.
+ *
+ * @author DiffusionData Limited
+ */
 public class AddAndSetJSONValueWithoutConstraintExample {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AddAndSetJSONValueWithoutConstraintExample.class);
+    private static final Logger LOG =
+        LoggerFactory.getLogger(AddAndSetJSONValueWithoutConstraintExample.class);
 
     public static void main(String[] args) {
 
-        Session session = Diffusion.sessions()
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        TopicSpecification specification = Diffusion.newTopicSpecification(TopicType.JSON);
+        final TopicSpecification specification = Diffusion.newTopicSpecification(TopicType.JSON);
 
-        JSON value = Diffusion.dataTypes().json()
+        final JSON value = Diffusion.dataTypes().json()
             .fromJsonString("{ \"diffusion\": \"data\" }");
 
         // create a topic with a json value
@@ -49,7 +59,7 @@ public class AddAndSetJSONValueWithoutConstraintExample {
         LOG.info("Topic updated");
 
         // only allow updates if the specified position in the json object does not exist
-        UpdateConstraint constraint = Diffusion.updateConstraints()
+        final UpdateConstraint constraint = Diffusion.updateConstraints()
             .jsonValue().without("/diffusion");
 
         try {
@@ -59,10 +69,9 @@ public class AddAndSetJSONValueWithoutConstraintExample {
                 .addAndSet("my/topic/path", specification, JSON.class, value, constraint).join();
         }
         catch (CompletionException e) {
-            LOG.info("Update failed: " + e.getCause().getMessage());
+            LOG.info("Update failed: {}", e.getCause().getMessage());
         }
 
         session.close();
-
     }
 }

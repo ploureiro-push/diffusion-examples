@@ -21,11 +21,11 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_listener_registered(SESSION_T *session, void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -33,7 +33,7 @@ static int on_registration_error(
     SESSION_T *session,
     const DIFFUSION_ERROR_T *error)
 {
-    MUTEX_BROADCAST
+    printf("On error: %s\n", error->message);
     return HANDLER_SUCCESS;
 }
 
@@ -41,6 +41,7 @@ static int on_session_error(
     SESSION_T *session,
     const DIFFUSION_ERROR_T *error)
 {
+    printf("On session error: %s\n", error->message);
     return HANDLER_SUCCESS;
 }
 
@@ -52,7 +53,7 @@ static int on_session_open(
     char *session_id = session_id_to_string(&request->session_id);
     printf("Session %s is now open with the following properties:\n", session_id);
     utils_print_hash(
-        request->properties, NULL, utils_print_string
+        request->properties, NULL, utils_print_string, false
     );
 
     free(session_id);
@@ -74,7 +75,7 @@ static int on_session_update(
     char *session_id = session_id_to_string(&request->session_id);
     printf("Session %s has been updated (%s) with the following properties:\n", session_id, update_type);
     utils_print_hash(
-        request->properties, NULL, utils_print_string
+        request->properties, NULL, utils_print_string, false
     );
 
     free(session_id);
@@ -99,7 +100,6 @@ static int on_session_close(
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_INVALID_INBOUND_MESSAGE, "Connection Lost");
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_ABORTED, "Connection Lost");
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_LOST_MESSAGES, "Connection Lost");
-    hash_num_add(close_reason_map, SESSION_CLOSE_REASON_SERVER_CLOSING, "Connection Lost");
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_CLOSED_BY_CONTROLLER, "Connection Lost");
     hash_num_add(close_reason_map, SESSION_CLOSE_REASON_FAILED_OVER, "Connection Lost");
 
@@ -107,7 +107,7 @@ static int on_session_close(
     char *session_id = session_id_to_string(&request->session_id);
     printf("Session %s has been closed (%s) with the following properties:\n", session_id, close_reason);
     utils_print_hash(
-        request->properties, NULL, utils_print_string
+        request->properties, NULL, utils_print_string, false
     );
 
     free(session_id);
@@ -121,13 +121,15 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
     SET_T *required_properties = set_new_string(5);
     set_add(required_properties, PROPERTIES_SELECTOR_ALL_FIXED_PROPERTIES);
     set_add(required_properties, PROPERTIES_SELECTOR_ALL_USER_PROPERTIES);
+
+    COORDINATOR_T *coordinator = coordinator_init();
 
     SESSION_PROPERTIES_REGISTRATION_PARAMS_T params = {
         .on_registered = on_listener_registered,
@@ -136,15 +138,15 @@ void run_example(
         .on_session_close = on_session_close,
         .on_session_error = on_session_error,
         .on_session_update = on_session_update,
-        .required_properties = required_properties
+        .required_properties = required_properties,
+        .context = coordinator
     };
     session_properties_listener_register(session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
 
-
+    coordinator_free(coordinator);
     set_free(required_properties);
-    MUTEX_TERMINATE
 }

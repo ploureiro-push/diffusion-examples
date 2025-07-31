@@ -34,22 +34,13 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityCo
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
-            WriteLine($"OPERATOR role has been locked by admin principal.");
+            WriteLine($"EXAMPLE role has been locked by admin principal.");
 
-            string script = session.SecurityControl.Script.SetRoleLockedByPrincipal("OPERATOR", "admin").ToScript();
+            string script = session.SecurityControl.Script.SetRoleLockedByPrincipal("EXAMPLE", "admin").ToScript();
 
             WriteLine($"{script}");
 
             await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
-
-            await Task.Delay(5000);
-
-            script = session.SystemAuthenticationControl.Script
-                                .RemovePrincipal("admin")
-                                .AddPrincipal("admin", "password", new List<string>() { "ADMINISTRATOR" })
-                                .ToScript();
-
-            await session.SystemAuthenticationControl.UpdateStoreAsync(script, cancellationToken);
 
             session.Close();
         }

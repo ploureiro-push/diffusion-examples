@@ -14,14 +14,23 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.establishment;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.session.Session.Listener;
 import com.pushtechnology.diffusion.client.session.Session.State;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to use a session state listener to monitor
+ * changes in the state of a Diffusion session.
+ * <P>
+ * The example registers a custom session listener that logs state transitions
+ * of the session.
+ *
+ * @author DiffusionData Limited
+ */
 public class SessionStateListenerExample {
 
     private static final Logger LOG = LoggerFactory
@@ -32,7 +41,7 @@ public class SessionStateListenerExample {
         final Listener mySessionListener = new Listener() {
             @Override
             public void onSessionStateChanged(Session session, State oldState, State newState) {
-                System.out.printf("State changed from %s to %s\n", oldState, newState);
+                LOG.info("State changed from {} to {}", oldState, newState);
             }
         };
 
@@ -45,7 +54,5 @@ public class SessionStateListenerExample {
         // Insert work here
 
         session.close();
-
-        LOG.info("session state: {}", session.getState());
     }
 }

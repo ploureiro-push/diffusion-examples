@@ -55,6 +55,7 @@ void run_example(
         url, principal, credentials, &session_listener, NULL, user_context, &error
     );
     MUTEX_WAIT
+
     if(session != NULL) {
         char *sid_str = session_id_to_string(session->id);
         printf("Connected. Session Identifier: %s\n", sid_str);

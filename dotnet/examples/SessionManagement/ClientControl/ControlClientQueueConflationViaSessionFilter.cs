@@ -39,9 +39,7 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement.ClientContro
                 .Open(serverUrl);
 
             int matchedSessions = await session.ClientControl.SetConflatedAsync("$Principal is 'client'", false, cancellationToken);
-            WriteLine($"Total clients with queue conflation enabled by session filter: {matchedSessions}.");
-
-            await Task.Delay(5000);
+            WriteLine($"Total clients with queue conflation disabled by session filter: {matchedSessions}.");
 
             session2.Close();
             session.Close();

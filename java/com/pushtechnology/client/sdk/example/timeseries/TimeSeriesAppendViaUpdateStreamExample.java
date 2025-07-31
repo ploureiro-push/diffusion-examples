@@ -16,6 +16,11 @@ package com.pushtechnology.client.sdk.example.timeseries;
 
 import static com.pushtechnology.diffusion.datatype.DataTypes.DOUBLE_DATATYPE_NAME;
 
+import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.TopicUpdate;
 import com.pushtechnology.diffusion.client.features.UpdateStream;
@@ -24,17 +29,18 @@ import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Random;
-
+/**
+ * This example demonstrates how to append events to a time series topic via
+ * an update stream in Diffusion.
+ *
+ * @author DiffusionData Limited
+ */
 public class TimeSeriesAppendViaUpdateStreamExample {
     private static final Logger LOG =
         LoggerFactory.getLogger(TimeSeriesAppendViaUpdateStreamExample.class);
 
     public static void main(String[] args) {
-        Session session = Diffusion.sessions()
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");

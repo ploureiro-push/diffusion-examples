@@ -14,6 +14,12 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.pubsub.fetch;
 
+import java.util.Collections;
+import java.util.concurrent.CompletionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.Topics;
 import com.pushtechnology.diffusion.client.session.Session;
@@ -21,17 +27,21 @@ import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.concurrent.CompletionException;
-
+/**
+ * This example demonstrates how to fetch the properties of topics in Diffusion.
+ * <P>
+ * The example creates a set of JSON and STRING topics with specific properties,
+ * and uses the fetch request feature to retrieve the properties of topics that
+ * match a given selector.
+ *
+ * @author DiffusionData Limited
+ */
 public class FetchTopicPropertiesExample {
-    private static final Logger LOG = LoggerFactory.getLogger(FetchTopicPropertiesExample.class);
 
-    public static void main(String[] args)
-        throws Throwable {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(FetchTopicPropertiesExample.class);
+
+    public static void main(String[] args) {
 
         try (Session session = Diffusion.sessions()
             .principal("admin")
@@ -101,8 +111,6 @@ public class FetchTopicPropertiesExample {
         }
         catch (CompletionException e) {
             LOG.error("Failed to run example to completion.", e);
-
-            throw e.getCause();
         }
     }
 }

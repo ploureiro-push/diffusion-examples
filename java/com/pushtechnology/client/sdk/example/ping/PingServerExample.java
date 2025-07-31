@@ -14,18 +14,25 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.ping;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.Pings;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to send a ping to the Diffusion server
+ * and receive a response.
+ *
+ * @author DiffusionData Limited
+ */
 public class PingServerExample {
-    private static final Logger LOG = LoggerFactory.getLogger(PingServerExample.class);
 
-    public static void main(String[] args)
-        throws Exception {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(PingServerExample.class);
+
+    public static void main(String[] args) {
 
         try (Session session = Diffusion.sessions()
             .principal("admin")

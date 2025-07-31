@@ -14,14 +14,24 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.resilience;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.session.retry.RetryStrategy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to configure an initial retry strategy for
+ * session establishment.
+ * <P>
+ * The example sets up a retry strategy with specified delay and retry count
+ * for reconnect attempts when establishing a session.
+ *
+ * @author DiffusionData Limited
+ */
 public class InitialSessionEstablishmentRetryExample {
+
     private static final Logger LOG =
         LoggerFactory.getLogger(InitialSessionEstablishmentRetryExample.class);
 
@@ -33,12 +43,10 @@ public class InitialSessionEstablishmentRetryExample {
             .initialRetryStrategy(new RetryStrategy(250, 10))
             .open("ws://localhost:8080");
 
-        System.out.printf("Connected, session identifier: '%s'.\n", session.getSessionId());
+        LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
 
         // Insert work here
 
         session.close();
-
-        LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
     }
 }

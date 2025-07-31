@@ -16,6 +16,11 @@ package com.pushtechnology.client.sdk.example.timeseries;
 
 import static com.pushtechnology.diffusion.datatype.DataTypes.DOUBLE_DATATYPE_NAME;
 
+import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
 import com.pushtechnology.diffusion.client.features.TimeSeries;
@@ -24,18 +29,22 @@ import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
+import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Random;
-
+/**
+ * This example demonstrates cross-compatible data types when using values streams with time series topics.
+ * <P>
+ * A time series topic is created with the Double event value type. A value stream of type JSON  is added to
+ * receive updates demonstrating cross-compatibility in data types.
+ *
+ * @author DiffusionData Limited
+ */
 public class TimeSeriesCrossCompatibleDatatypesExample {
     private static final Logger LOG =
         LoggerFactory.getLogger(TimeSeriesCrossCompatibleDatatypesExample.class);
 
     public static void main(String[] args) {
-        Session session = Diffusion.sessions()
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
@@ -43,7 +52,6 @@ public class TimeSeriesCrossCompatibleDatatypesExample {
         final Random r = new Random();
         final String myTopicPath = "my/time/series/topic/path";
         final String myTopicSelector = "?my/time/series//";
-        double myValue;
 
         final TopicControl topicControl = session.feature(TopicControl.class);
         final Topics topics = session.feature(Topics.class);
@@ -57,9 +65,10 @@ public class TimeSeriesCrossCompatibleDatatypesExample {
         topicControl.addTopic(myTopicPath, mySpec)
             .join();
 
-        topics.addTimeSeriesStream(myTopicSelector, Double.class, new MyValueStream());
+        topics.addTimeSeriesStream(myTopicSelector, JSON.class, new MyValueStream());
         topics.subscribe(myTopicSelector).join();
 
+        double myValue;
         for (int i = 0; i < 25; i++) {
             myValue = r.nextDouble();
 
@@ -73,7 +82,7 @@ public class TimeSeriesCrossCompatibleDatatypesExample {
         LOG.info("Topic has been created.");
     }
 
-    private static class MyValueStream implements Topics.ValueStream<TimeSeries.Event<Double>> {
+    private static final class MyValueStream implements Topics.ValueStream<TimeSeries.Event<JSON>> {
 
         @Override
         public void onSubscription(String topicPath,
@@ -91,15 +100,15 @@ public class TimeSeriesCrossCompatibleDatatypesExample {
         @Override
         public void onValue(String topicPath,
             TopicSpecification topicSpecification,
-            TimeSeries.Event<Double>  oldValue, TimeSeries.Event<Double>  newValue) {
+            TimeSeries.Event<JSON>  oldValue, TimeSeries.Event<JSON>  newValue) {
             System.out.printf("%s changed from %f to %f\n",
                 topicPath, oldValue.value(), newValue.value());
         }
 
         @Override
-        public void onClose() {}
+        public void onClose() { }
 
         @Override
-        public void onError(ErrorReason errorReason) {}
+        public void onError(ErrorReason errorReason) { }
     }
 }

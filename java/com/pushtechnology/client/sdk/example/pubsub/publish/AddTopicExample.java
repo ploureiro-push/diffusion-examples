@@ -14,21 +14,29 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.pubsub.publish;
 
+import java.util.concurrent.CompletionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.CompletionException;
-
+/**
+ * This example demonstrates how to create a topic in Diffusion.
+ * <P>
+ * The example uses the `addTopic` method to create a JSON topic at a specified path.
+ *
+ * @author DiffusionData Limited
+ */
 public class AddTopicExample {
-    private static final Logger LOG = LoggerFactory.getLogger(AddTopicExample.class);
 
-    public static void main(String[] args)
-        throws Throwable {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(AddTopicExample.class);
+
+    public static void main(String[] args) throws Throwable {
 
         try (Session session = Diffusion.sessions()
             .principal("admin")

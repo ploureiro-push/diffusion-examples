@@ -39,9 +39,7 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement.ClientContro
                 .Open(serverUrl);
 
             await session.ClientControl.SetConflatedAsync(session2.SessionId, false, cancellationToken);
-            WriteLine("Conflation policy was updated.");
-
-            await Task.Delay(5000);
+            WriteLine("Conflation policy was disabled.");
 
             session2.Close();
             session.Close();

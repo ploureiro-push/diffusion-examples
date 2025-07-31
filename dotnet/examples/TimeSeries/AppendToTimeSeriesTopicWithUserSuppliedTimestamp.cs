@@ -46,7 +46,7 @@ namespace PushTechnology.ClientInterface.Examples.TimeSeries
                         { TopicSpecificationProperty.TimeSeriesSubscriptionRange, "limit 3" }
                     };
 
-            var specification = session.TopicControl.NewSpecification(TopicType.TIME_SERIES)
+            var specification = Diffusion.NewSpecification(TopicType.TIME_SERIES)
                 .WithProperties(topicProperties);
 
             string topic = "my/time/series/topic/path/user/supplied";
@@ -71,8 +71,6 @@ namespace PushTechnology.ClientInterface.Examples.TimeSeries
 
                 await session.TimeSeries.AppendAsync<double?>(topic, newValue, DateTimeOffset.FromUnixTimeMilliseconds(++millis), cancellationToken);
             }
-
-            await Task.Delay(5000);
 
             session.Close();
         }

@@ -44,8 +44,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityCo
 
             await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
 
-            await Task.Delay(5000);
-
             WriteLine($"Removing path permissions for Role CLIENT at my/topic/path.");
 
             script = session.SecurityControl.Script.RemovePathPermissions("CLIENT", "my/topic/path").ToScript();
@@ -53,8 +51,6 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityCo
             WriteLine($"{script}");
 
             await session.SecurityControl.UpdateStoreAsync(script, cancellationToken);
-
-            await Task.Delay(5000);
 
             session.Close();
         }

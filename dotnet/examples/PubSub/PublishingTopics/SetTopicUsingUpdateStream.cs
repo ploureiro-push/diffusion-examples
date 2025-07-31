@@ -20,6 +20,10 @@ using PushTechnology.ClientInterface.Client.Factories;
 using static System.Console;
 using static PushTechnology.ClientInterface.Examples.Program;
 using PushTechnology.ClientInterface.Data.JSON;
+using NUnit.Framework;
+using PushTechnology.ClientInterface.Client.Features;
+using PushTechnology.ClientInterface.Client.Features.Control.Topics;
+using PushTechnology.ClientInterface.Client.Topics;
 
 namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics
 {
@@ -34,14 +38,27 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopics
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
 
+            string topic = "my/topic/path/with/update/stream";
+
+            var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
+
+            var result = await session.TopicControl.AddTopicAsync(topic, topicSpecification, cancellationToken);
+
+            if (result == AddTopicResult.CREATED)
+            {
+                WriteLine("Topic has been created.");
+            }
+            else
+            {
+                WriteLine("Topic already exists.");
+            }
+
             var updateStream = session.TopicUpdate.NewUpdateStreamBuilder()
-                .Build<IJSON>("my/topic/path/with/update/stream");
+                .Build<IJSON>(topic);
 
             await updateStream.SetAsync(Diffusion.DataTypes.JSON.FromJSONString("{\"diffusion\":[\"data\", \"more data\"]}"), cancellationToken);
 
             WriteLine("Topic value has been set.");
-
-            await Task.Delay(5000);
 
             session.Close();
         }

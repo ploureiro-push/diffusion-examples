@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_append(
         const DIFFUSION_TIME_SERIES_EVENT_METADATA_T *event_metadata,
@@ -36,7 +36,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/time/series/topic/path";
 
     SESSION_T *session = session_create(
@@ -58,6 +58,8 @@ void run_example(
     );
     hash_free(properties, NULL, NULL);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     for (int i = 0; i < 25; i++) {
         double random_value = utils_random_double();
 
@@ -71,15 +73,17 @@ void run_example(
             .topic_path = topic_path,
             .datatype = DATATYPE_DOUBLE,
             .value = value,
-            .timestamp = user_supplied_timestamp
+            .timestamp = user_supplied_timestamp,
+            .context = coordinator
         };
 
         diffusion_time_series_timestamp_append(session, params, NULL);
-        MUTEX_WAIT
+        coordinator_wait(coordinator);
         buf_free(value);
     }
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
-}
+
+    coordinator_free(coordinator);
+    }

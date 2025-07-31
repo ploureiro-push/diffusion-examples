@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_topic_added_with_specification(
     SESSION_T *session,
@@ -34,7 +34,7 @@ static int on_topic_added_with_specification(
     else if (result_code == TOPIC_ADD_RESULT_EXISTS) {
         printf("Topic already exists.\n");
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -54,17 +54,12 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/time/series/topic/path";
 
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
     );
-
-    ADD_TOPIC_CALLBACK_T callback = {
-        .on_topic_added_with_specification = on_topic_added_with_specification,
-        .on_topic_add_failed_with_specification = on_topic_add_failed_with_specification
-    };
 
     HASH_T *properties = hash_new(5);
     hash_add(properties, DIFFUSION_TIME_SERIES_EVENT_VALUE_TYPE, "double");
@@ -74,14 +69,24 @@ void run_example(
     TOPIC_SPECIFICATION_T *topic_specification =
         topic_specification_init_with_properties(TOPIC_TYPE_TIME_SERIES, properties);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
+    ADD_TOPIC_CALLBACK_T callback = {
+        .on_topic_added_with_specification = on_topic_added_with_specification,
+        .on_topic_add_failed_with_specification = on_topic_add_failed_with_specification,
+        .context = coordinator
+    };
+
     add_topic_from_specification(
         session, topic_path, topic_specification, callback
     );
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
 
     session_close(session, NULL);
     session_free(session);
+
+    coordinator_free(coordinator);
     topic_specification_free(topic_specification);
     hash_free(properties, NULL, NULL);
-    MUTEX_TERMINATE
-}
+    }

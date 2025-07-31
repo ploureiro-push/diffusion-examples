@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_append(
         const DIFFUSION_TIME_SERIES_EVENT_METADATA_T *event_metadata,
@@ -63,7 +63,7 @@ static int on_query_result(
 
         diffusion_value_free(value);
     }
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     list_free(events, (void (*)(void *))diffusion_time_series_event_free);
     return HANDLER_SUCCESS;
 }
@@ -74,7 +74,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     char *topic_path = "my/time/series/topic/path";
 
     SESSION_T *session = session_create(
@@ -96,6 +96,8 @@ void run_example(
     );
     hash_free(properties, NULL, NULL);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     for (int i = 0; i < 25; i++) {
         double random_value = utils_random_double();
 
@@ -106,11 +108,13 @@ void run_example(
             .on_append = on_append,
             .topic_path = topic_path,
             .datatype = DATATYPE_DOUBLE,
-            .value = value
+            .value = value,
+            .context = coordinator
         };
 
         diffusion_time_series_append(session, params, NULL);
-        MUTEX_WAIT
+        coordinator_wait(coordinator);
+
         buf_free(value);
     }
 
@@ -121,10 +125,11 @@ void run_example(
         .original_sequence = 10,
         .topic_path = topic_path,
         .datatype = DATATYPE_DOUBLE,
-        .value = edit_value
+        .value = edit_value,
+        .context = coordinator
     };
     diffusion_time_series_edit(session, edit_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
     buf_free(edit_value);
 
     DIFFUSION_TIME_SERIES_RANGE_QUERY_T *range_query = diffusion_time_series_range_query();
@@ -135,14 +140,16 @@ void run_example(
     DIFFUSION_TIME_SERIES_RANGE_QUERY_PARAMS_T query_params = {
         .topic_path = topic_path,
         .range_query = range_query,
-        .on_query_result = on_query_result
+        .on_query_result = on_query_result,
+        .context = coordinator
     };
 
     diffusion_time_series_select_from(session, query_params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
+
+    coordinator_free(coordinator);
     diffusion_time_series_range_query_free(range_query);
-    MUTEX_TERMINATE
-}
+    }

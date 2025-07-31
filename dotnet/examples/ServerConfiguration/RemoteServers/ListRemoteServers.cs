@@ -73,10 +73,7 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
             foreach (var remoteServer in listServers)
             {
                 WriteLine($"{remoteServer.Name} ({remoteServer.ServerUrl})");
-
             }
-
-            await Task.Delay(5000);
 
             session.Close();
         }

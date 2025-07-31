@@ -14,39 +14,44 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
-import com.pushtechnology.diffusion.client.Diffusion;
-import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
-import com.pushtechnology.diffusion.client.session.Session;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import com.pushtechnology.diffusion.client.Diffusion;
+import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
+import com.pushtechnology.diffusion.client.session.Session;
 
+/**
+ * This example demonstrates how to set default roles for anonymous sessions using
+ * the security control feature in Diffusion.
+ * <P>
+ * The example assigns the `AUTHENTICATION_HANDLER` role to all anonymous sessions.
+ *
+ * @author DiffusionData Limited
+ */
 public class SetDefaultRolesForAnonymousSessionsExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
         SetDefaultRolesForAnonymousSessionsExample.class);
 
     public static void main(String[] args) throws Exception {
-        Session session = Diffusion.sessions()
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        SecurityControl securityControl = session.feature(SecurityControl.class);
-        SecurityControl.ScriptBuilder builder = securityControl.scriptBuilder();
-
-        System.out.println("All anonymous sessions now have AUTHENTICATION_HANDLER privileges.");
+        final SecurityControl securityControl = session.feature(SecurityControl.class);
+        final SecurityControl.ScriptBuilder builder = securityControl.scriptBuilder();
 
         builder.setRolesForAnonymousSessions(Collections.singleton("AUTHENTICATION_HANDLER"));
 
-        String script = builder.script();
-        System.out.println(script);
-        securityControl.updateStore(script).join();
+        securityControl.updateStore(builder.script())
+            .whenComplete((r, ex) ->
+                LOG.info("All anonymous sessions now have AUTHENTICATION_HANDLER privileges."));
 
         session.close();
-
-        LOG.info(script);
     }
 }

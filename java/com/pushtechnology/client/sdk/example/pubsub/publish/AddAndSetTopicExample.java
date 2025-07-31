@@ -14,6 +14,9 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.pubsub.publish;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.TopicCreationResult;
 import com.pushtechnology.diffusion.client.features.Topics;
@@ -21,22 +24,35 @@ import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to create a new topic and set its initial value
+ * in Diffusion.
+ * <P>
+ * The example uses the `addAndSet` method to create a JSON topic at a specified
+ * path and set its initial value.
+ *
+ * @author DiffusionData Limited
+ */
 public class AddAndSetTopicExample {
-    private static final Logger LOG = LoggerFactory.getLogger(AddAndSetTopicExample.class);
+
+    private static final Logger LOG =
+        LoggerFactory.getLogger(AddAndSetTopicExample.class);
 
     public static void main(String[] args) {
+
         try (Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080")) {
 
+            final JSON data = Diffusion.dataTypes().json()
+                .fromJsonString("{ \"diffusion\": \"data\" }");
+
             final TopicCreationResult result = session.feature(Topics.class)
                 .addAndSet("my/topic/path",
-                    Diffusion.newTopicSpecification(TopicType.JSON), JSON.class,
-                    Diffusion.dataTypes().json().fromJsonString("{ \"diffusion\": \"data\" }"))
+                    Diffusion.newTopicSpecification(TopicType.JSON),
+                    JSON.class,
+                    data)
                 .join();
 
             LOG.info("Topic: {}.", result);

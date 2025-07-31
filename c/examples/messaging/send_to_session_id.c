@@ -141,8 +141,9 @@ void run_example(
         .response_datatype = DATATYPE_STRING
     };
     send_request_to_session(sending_session, send_request_params);
-    buf_free(request);
     MUTEX_WAIT
+
+    buf_free(request);
 
     session_close(receiving_session, NULL);
     session_free(receiving_session);

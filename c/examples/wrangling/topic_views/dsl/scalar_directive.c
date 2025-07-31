@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_topic_view_created(
     const DIFFUSION_TOPIC_VIEW_T *topic_view,
@@ -30,7 +30,7 @@ static int on_topic_view_created(
     char *name = diffusion_topic_view_get_name(topic_view);
     printf("Topic view %s was created.\n", name);
     free(name);
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -48,7 +48,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
     );
@@ -82,5 +82,4 @@ void run_example(
     session_close(session, NULL);
     session_free(session);
     free(value_stream_ptr);
-    MUTEX_TERMINATE
-}
+    }

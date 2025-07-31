@@ -16,28 +16,35 @@ package com.pushtechnology.client.sdk.example.serverconfiguration.metrics.sessio
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.Metrics;
 import com.pushtechnology.diffusion.client.features.control.Metrics.SessionMetricCollector;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to add a session metric collector using the
+ * Metrics feature.
+ *
+ * @author DiffusionData Limited
+ */
 public class PutSessionMetricCollectorExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
         PutSessionMetricCollectorExample.class);
 
     public static void main(String[] args) throws Exception {
-        Session session = Diffusion.sessions()
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        Metrics metricsControl = session.feature(Metrics.class);
+        final Metrics metricsControl = session.feature(Metrics.class);
 
-        SessionMetricCollector sessionMetricCollector =
+        final SessionMetricCollector sessionMetricCollector =
             Diffusion.newSessionMetricCollectorBuilder()
                 .exportToPrometheus(false)
                 .maximumGroups(10)

@@ -42,6 +42,7 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.To
             builder = (ITopicMetricCollectorBuilder)builder.ExportsToPrometheus(false);
             builder = builder.GroupByTopicType(true);
             builder = builder.GroupByTopicView(true);
+            builder = builder.GroupByPathPrefixParts(15);
             builder = (ITopicMetricCollectorBuilder)builder.MaximumGroups(10);
             collector = builder.Create("Topic Metric Collector 1", topicSelector);
 
@@ -51,12 +52,11 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.To
             builder = (ITopicMetricCollectorBuilder)builder.ExportsToPrometheus(true);
             builder = builder.GroupByTopicType(false);
             builder = builder.GroupByTopicView(true);
+            builder = builder.GroupByPathPrefixParts(15);
             builder = (ITopicMetricCollectorBuilder)builder.MaximumGroups(250);
             collector = builder.Create("Topic Metric Collector 2", topicSelector);
 
             await session.Metrics.PutTopicMetricCollectorAsync(collector, cancellationToken);
-
-            await Task.Delay(5000);
 
             var listTopicMetricCollectors = await session.Metrics.ListTopicMetricCollectorsAsync(cancellationToken);
 
@@ -67,10 +67,9 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics.To
                     $"({topicMetricCollector.MaximumGroups}, " +
                     $"{GetAnswer(topicMetricCollector.ExportsToPrometheus)}, " +
                     $"{GetAnswer(topicMetricCollector.GroupsByTopicType)}, " +
-                    $"{GetAnswer(topicMetricCollector.GroupsByTopicView)})");
+                    $"{GetAnswer(topicMetricCollector.GroupsByTopicView)}, " +
+                    $"{topicMetricCollector.GroupByPathPrefixParts})");
             }
-
-            await Task.Delay(5000);
 
             session.Close();
         }

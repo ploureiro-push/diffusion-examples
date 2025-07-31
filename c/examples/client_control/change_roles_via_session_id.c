@@ -21,12 +21,12 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_roles_changed(
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -44,7 +44,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *admin_session = utils_open_session(url, "admin", "password");
 
@@ -56,15 +56,18 @@ void run_example(
     SET_T *new_roles = set_new_string(1);
     set_add(new_roles, "TOPIC_CONTROL");
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_CHANGE_ROLES_WITH_SESSION_ID_PARAMS_T params = {
         .session_id = client_session->id,
         .roles_to_remove = NULL,
         .roles_to_add = new_roles,
         .on_roles_changed = on_roles_changed,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
     diffusion_change_roles_with_session_id(admin_session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     printf("\nChanged value\n");
     utils_print_session_properties(admin_session, client_session->id, "$Roles");
@@ -74,5 +77,7 @@ void run_example(
 
     session_close(admin_session, NULL);
     session_free(admin_session);
-    MUTEX_TERMINATE
+
+    coordinator_free(coordinator);
+    set_free(new_roles);
 }

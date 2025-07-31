@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_system_authentication_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -47,8 +47,6 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
-
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
     LIST_T *list_original_roles = list_create();
@@ -59,14 +57,17 @@ void run_example(
         add_script, "super_user", "password12345", list_original_roles
     );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SYSTEM_AUTHENTICATION_STORE_PARAMS_T add_params = {
         .on_update = on_system_authentication_store_updated,
         .on_error = on_error,
-        .update_script = add_script
+        .update_script = add_script,
+        .context = coordinator
     };
-
     update_system_authentication_store(session, add_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     script_free(add_script);
     list_free(list_original_roles, NULL);
 
@@ -78,17 +79,16 @@ void run_example(
     const UPDATE_SYSTEM_AUTHENTICATION_STORE_PARAMS_T change_password_params = {
         .on_update = on_system_authentication_store_updated,
         .on_error = on_error,
-        .update_script = change_password_script
+        .update_script = change_password_script,
+        .context = coordinator
     };
-
     update_system_authentication_store(session, change_password_params);
-    MUTEX_WAIT
-    script_free(change_password_script);
+    coordinator_wait(coordinator);
 
 
     session_close(session, NULL);
     session_free(session);
 
-
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
+    script_free(change_password_script);
 }

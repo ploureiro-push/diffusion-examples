@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2025 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
             string topic = "my/topic/path/hello";
             string topicSelector = "?my/topic/path//";
 
-            var specification = session.TopicControl.NewSpecification(TopicType.STRING);
+            var specification = Diffusion.NewSpecification(TopicType.STRING);
 
             await session.TopicUpdate.AddAndSetAsync(topic, specification, "Hello World!", cancellationToken);
 
@@ -64,15 +64,7 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
             var valueStream = new ValueStream();
             session2.Topics.AddStream(topicSelector, valueStream);
 
-            var properties = new Dictionary<string, string> { { "$Latitude", "51.509865" } };
-            await session.ClientControl.SetSessionPropertiesAsync(session2.SessionId, properties, cancellationToken);
-
-            await Task.Delay(5000);
-
             session2.Close();
-            await registration.CloseAsync();
-
-            await Task.Delay(2000);
             session.Close();
         }
 
@@ -92,8 +84,11 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
                 {
                     if (session.SessionId.ToString() != sessionEventStreamEvent.SessionId.ToString())
                     {
+                        Thread.Sleep(2000);
+
                         session.SubscriptionControl.SubscribeAsync(sessionEventStreamEvent.SessionId, "?my/topic/path//");
-                        Thread.Sleep(5000);
+
+                        Thread.Sleep(2000);
 
                         session.SubscriptionControl.UnsubscribeAsync(sessionEventStreamEvent.SessionId, "?my/topic/path//");
                     }

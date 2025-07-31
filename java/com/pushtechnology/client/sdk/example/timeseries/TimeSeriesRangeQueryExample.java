@@ -16,6 +16,11 @@ package com.pushtechnology.client.sdk.example.timeseries;
 
 import static com.pushtechnology.diffusion.datatype.DataTypes.DOUBLE_DATATYPE_NAME;
 
+import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.TimeSeries;
 import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
@@ -24,11 +29,13 @@ import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.Bytes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Random;
-
+/**
+ * This example demonstrates how to query a range of events from a time series topic.
+ * <P>
+ * A range query is performed to retrieve events from sequence 5 to 15.
+ *
+ * @author DiffusionData Limited
+ */
 public class TimeSeriesRangeQueryExample {
     private static final Logger LOG = LoggerFactory.getLogger(TimeSeriesRangeQueryExample.class);
 

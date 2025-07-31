@@ -150,8 +150,9 @@ void run_example(
         .on_response = on_response
     };
     send_request_to_filter(sending_session, send_request_params);
-    buf_free(request);
     MUTEX_WAIT
+
+    buf_free(request);
 
     session_close(receiving_session, NULL);
     session_free(receiving_session);
@@ -161,5 +162,6 @@ void run_example(
 
     session_close(sending_session, NULL);
     session_free(sending_session);
+
     MUTEX_TERMINATE
 }

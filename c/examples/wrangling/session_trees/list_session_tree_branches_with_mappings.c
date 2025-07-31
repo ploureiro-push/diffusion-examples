@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_session_tree_branches_received(
         const LIST_T *session_tree_branches,
@@ -34,7 +34,7 @@ static int on_session_tree_branches_received(
         printf("\t%s\n", session_tree_branch);
     }
 
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -53,7 +53,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = session_create(
         url, principal, credentials, NULL, NULL, NULL
@@ -79,15 +79,19 @@ void run_example(
         session, "my/alternate/path", 3, mappings_2
     );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_SESSION_TREES_GET_SESSION_TREE_BRANCHES_PARAMS_T params = {
         .on_session_tree_branches_received = on_session_tree_branches_received,
-        .on_error = on_error
+        .on_error = on_error,
+        .context = coordinator
     };
 
     diffusion_session_trees_get_session_tree_branches(session, params, NULL);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
 
     session_close(session, NULL);
     session_free(session);
-    MUTEX_TERMINATE
-}
+
+    coordinator_free(coordinator);
+    }

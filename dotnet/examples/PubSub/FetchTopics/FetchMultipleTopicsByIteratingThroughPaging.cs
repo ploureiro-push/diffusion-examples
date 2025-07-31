@@ -36,8 +36,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.FetchTopics
 
             var topics = session.Topics;
 
-
-            var topicSpecification = session.TopicControl.NewSpecification(TopicType.STRING);
+            var topicSpecification = Diffusion.NewSpecification(TopicType.STRING);
 
             for (int i = 1; i <= 25; i++)
             {
@@ -49,7 +48,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.FetchTopics
 
             string topicSelector = "?my/topic/path//";
 
-            // Fetch the values for the topic selector using a maximum result size of 10.
             fetchResult = await topics.FetchRequest.WithValues<string>().First(10).FetchAsync(topicSelector, cancellationToken);
 
             while (true)
@@ -72,8 +70,6 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.FetchTopics
                     break;
                 }
             }
-
-            await Task.Delay(5000);
             
             session.Close();
         }

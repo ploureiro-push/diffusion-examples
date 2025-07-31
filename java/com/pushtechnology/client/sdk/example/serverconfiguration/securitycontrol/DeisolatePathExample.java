@@ -14,46 +14,50 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl.ScriptBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DeisolatePathExample {
 
+    /**
+     * This example demonstrates how to deisolate a topic path using the security
+     * control feature in Diffusion.
+     *
+     * @author DiffusionData Limited
+     */
     private static final Logger LOG = LoggerFactory.getLogger(
         DeisolatePathExample.class);
 
-    public static void main(String[] args) throws Exception{
-        Session session = Diffusion.sessions()
+    public static void main(String[] args) throws Exception {
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        SecurityControl securityControl = session.feature(SecurityControl.class);
-        ScriptBuilder builder = securityControl.scriptBuilder();
-
-        System.out.println("Isolating my/topic/path permissions from parent and default path permissions");
+        final SecurityControl securityControl = session.feature(SecurityControl.class);
+        final ScriptBuilder builder = securityControl.scriptBuilder();
 
         builder.isolatePath("my/topic/path");
-        String script = builder.script();
-        System.out.println(script);
+        final String script = builder.script();
 
-        securityControl.updateStore(script).join();
+        LOG.info("Isolating my/topic/path permissions from parent and default path permissions");
 
-        System.out.println("Removing my/topic/path permission isolation");
+        securityControl.updateStore(script)
+            .whenComplete((r, ex) ->   LOG.info(script));
 
-        SecurityControl.ScriptBuilder newBuilder = securityControl.scriptBuilder();
-        newBuilder.deisolatePath("my/topic/path");
-        String newScript = newBuilder.script();
-        System.out.println(newScript);
+        builder.deisolatePath("my/topic/path");
 
-        securityControl.updateStore(newScript).join();
+        LOG.info("Desolating my/topic/path");
+
+        securityControl.updateStore(script)
+            .whenComplete((r, ex) ->   LOG.info(builder.script()));
 
         session.close();
-        LOG.info(newScript);
     }
 }

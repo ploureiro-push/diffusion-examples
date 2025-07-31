@@ -21,7 +21,7 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 SESSION_T *g_session;
 const char *g_topic_selector = "?my/topic/path//";
@@ -45,6 +45,7 @@ static int on_fetch_result(
         read_diffusion_string_value(value, &string_value, NULL);
 
         printf("%s: %s\n", topic_path, string_value);
+        free(string_value);
     }
 
     if (diffusion_fetch_result_has_more(fetch_result)) {
@@ -62,10 +63,15 @@ static int on_fetch_result(
         DIFFUSION_FETCH_REQUEST_PARAMS_T fetch_params = {
             .topic_selector = g_topic_selector,
             .fetch_request = g_fetch_request,
-            .on_fetch_result = on_fetch_result
+            .on_fetch_result = on_fetch_result,
+            .context = context
         };
 
         diffusion_fetch_request_fetch(g_session, fetch_params);
+    }
+    else {
+        printf("All pages loaded. Fetch complete\n");
+        coordinator_broadcast((COORDINATOR_T *) context);
     }
     list_free(results, (void (*)(void *))diffusion_topic_result_free);
 
@@ -78,17 +84,17 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
     g_session = session_create(
         url, principal, credentials, NULL, NULL, NULL
     );
 
     for (int i = 1; i <= 25; i++) {
         char *topic_path = calloc(100, sizeof(char));
-        sprintf(topic_path, "my/topic/path/%d", i);
+        snprintf(topic_path, 100, "my/topic/path/%d", i);
 
         char *value = calloc(100, sizeof(char));
-        sprintf(value, "diffusion data #%d", i);
+        snprintf(value, 100, "diffusion data #%d", i);
 
         utils_create_string_topic(g_session, topic_path, value);
 
@@ -101,18 +107,20 @@ void run_example(
     diffusion_fetch_request_with_values(g_fetch_request, &datatype, NULL);
     diffusion_fetch_request_first(g_fetch_request, 10, NULL);
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     DIFFUSION_FETCH_REQUEST_PARAMS_T fetch_request_params = {
         .topic_selector = g_topic_selector,
         .fetch_request = g_fetch_request,
-        .on_fetch_result = on_fetch_result
+        .on_fetch_result = on_fetch_result,
+        .context = coordinator
     };
-
     diffusion_fetch_request_fetch(g_session, fetch_request_params);
-    MUTEX_WAIT
-    diffusion_fetch_request_free(g_fetch_request);
-
+    coordinator_wait(coordinator);
 
     session_close(g_session, NULL);
     session_free(g_session);
-    MUTEX_TERMINATE
+
+    diffusion_fetch_request_free(g_fetch_request);
+    coordinator_free(coordinator);
 }

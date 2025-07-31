@@ -21,14 +21,32 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
+
+static int on_security_store_updated(
+    SESSION_T *session,
+    const LIST_T *error_report,
+    void *context)
+{
+    coordinator_broadcast((COORDINATOR_T *) context);
+    return HANDLER_SUCCESS;
+}
+
+static int on_error(
+    SESSION_T *session,
+    const DIFFUSION_ERROR_T *error)
+{
+    printf("On error: %s\n", error->message);
+    return HANDLER_SUCCESS;
+}
+
 
 void run_example(
     const char *url,
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     // Administrator
     SESSION_T *admin_session = utils_open_session(url, "admin", "password");
@@ -58,6 +76,31 @@ void run_example(
     VALUE_STREAM_T *admin_value_stream_ptr =
         utils_subscribe(admin_session, "my/personal/path", DATATYPE_STRING);
 
+    // Allow CLIENT role to read and select my/personal/path
+    SET_T *set_permissions = set_new(2);
+    set_add(set_permissions, &SECURITY_PATH_PERMISSIONS_TABLE[PATH_PERMISSION_SELECT_TOPIC]);
+    set_add(set_permissions, &SECURITY_PATH_PERMISSIONS_TABLE[PATH_PERMISSION_READ_TOPIC]);
+
+    SCRIPT_T *script = script_create();
+    update_security_store_path_permissions(
+        script, "CLIENT", "my/personal/path", set_permissions
+    );
+
+    COORDINATOR_T *coordinator = coordinator_init();
+
+    const UPDATE_SECURITY_STORE_PARAMS_T params = {
+        .on_update = on_security_store_updated,
+        .on_error = on_error,
+        .update_script = script,
+        .context = coordinator
+    };
+
+    update_security_store(admin_session, params);
+    coordinator_wait(coordinator);
+
+    script_free(script);
+    set_free(set_permissions);
+
     // Control Client
     SESSION_T *control_session = utils_open_session(url, "control", "password");
 
@@ -85,5 +128,4 @@ void run_example(
     session_close(admin_session, NULL);
     session_free(admin_session);
     free(admin_value_stream_ptr);
-    MUTEX_TERMINATE
-}
+    }

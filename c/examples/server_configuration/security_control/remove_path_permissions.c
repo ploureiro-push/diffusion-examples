@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_security_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -47,7 +47,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *session = utils_open_session(url, "admin", "password");
 
@@ -65,17 +65,21 @@ void run_example(
         set_script, "CLIENT", topic_path, set_permissions
     );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SECURITY_STORE_PARAMS_T set_params = {
         .on_update = on_security_store_updated,
         .on_error = on_error,
-        .update_script = set_script
+        .update_script = set_script,
+        .context = coordinator
     };
 
     printf("\nAllowing Role CLIENT to update and modify %s.\n", topic_path);
     utils_print_script(set_script);
 
     update_security_store(session, set_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     script_free(set_script);
     set_free(set_permissions);
 
@@ -90,14 +94,16 @@ void run_example(
     const UPDATE_SECURITY_STORE_PARAMS_T remove_params = {
         .on_update = on_security_store_updated,
         .on_error = on_error,
-        .update_script = remove_script
+        .update_script = remove_script,
+        .context = coordinator
     };
 
     printf("\nRemoving path permissions for Role CLIENT at %s.\n", topic_path);
     utils_print_script(remove_script);
 
     update_security_store(session, remove_params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
     script_free(remove_script);
 
     printf("Security Store settings for role CLIENT after removal of path permissions\n");
@@ -106,5 +112,5 @@ void run_example(
     session_close(session, NULL);
     session_free(session);
 
-    MUTEX_TERMINATE
+    coordinator_free(coordinator);
 }

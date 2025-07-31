@@ -42,11 +42,11 @@ namespace PushTechnology.ClientInterface.Examples.TimeSeries
 
             var topicProperties = new Dictionary<string, string> {
                         { TopicSpecificationProperty.TimeSeriesEventValueType, typeName },
-                        { TopicSpecificationProperty.TimeSeriesRetainedRange, "limit 15 last 10s" },
+                        { TopicSpecificationProperty.TimeSeriesRetainedRange, "limit 50 last 120s" },
                         { TopicSpecificationProperty.TimeSeriesSubscriptionRange, "limit 3" }
                     };
 
-            var specification = session.TopicControl.NewSpecification(TopicType.TIME_SERIES)
+            var specification = Diffusion.NewSpecification(TopicType.TIME_SERIES)
                 .WithProperties(topicProperties);
 
             string topic = "my/time/series/topic/path";
@@ -87,8 +87,6 @@ namespace PushTechnology.ClientInterface.Examples.TimeSeries
             {
                 WriteLine($"{eventResult.Metadata.Sequence} ({eventResult.Metadata.Timestamp}): {eventResult.Value}");
             }
-
-            await Task.Delay(5000);
 
             session.Close();
         }

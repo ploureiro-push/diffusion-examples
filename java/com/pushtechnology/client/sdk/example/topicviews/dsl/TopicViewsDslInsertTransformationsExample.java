@@ -16,27 +16,42 @@ package com.pushtechnology.client.sdk.example.topicviews.dsl;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.callbacks.ErrorReason;
 import com.pushtechnology.diffusion.client.features.Topics;
+import com.pushtechnology.diffusion.client.features.control.topics.views.TopicView;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.topics.details.TopicSpecification;
 import com.pushtechnology.diffusion.client.topics.details.TopicType;
 import com.pushtechnology.diffusion.datatype.json.JSON;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This example demonstrates how to use the topic view insert clause.
+ * <P>
+ * A JSON topic containing a list of cast members is created. A topic view is then defined to
+ * insert additional cast members from separate topics into the list.
+ *
+ * @author DiffusionData Limited
+ */
 public class TopicViewsDslInsertTransformationsExample {
-    private static final Logger LOG = LoggerFactory.getLogger(TopicViewsDslInsertTransformationsExample.class);
 
-    public static void main(String[] args)
-        throws Exception {
+    private static final Logger LOG =
+        LoggerFactory.getLogger(TopicViewsDslInsertTransformationsExample.class);
+
+    public static void main(String[] args) throws Exception {
 
         try (Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080")) {
+
+            final Topics topics = session.feature(Topics.class);
+            final TopicSpecification specification = Diffusion.newTopicSpecification(TopicType.JSON);
+            final String viewSelector = "?views//";
+            final MyStream myStream = new MyStream();
 
             final JSON originalCastJsonValue = Diffusion.dataTypes().json().fromJsonString("[\n" +
                 "  \"Fred Flintstone\"," +
@@ -45,49 +60,43 @@ public class TopicViewsDslInsertTransformationsExample {
                 "  \"Betty Rubble\"" +
                 "]");
 
-            final Topics topics = session.feature(Topics.class);
+            final JSON additionalCast1 = Diffusion.dataTypes().json()
+                .fromJsonString("\"Pebbles Flintstone\"");
+
+            final JSON additionalCast2 = Diffusion.dataTypes().json()
+                .fromJsonString("\"Bamm-Bamm Rubble\"");
 
             topics.addAndSet(
-                    "my/topic/path/original_cast",
-                    Diffusion.newTopicSpecification(TopicType.JSON), JSON.class, originalCastJsonValue)
+                    "my/topic/path/original_cast", specification, JSON.class, originalCastJsonValue)
                 .join();
-
-            final JSON additionalCastJsonValue = Diffusion.dataTypes().json().fromJsonString("[\n" +
-                "  \"Pebbles Flintstone\"," +
-                "  \"Bamm-Bamm Rubble\"" +
-                "]");
 
             topics.addAndSet(
-                    "my/topic/path/additional_cast",
-                    Diffusion.newTopicSpecification(TopicType.JSON), JSON.class, additionalCastJsonValue)
+                    "my/topic/path/additional_cast/1", specification, JSON.class, additionalCast1)
                 .join();
 
-            final String topicSelectorExpression = "?views//";
-
-            final MyLoggingJsonStream myLoggingJsonStream = new MyLoggingJsonStream();
-            topics.addFallbackStream(JSON.class, myLoggingJsonStream);
-            topics.subscribe(topicSelectorExpression)
+            topics.addAndSet(
+                    "my/topic/path/additional_cast/2", specification, JSON.class, additionalCast2)
                 .join();
 
-            final String topicViewName = "topic_view_1";
+            topics.addStream(viewSelector, JSON.class, myStream);
+            topics.subscribe(viewSelector).join();
 
-            topics.createTopicView(topicViewName,
-                    "map my/topic/path/original_cast to views/the_flintstones insert my/topic/path/additional_cast at /-")
+            final TopicView topicView = topics.createTopicView("topic_view_1",
+                    "map my/topic/path/original_cast\n" +
+                        "  to views/the_flintstones\n" +
+                        "  insert my/topic/path/additional_cast/1 at /-\n" +
+                        "  insert my/topic/path/additional_cast/2 at /-")
                 .join();
 
-            LOG.info("Topic View {} has been created.", topicViewName);
+            LOG.info("Topic View {} has been created", topicView.getName());
 
-            topics.unsubscribe(topicSelectorExpression)
-                .join();
+            SECONDS.sleep(1);
 
-            topics.removeStream(myLoggingJsonStream);
-
-            SECONDS.sleep(2);
+            topics.removeStream(myStream);
         }
     }
 
-    public static class MyLoggingJsonStream implements Topics.ValueStream<JSON> {
-        private static final Logger LOG = LoggerFactory.getLogger(MyLoggingJsonStream.class);
+    static class MyStream implements Topics.ValueStream<JSON> {
 
         @Override
         public void onValue(
@@ -95,37 +104,30 @@ public class TopicViewsDslInsertTransformationsExample {
             TopicSpecification topicSpecification,
             JSON oldValue,
             JSON newValue) {
-
-            LOG.info("'{}' changed from '{}' to '{}}'.",
-                topicPath, oldValue, newValue);
+            LOG.info("{} new value {}", topicPath, newValue.toJsonString());
         }
 
         @Override
-        public void onSubscription(
-            String topicPath,
+        public void onSubscription(String topicPath,
             TopicSpecification topicSpecification) {
-
-            LOG.info("Subscribed to: '{}'.", topicPath);
+            LOG.info("Subscribed to {}", topicPath);
         }
 
         @Override
-        public void onUnsubscription(
-            String topicPath,
+        public void onUnsubscription(String topicPath,
             TopicSpecification topicSpecification,
             Topics.UnsubscribeReason unsubscribeReason) {
-
-            LOG.info("Unsubscribed from: '{}', reason: {}.",
-                topicPath, unsubscribeReason);
+            LOG.info("Unsubscribed from {}", topicPath);
         }
 
         @Override
         public void onClose() {
-            LOG.info("On close.");
+            LOG.info("stream closed");
         }
 
         @Override
         public void onError(ErrorReason errorReason) {
-            LOG.error("On error: {}.", errorReason);
+            LOG.error("stream error: {}", errorReason);
         }
     }
 }

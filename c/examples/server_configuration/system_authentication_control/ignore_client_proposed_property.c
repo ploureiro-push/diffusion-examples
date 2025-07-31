@@ -21,14 +21,14 @@
 
 #include "diffusion.h"
 #include "utils.h"
-MUTEX_DEF
+
 
 static int on_system_authentication_store_updated(
     SESSION_T *session,
     const LIST_T *error_report,
     void *context)
 {
-    MUTEX_BROADCAST
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -47,7 +47,7 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    MUTEX_INIT
+
 
     SESSION_T *admin_session = utils_open_session(url, "admin", "password");
 
@@ -59,14 +59,19 @@ void run_example(
         script, "Rubble"
     );
 
+    COORDINATOR_T *coordinator = coordinator_init();
+
     const UPDATE_SYSTEM_AUTHENTICATION_STORE_PARAMS_T params = {
         .on_update = on_system_authentication_store_updated,
         .on_error = on_error,
-        .update_script = script
+        .update_script = script,
+        .context = coordinator
     };
 
     update_system_authentication_store(admin_session, params);
-    MUTEX_WAIT
+    coordinator_wait(coordinator);
+
+    coordinator_free(coordinator);
     script_free(script);
 
     DIFFUSION_SESSION_FACTORY_T *session_factory = diffusion_session_factory_init();
@@ -79,9 +84,7 @@ void run_example(
 
     SESSION_T *invalid_value_session = session_create_with_session_factory(session_factory, url);
 
-    utils_print_session_properties(
-        admin_session, invalid_value_session->id, NULL
-    );
+    utils_print_session_properties(admin_session, invalid_value_session->id, NULL);
 
     session_close(invalid_value_session, NULL);
     session_free(invalid_value_session);
@@ -91,9 +94,7 @@ void run_example(
 
     SESSION_T *valid_value_session = session_create_with_session_factory(session_factory, url);
 
-    utils_print_session_properties(
-        admin_session, valid_value_session->id, NULL
-    );
+    utils_print_session_properties(admin_session, valid_value_session->id, NULL);
 
     session_close(valid_value_session, NULL);
     session_free(valid_value_session);
@@ -101,5 +102,5 @@ void run_example(
     session_close(admin_session, NULL);
     session_free(admin_session);
 
-    MUTEX_TERMINATE
+    diffusion_session_factory_free(session_factory);
 }

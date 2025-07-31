@@ -14,45 +14,49 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.serverconfiguration.securitycontrol;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl;
 import com.pushtechnology.diffusion.client.features.control.clients.SecurityControl.ScriptBuilder;
 import com.pushtechnology.diffusion.client.session.Session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
-
+/**
+ * This example demonstrates how to define a roles hierarchy using the security
+ * control feature in Diffusion.
+ * <P>
+ * The example assigns a set of roles to an existing role by updating the security store.
+ *
+ * @author DiffusionData Limited
+ */
 public class DefineRolesHierarchyExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
         DefineRolesHierarchyExample.class);
 
     public static void main(String[] args) throws Exception {
-        Session session = Diffusion.sessions()
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        SecurityControl securityControl = session.feature(SecurityControl.class);
-        ScriptBuilder builder = securityControl.scriptBuilder();
+        final SecurityControl securityControl = session.feature(SecurityControl.class);
+        final ScriptBuilder builder = securityControl.scriptBuilder();
 
-        Set<String> myRoles = new HashSet<String>(){{
-            add("CLIENT");
-            add("CLIENT_CONTROL");
-        }};
-
-        System.out.println("OPERATOR now includes CLIENT and CLIENT_CONTROL roles");
+        final Set<String> myRoles = new HashSet<>();
+        myRoles.add("CLIENT");
+        myRoles.add("CLIENT_CONTROL");
 
         builder.setRoleIncludes("OPERATOR", myRoles);
-        String script = builder.script();
-        System.out.println(script);
 
-        securityControl.updateStore(script).join();
+        securityControl.updateStore(builder.script()).whenComplete((r, ex) ->
+            LOG.info("OPERATOR now includes CLIENT and CLIENT_CONTROL roles"));
+
         session.close();
-
-        LOG.info(script);
     }
 }

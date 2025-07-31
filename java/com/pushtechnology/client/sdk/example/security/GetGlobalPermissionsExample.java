@@ -14,37 +14,42 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.security;
 
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.Security;
 import com.pushtechnology.diffusion.client.session.Session;
 import com.pushtechnology.diffusion.client.types.GlobalPermission;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Set;
-
+/**
+ * This example demonstrates how to retrieve the global permissions using the
+ * Security feature.
+ *
+ * @author DiffusionData Limited
+ */
 public class GetGlobalPermissionsExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(
         GetGlobalPermissionsExample.class);
 
     public static void main(String[] args) throws Exception {
-        Session session = Diffusion.sessions()
+
+        final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
             .open("ws://localhost:8080");
 
-        Set<GlobalPermission> globalPermissions = session.feature(Security.class)
+        final Set<GlobalPermission> globalPermissions = session.feature(Security.class)
             .getGlobalPermissions()
             .join();
 
         for (GlobalPermission permission : globalPermissions) {
-            System.out.println(permission);
+            LOG.info(permission.name());
         }
 
         session.close();
-
-        LOG.info("Permissions retrieved: {}", globalPermissions.size());
     }
 }
