@@ -43,6 +43,7 @@ using PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityContro
 using PushTechnology.ClientInterface.Examples.SessionManagement;
 using PushTechnology.ClientInterface.Examples.SessionManagement.ClientControl;
 using PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL;
+using NUnit.Framework;
 
 namespace PushTechnology.ClientInterface.Examples
 {
