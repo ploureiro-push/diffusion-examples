@@ -336,6 +336,12 @@ namespace PushTechnology.ClientInterface.Examples
                 // Start the subscription control example
                 //runner.Start(new SubscriptionControl(), url);
 
+                // Start the revoke authentication example
+                runner.Start(new RevokeAuthentication(), url);
+
+                // Start the session expiry example
+                runner.Start(new SessionExpiry(), url);
+
                 // Start the authentication control example
                 //runner.Start(new AuthenticationControl(), url);
 
