@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2024 Diffusion Data Ltd.
+ * Copyright © 2024 - 2025 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using PushTechnology.ClientInterface.Client.Factories;
-using PushTechnology.ClientInterface.Client.Session;
 using static System.Console;
 using static PushTechnology.ClientInterface.Examples.Program;
 
