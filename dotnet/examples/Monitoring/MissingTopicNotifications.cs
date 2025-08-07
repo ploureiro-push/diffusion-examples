@@ -16,9 +16,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using static System.Console;
-using System.Linq;
 using PushTechnology.ClientInterface.Client.Callbacks;
 using PushTechnology.ClientInterface.Client.Factories;
 using PushTechnology.ClientInterface.Client.Features;
