@@ -17,6 +17,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using PushTechnology.ClientInterface.Client.Factories;
+using PushTechnology.ClientInterface.Client.Features;
 using PushTechnology.ClientInterface.Client.Features.Control.Topics;
 using PushTechnology.ClientInterface.Client.Topics;
 using static System.Console;
@@ -52,7 +53,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
             }
 
             string json = "{\"diffusion\":\"bar\"}";
-            var constraint = Diffusion.UpdateConstraints.JSONValue.With("/diffusion", "bar");
+            var constraint = Diffusion.UpdateConstraints.JSONValue.With("/diffusion", UpdateConstraintOperator.IS, "bar");
             await session.TopicUpdate.SetAsync<IJSON>(topic, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
 
             string json2 = "{\"diffusion\":\"baz\"}";
