@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2025 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
             {
                 var result = await session.RemoteServers.CheckRemoteServerAsync(remoteServer.Name, cancellationToken);
 
-                WriteLine($"{remoteServer.Name} ({remoteServer.ServerUrl}): {result.ConnectionState} ({result.FailureMessage})");
+                WriteLine($"{remoteServer.Name} ({(remoteServer as ISecondaryInitiator).ServerUrl}): {result.ConnectionState} ({result.FailureMessage})");
             }
 
             session.Close();

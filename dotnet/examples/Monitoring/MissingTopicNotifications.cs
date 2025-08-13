@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2025 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using static System.Console;
-using System.Linq;
 using PushTechnology.ClientInterface.Client.Callbacks;
 using PushTechnology.ClientInterface.Client.Factories;
 using PushTechnology.ClientInterface.Client.Features;
@@ -28,7 +26,6 @@ using PushTechnology.ClientInterface.Client.Session;
 using PushTechnology.ClientInterface.Client.Topics;
 using PushTechnology.ClientInterface.Client.Topics.Details;
 using static PushTechnology.ClientInterface.Examples.Program;
-using NUnit.Framework;
 
 namespace PushTechnology.ClientInterface.Examples.Monitoring
 {

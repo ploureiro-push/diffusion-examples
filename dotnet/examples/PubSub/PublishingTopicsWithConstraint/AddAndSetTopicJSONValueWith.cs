@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2025 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
 
             string json = "{\"diffusion\":\"bar\"}";
             var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
-            var constraint = Diffusion.UpdateConstraints.JSONValue.With("/diffusion", "bar");
+            var constraint = Diffusion.UpdateConstraints.JSONValue.With("/diffusion", UpdateConstraintOperator.IS, "bar");
             var result = await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
 
             if (result == TopicCreationResult.CREATED)

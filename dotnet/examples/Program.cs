@@ -43,6 +43,7 @@ using PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityContro
 using PushTechnology.ClientInterface.Examples.SessionManagement;
 using PushTechnology.ClientInterface.Examples.SessionManagement.ClientControl;
 using PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL;
+using NUnit.Framework;
 
 namespace PushTechnology.ClientInterface.Examples
 {
@@ -337,10 +338,10 @@ namespace PushTechnology.ClientInterface.Examples
                 //runner.Start(new SubscriptionControl(), url);
 
                 // Start the revoke authentication example
-                runner.Start(new RevokeAuthentication(), url);
+                //runner.Start(new RevokeAuthentication(), url);
 
                 // Start the session expiry example
-                runner.Start(new SessionExpiry(), url);
+                //runner.Start(new SessionExpiry(), url);
 
                 // Start the authentication control example
                 //runner.Start(new AuthenticationControl(), url);

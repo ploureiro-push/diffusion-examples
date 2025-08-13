@@ -67,7 +67,17 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
             {
                 WriteLine("Topic already exists.");
             }
-                hasUpdateFailed = true;
-            Assert.IsTrue(hasUpdateFailed);
-            var removeResult = await session.TopicControl.RemoveTopicsAsync(topic, cancellationToken);
-            WriteLine($"Or: {removeResult.ToString()}");
+            
+            try
+            {
+                // This fails for both the no topic and value constraints
+                await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, value, constraint, cancellationToken);
+            }
+            catch (UnsatisfiedConstraintException ex) { 
+                WriteLine($"Update failed: {ex.Message}");
+            }
+
+            session.Close();
+        }
+    }
+}
