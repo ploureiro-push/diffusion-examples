@@ -14,18 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../test/util');
-/// end::log
 
 export async function messagingSendToSessionId() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Received message: Hello'],
-        ['Received response: Goodbye'],
-    ]);
-    /// end::log
-    /// tag::messaging_send_to_session_id[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -37,9 +27,6 @@ export async function messagingSendToSessionId() {
     const stream1 = {
         onRequest: (path, request, responder) => {
             console.log(`Received message: ${request}`);
-            /// tag::log
-            check.log(`Received message: ${request}`);
-            /// end::log
             responder.respond('Goodbye');
         },
         onError: (error) => {
@@ -64,9 +51,6 @@ export async function messagingSendToSessionId() {
         onRequest: (path, request, responder) => {
             console.log(`Received message: ${request}`);
             responder.respond('I\'m not supposed to receive a message.');
-            /// tag::log
-            check.log('I\'m not supposed to receive a message.');
-            /// end::log
         },
         onError: (error) => {
             console.error('An error occurred.', error);
@@ -93,15 +77,8 @@ export async function messagingSendToSessionId() {
         diffusion.datatypes.string()
     );
     console.log(`Received response: ${response}`);
-    /// tag::log
-    check.log(`Received response: ${response}`);
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
     await session3.closeSession();
-    /// end::messaging_send_to_session_id[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

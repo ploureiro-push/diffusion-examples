@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics, topicUpdate, updateConstraints } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue } from '../../../../test/util';
-/// end::log
 
 export async function addTopicAndSetNoTopicConstraintExample(): Promise<void> {
-    /// tag::pub_sub_publish_with_constraint_add_and_set_topic_no_topic[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -45,9 +41,6 @@ export async function addTopicAndSetNoTopicConstraintExample(): Promise<void> {
         } else {
             console.log('Topic already exists.');
         }
-        /// tag::log
-        expect(topicCreationResult).toBe(topicUpdate.TopicCreationResult.CREATED);
-        /// end::log
         console.log('Topic value has been set.');
     } catch (err) {
         console.error('Topic value could not be set.', err);
@@ -55,8 +48,4 @@ export async function addTopicAndSetNoTopicConstraintExample(): Promise<void> {
     }
 
     await session.closeSession();
-    /// end::pub_sub_publish_with_constraint_add_and_set_topic_no_topic[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path', { diffusion: 'data' });
-    /// end::log
 }

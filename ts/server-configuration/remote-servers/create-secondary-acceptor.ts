@@ -21,7 +21,6 @@ import {
 } from 'diffusion';
 
 export async function remoteServersCreateSecondaryAcceptor(): Promise<void> {
-    /// tag::remote_servers_create_secondary_acceptor[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -41,14 +40,8 @@ export async function remoteServersCreateSecondaryAcceptor(): Promise<void> {
         .missingTopicNotificationFilter('?abc')
         .build('Remote Server 1', 'ws://new.server.url.com');
     await session.remoteServers.createRemoteServer(definition);
-    /// tag::log
-    const remoteServers = await session.remoteServers.listRemoteServers();
-    expect(remoteServers.length).toBe(1);
-    expect(remoteServers[0].name).toBe('Remote Server 1');
-    /// end::log
 
     // Clean up
     await session.remoteServers.removeRemoteServer('Remote Server 1');
     await session.closeSession();
-    /// end::remote_servers_create_secondary_acceptor[]
 }

@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function metricsPutTopicMetricCollector() {
-    /// tag::metrics_topic_metric_collector_put[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -33,12 +32,6 @@ export async function metricsPutTopicMetricCollector() {
         .groupByPathPrefixParts(15)
         .create('Topic Metric Collector 1', '?my/topic//');
     await session.metrics.putTopicMetricCollector(topicMetricCollector);
-    /// tag::log
-    const topicMetricCollectors = await session.metrics.listTopicMetricCollectors();
-    expect(topicMetricCollectors.collectors.length).toBe(1);
-    expect(topicMetricCollectors.collectors[0].name).toBe('Topic Metric Collector 1');
-    /// end::log
 
     await session.closeSession();
-    /// end::metrics_topic_metric_collector_put[]
 }

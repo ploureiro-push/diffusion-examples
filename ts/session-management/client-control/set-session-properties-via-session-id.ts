@@ -16,7 +16,6 @@
 import { clients, connect } from 'diffusion';
 
 export async function clientControlSetSessionPropertiesViaSessionId(): Promise<void> {
-    /// tag::client_control_set_session_properties_via_session_id[]
     // Connect to the server.
     const session1 = await connect({
         host: 'localhost',
@@ -55,11 +54,7 @@ export async function clientControlSetSessionPropertiesViaSessionId(): Promise<v
     for (const key of Object.keys(properties2)) {
         console.log(`  ${key}: ${properties2[key]}`);
     }
-    /// tag::log
-    expect(properties2['$Language']).toBe('en-gb');
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
-    /// end::client_control_set_session_properties_via_session_id[]
 }

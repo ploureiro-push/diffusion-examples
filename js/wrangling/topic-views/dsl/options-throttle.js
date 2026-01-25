@@ -14,21 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslOptionsThrottle() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [ 'Subscribed to views/my/topic/path', 'Subscribed to my/topic/path' ],
-        [
-            'views/my/topic/path changed from undefined',
-            'views/my/topic/path changed from 0'
-        ],
-    ]);
-    /// end::log
-    /// tag::topic_views_dsl_options_throttle[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -48,20 +35,12 @@ export async function topicViewsDslOptionsThrottle() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue} to ${newValue}`);
-            /// tag::log
-            if (topic !== 'my/topic/path') {
-                check.log(`${topic} changed from ${oldValue}`);
-            }
-            /// end::log
         }
     });
 
@@ -84,8 +63,4 @@ export async function topicViewsDslOptionsThrottle() {
     }
 
     await session.closeSession();
-    /// end::topic_views_dsl_options_throttle[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

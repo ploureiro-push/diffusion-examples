@@ -14,28 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue, expectTopicCounts, PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslOptionsPreserveTopics() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [
-            'Subscribed to views/preserved/Fred Flintstone',
-            'Subscribed to views/not_preserved/Fred Flintstone',
-        ],
-        [
-            'Subscribed to views/preserved/Wilma Flintstone',
-            'Subscribed to views/not_preserved/Wilma Flintstone',
-        ],
-        [
-            'Subscribed to views/preserved/Pebbles Flintstone',
-            'Subscribed to views/not_preserved/Pebbles Flintstone'
-        ]
-    ]);
-    /// end::log
-    /// tag::topic_views_dsl_options_preserve_topics[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -58,9 +38,6 @@ export async function topicViewsDslOptionsPreserveTopics() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -102,36 +79,8 @@ export async function topicViewsDslOptionsPreserveTopics() {
     );
 
     await new Promise(resolve => setTimeout(resolve, 2000));
-    /// tag::log
-    await expectTopicCounts({
-        'my/topic/path': 1,
-        'views/preserved/Fred Flintstone': 1,
-        'views/preserved/Wilma Flintstone': 1,
-        'views/preserved/Pebbles Flintstone': 1,
-        'views/not_preserved/Fred Flintstone': 0,
-        'views/not_preserved/Wilma Flintstone': 0,
-        'views/not_preserved/Pebbles Flintstone': 1
-    });
-
-    await expectJsonTopicToHaveValue('views/preserved/Fred Flintstone', {
-        name: 'Fred Flintstone'
-    });
-    await expectJsonTopicToHaveValue('views/preserved/Wilma Flintstone', {
-        name: 'Wilma Flintstone'
-    });
-    await expectJsonTopicToHaveValue('views/preserved/Pebbles Flintstone', {
-        name: 'Pebbles Flintstone'
-    });
-    await expectJsonTopicToHaveValue('views/not_preserved/Pebbles Flintstone', {
-        name: 'Pebbles Flintstone'
-    });
-    /// end::log
 
     await session.topics.remove('my/topic/path');
 
     await session.closeSession();
-    /// end::topic_views_dsl_options_preserve_topics[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

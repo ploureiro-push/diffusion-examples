@@ -14,15 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { expectTimeseriesDoubleTopicToHaveValues } from '../../../test/util';
-/// end::log
 
 export async function timeSeriesAppendUserSuppliedTimestamp(): Promise<void> {
-    /// tag::log
-    const values: number[] = [];
-    /// end::log
-    /// tag::time_series_append_user_supplied_timestamp[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -48,20 +41,8 @@ export async function timeSeriesAppendUserSuppliedTimestamp(): Promise<void> {
             datatypes.double(),
             timestamp
         );
-        /// tag::log
-        values.push(value);
-        /// end::log
         timestamp++;
     }
 
     await session.closeSession();
-    /// end::time_series_append_user_supplied_timestamp[]
-    /// tag::log
-    const timestamps = values.map((_, i) => 1000001 + i);
-    await expectTimeseriesDoubleTopicToHaveValues(
-        'my/time/series/topic/path/user/supplied',
-        values.slice(-15),
-        timestamps.slice(-15)
-    );
-    /// end::log
 }

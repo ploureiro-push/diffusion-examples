@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, updateConstraints } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue } from '../../../../test/util';
-/// end::log
 
 export async function setTopicSessionLockConstraintExample(): Promise<void> {
-    /// tag::pub_sub_publish_with_constraint_set_topic_session_lock[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -47,8 +43,4 @@ export async function setTopicSessionLockConstraintExample(): Promise<void> {
     }
 
     await session.closeSession();
-    /// end::pub_sub_publish_with_constraint_set_topic_session_lock[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path', { diffusion: ['data', 'more data'] });
-    /// end::log
 }

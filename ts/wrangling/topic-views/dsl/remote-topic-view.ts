@@ -16,7 +16,6 @@
 import { connect, ConnectionOption, newRemoteServerBuilder } from 'diffusion';
 
 export async function topicViewsDslRemoteTopicView(): Promise<void> {
-    /// tag::topic_views_dsl_remote_topic_view[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -44,5 +43,4 @@ export async function topicViewsDslRemoteTopicView(): Promise<void> {
 
     await session.remoteServers.removeRemoteServer('Remote Server 1');
     await session.closeSession();
-    /// end::topic_views_dsl_remote_topic_view[]
 }

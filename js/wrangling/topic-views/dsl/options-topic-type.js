@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function topicViewsDslOptionsTopicType() {
-    /// tag::topic_views_dsl_options_topic_type[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -47,9 +46,6 @@ export async function topicViewsDslOptionsTopicType() {
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    /// tag::log
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    /// end::log
 
     const queryResult = await session.timeseries.rangeQuery()
         .fromStart()
@@ -57,10 +53,6 @@ export async function topicViewsDslOptionsTopicType() {
     for (const event of queryResult.events) {
         console.log(`${event.sequence} (${event.timestamp}): ${event.value}`);
     }
-    /// tag::log
-    expect(queryResult.events.length).toBe(10);
-    /// end::log
 
     await session.closeSession();
-    /// end::topic_views_dsl_options_topic_type[]
 }

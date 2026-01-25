@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics, topicUpdate } from 'diffusion';
-/// tag::log
-import { expectTopicCounts } from '../../../../test/util';
-/// end::log
 
 export async function pubSubRemoveMultipleTopicsViaSelector(): Promise<void> {
-    /// tag::pub_sub_remove_multiple_topics_via_selector[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -41,9 +37,6 @@ export async function pubSubRemoveMultipleTopicsViaSelector(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult1).toBe(topicUpdate.TopicCreationResult.CREATED);
-    /// end::log
 
     const jsonData2 = datatypes.json().from({ diffusion: [ 'data', 'also more data' ] });
     const topicCreationResult2 = await session.topicUpdate.set(
@@ -57,9 +50,6 @@ export async function pubSubRemoveMultipleTopicsViaSelector(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult2).toBe(topicUpdate.TopicCreationResult.CREATED);
-    /// end::log
 
     const jsonData3 = datatypes.json().from({ diffusion: [ 'no data' ] });
 
@@ -74,9 +64,6 @@ export async function pubSubRemoveMultipleTopicsViaSelector(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult3).toBe(topicUpdate.TopicCreationResult.CREATED);
-    /// end::log
 
     const jsonData4 = datatypes.json().from({ diffusion: [ 'no data either' ] });
 
@@ -91,22 +78,10 @@ export async function pubSubRemoveMultipleTopicsViaSelector(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult4).toBe(topicUpdate.TopicCreationResult.CREATED);
-    /// end::log
 
 
     const removalResult = await session.topics.remove('?my/topic/path/to/be//');
     console.log(`${removalResult.removedCount} topics have been removed.`);
 
     await session.closeSession();
-    /// end::pub_sub_remove_multiple_topics_via_selector[]
-    /// tag::log
-    await expectTopicCounts({
-        'my/topic/path/to/be/removed': 0,
-        'my/topic/path/to/be/also/removed': 0,
-        'my/topic/path/will/not/be/removed': 1,
-        'my/topic/path/will/not/be/removed/either': 1
-    });
-    /// end::log
 }

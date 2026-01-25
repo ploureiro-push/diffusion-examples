@@ -14,20 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } from '../../../../../test/util';
-/// end::log
 
 export async function topicViewsDslExpandValue(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/currency0',
-        'Subscribed to views/currency1',
-        'Subscribed to views/currency2',
-        'Subscribed to views/currency3'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_expand_value[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -51,9 +39,6 @@ export async function topicViewsDslExpandValue(): Promise<void> {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -68,13 +53,4 @@ export async function topicViewsDslExpandValue(): Promise<void> {
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_expand_value[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/currency0', 'USD');
-    await expectJsonTopicToHaveValue('views/currency1', 'GBP');
-    await expectJsonTopicToHaveValue('views/currency2', 'EUR');
-    await expectJsonTopicToHaveValue('views/currency3', 'CHF');
-
-    await check.done();
-    /// end::log
 }

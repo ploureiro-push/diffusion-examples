@@ -14,21 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester, promiseWithResolvers } from '../../../test/util'
-/// end::log
 
 export async function timeSeriesSubscribeCrossCompatible(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Subscribed to my/time/series/topic/path']
-    ]);
-
-    const valuePromise = promiseWithResolvers<void>();
-    let valueCount = 0;
-    let oldValue = 'undefined';
-    /// end::log
-    /// tag::time_series_subscribe_cross_compatible[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -49,26 +36,12 @@ export async function timeSeriesSubscribeCrossCompatible(): Promise<void> {
     jsonValueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
-        /// tag::log
-        close : () => {
-            check.log(`Closed`);
-        },
-        /// end::log
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue?.get()} to ${newValue.get()}`);
-            /// tag::log
-            if (++valueCount >= 25) {
-                valuePromise.resolve();
-            }
-            check.log(`${topic} changed from ${oldValue?.get()} to ${newValue.get()}`);
-            /// end::log
         }
     });
 
@@ -76,19 +49,7 @@ export async function timeSeriesSubscribeCrossCompatible(): Promise<void> {
 
     for (let count = 0; count < 25; count++) {
         const value = Math.random();
-        /// tag::log
-        check.appendExpected([`my/time/series/topic/path changed from ${oldValue} to ${value}`]);
-        oldValue = `${value}`;
-        /// end::log
         await session.timeseries.append('my/time/series/topic/path', value, datatypes.double());
     }
-    /// tag::log
-    check.appendExpected([`Closed`]);
-    await valuePromise.promise;
-    /// end::log
     await session.closeSession();
-    /// end::time_series_subscribe_cross_compatible[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

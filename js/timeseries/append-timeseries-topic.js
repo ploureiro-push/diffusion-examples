@@ -14,16 +14,9 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectTimeseriesDoubleTopicToHaveValues } = require('../../../test/util');
-/// end::log
 
 
 export async function timeSeriesAppendValue() {
-    /// tag::log
-    const values = [];
-    /// end::log
-    /// tag::time_series_append_value[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -44,24 +37,11 @@ export async function timeSeriesAppendValue() {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(addResult.added).toBeTrue();
-    /// end::log
 
     for (let count = 0; count < 25; count++) {
         const value = Math.random();
         await session.timeseries.append('my/time/series/topic/path', value, diffusion.datatypes.double());
-        /// tag::log
-        values.push(value);
-        /// end::log
     }
 
     await session.closeSession();
-    /// end::time_series_append_value[]
-    /// tag::log
-    await expectTimeseriesDoubleTopicToHaveValues(
-        'my/time/series/topic/path',
-        values.slice(-15)
-    );
-    /// end::log
 }

@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue } = require('../../../../test/util');
-/// end::log
 
 export async function addTopicAndSetJsonValueWithConstraintExample() {
-    /// tag::pub_sub_publish_with_constraint_add_and_set_topic_json_value_with[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -44,9 +40,6 @@ export async function addTopicAndSetJsonValueWithConstraintExample() {
         } else {
             throw new Error('Topic already exists.');
         }
-        /// tag::log
-        expect(topicCreationResult).toBe(diffusion.topicUpdate.TopicCreationResult.CREATED);
-        /// end::log
 
         const updateConstraint = diffusion.updateConstraints()
             .jsonValue().with('/diffusion', 'bar', diffusion.topicUpdate.UpdateConstraintOperator.IS);
@@ -66,8 +59,4 @@ export async function addTopicAndSetJsonValueWithConstraintExample() {
     }
 
     await session.closeSession();
-    /// end::pub_sub_publish_with_constraint_add_and_set_topic_json_value_with[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path', { diffusion: 'baz' });
-    /// end::log
 }

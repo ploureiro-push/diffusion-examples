@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslPatchTransformationsCopy() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/my/topic/path'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_patch_transformations_copy[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -53,9 +44,6 @@ export async function topicViewsDslPatchTransformationsCopy() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -76,19 +64,4 @@ export async function topicViewsDslPatchTransformationsCopy() {
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_patch_transformations_copy[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/my/topic/path', {
-        'Meet the Flintstones': {
-            Fred: 'Flintstone',
-            Barne: 'Rubble'
-        },
-        'The Jetsons': {
-            Fred: 'Flintstone',
-            George: 'Jetson'
-        }
-    });
-
-    await check.done();
-    /// end::log
 }

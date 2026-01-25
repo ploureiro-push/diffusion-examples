@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function removePrincipal(): Promise<void> {
-    /// tag::system_authentication_control_remove_principal[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -36,5 +35,4 @@ export async function removePrincipal(): Promise<void> {
     await session.security.updateAuthenticationStore(authenticationScript2);
 
     await session.closeSession();
-    /// end::system_authentication_control_remove_principal[]
 }

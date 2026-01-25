@@ -20,7 +20,6 @@ import {
 } from 'diffusion';
 
 export async function securityControlSetPathPermissions(): Promise<void> {
-    /// tag::security_control_set_path_permissions[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -42,5 +41,4 @@ export async function securityControlSetPathPermissions(): Promise<void> {
         .build();
     await session.security.updateSecurityStore(securityScriptCleanup);
     await session.closeSession();
-    /// end::security_control_set_path_permissions[]
 }

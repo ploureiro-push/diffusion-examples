@@ -14,18 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../../test/util');
-/// end::log
 
 export async function remoteServersList() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Remote Server 1 (ws://new.server.url.com)',
-        'Remote Server 2 (ws://another.server.url.com)'
-    ]]);
-    /// end::log
-    /// tag::remote_servers_list[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -61,17 +51,10 @@ export async function remoteServersList() {
     const remoteServers = await session.remoteServers.listRemoteServers();
     for (const remoteServer of remoteServers) {
         console.log(`${remoteServer.name} (${remoteServer.url})`);
-        /// tag::log
-        check.log(`${remoteServer.name} (${remoteServer.url})`);
-        /// end::log
     }
 
     // Clean up
     await session.remoteServers.removeRemoteServer('Remote Server 1');
     await session.remoteServers.removeRemoteServer('Remote Server 2');
     await session.closeSession();
-    /// end::remote_servers_list[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

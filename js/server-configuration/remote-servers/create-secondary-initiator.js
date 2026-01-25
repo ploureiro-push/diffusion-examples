@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function remoteServersCreateSecondaryInitiator() {
-    /// tag::remote_servers_create_secondary_initiator[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -36,14 +35,8 @@ export async function remoteServersCreateSecondaryInitiator() {
         .missingTopicNotificationFilter('?abc')
         .build('Remote Server 1', 'ws://new.server.url.com');
     await session.remoteServers.createRemoteServer(definition);
-    /// tag::log
-    const remoteServers = await session.remoteServers.listRemoteServers();
-    expect(remoteServers.length).toBe(1);
-    expect(remoteServers[0].name).toBe('Remote Server 1');
-    /// end::log
 
     // Clean up
     await session.remoteServers.removeRemoteServer('Remote Server 1');
     await session.closeSession();
-    /// end::remote_servers_create_secondary_initiator[]
 }

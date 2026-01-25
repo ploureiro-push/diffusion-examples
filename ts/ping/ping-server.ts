@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function pingExample(): Promise<void> {
-    /// tag::ping_server[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -29,5 +28,4 @@ export async function pingExample(): Promise<void> {
     console.log('Received Ping response.');
 
     await session.closeSession();
-    /// end::ping_server[]
 }

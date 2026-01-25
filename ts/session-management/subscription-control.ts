@@ -21,21 +21,8 @@ import {
     topics,
     clients
 } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester, promiseWithResolvers } from '../../../test/util';
-/// end::log
 
 export async function sessionManagementSubscriptionControl(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['subscribed client'],
-        ['Subscribed to my/topic/path/hello'],
-        ['unsubscribed client', 'Unsubscribed from my/topic/path/hello']
-    ]);
-    const subscribedPromise = promiseWithResolvers<void>();
-    const unsubscribeTopicPromise = promiseWithResolvers<void>();
-    /// end::log
-    /// tag::session_management_subscription_control[]
     // Connect to the server.
     const session1 = await connect({
         host: 'localhost',
@@ -70,17 +57,8 @@ export async function sessionManagementSubscriptionControl(): Promise<void> {
                 && event.sessionId.toString() !== session1.sessionId.toString()
             ) {
                 session1.clients.subscribe(event.sessionId, '?my/topic/path//');
-                /// tag::log
-                check.log('subscribed client');
-                /// end::log
                 setTimeout(async () => {
-                    /// tag::log
-                    await subscribedPromise.promise;
-                    /// end::log
                     await session1.clients.unsubscribe(event.sessionId, '?my/topic/path//');
-                    /// tag::log
-                    check.log('unsubscribed client');
-                    /// end::log
                     deferredUnsubscribeResolve();
                 }, 5000);
             }
@@ -102,17 +80,9 @@ export async function sessionManagementSubscriptionControl(): Promise<void> {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            subscribedPromise.resolve();
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
-            /// tag::log
-            check.log(`Unsubscribed from ${topic}`);
-            unsubscribeTopicPromise.resolve();
-            /// end::log
         },
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue.get()} to ${newValue.get()}`);
@@ -120,14 +90,7 @@ export async function sessionManagementSubscriptionControl(): Promise<void> {
     });
 
     await unsubscribePromise;
-    /// tag::log
-    await unsubscribeTopicPromise.promise;
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
-    /// end::session_management_subscription_control[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

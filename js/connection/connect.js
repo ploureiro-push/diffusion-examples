@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function connectExample() {
-    /// tag::connection_establishment_connect_async[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -27,11 +26,6 @@ export async function connectExample() {
     console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
 
     // Insert work here
-    /// tag::log
-    expect(session.sessionId).not.toBeNull();
-    expect(session.isConnected()).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::connection_establishment_connect_async[]
 }

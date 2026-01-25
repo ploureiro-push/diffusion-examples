@@ -14,19 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, MissingTopicHandler, topics } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester, promiseWithResolvers } from '../../../test/util';
-/// end::log
 
 export async function monitoringMissingTopicNotifications(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [ 'missing topic notification my/topic/path/does/not/exist/yet' ],
-        [ 'Subscribed to my/topic/path/does/not/exist/yet' ],
-    ]);
-    const promise = promiseWithResolvers<void>();
-    /// end::log
-    /// tag::monitoring_missing_topic_notifications[]
     // Connect to the server.
     const session1 = await connect({
         host: 'localhost',
@@ -37,9 +26,6 @@ export async function monitoringMissingTopicNotifications(): Promise<void> {
 
     const missingTopicHandler: MissingTopicHandler = {
         onMissingTopic: async (notification) => {
-            /// tag::log
-            check.log(`missing topic notification ${notification.path}`);
-            /// end::log
             const specification = new topics.TopicSpecification(topics.TopicType.STRING);
             await session1.topics.add(notification.path, specification);
         },
@@ -61,10 +47,6 @@ export async function monitoringMissingTopicNotifications(): Promise<void> {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            promise.resolve();
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
@@ -77,14 +59,7 @@ export async function monitoringMissingTopicNotifications(): Promise<void> {
     await session2.select('my/topic/path/does/not/exist/yet');
 
     // wait until topic has been created
-    /// tag::log
-    await promise.promise;
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
-    /// end::monitoring_missing_topic_notifications[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

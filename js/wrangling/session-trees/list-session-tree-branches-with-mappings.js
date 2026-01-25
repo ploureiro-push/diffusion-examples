@@ -14,18 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../../test/util');
-/// end::log
 
 export async function sessionTreesListSessionTreeBranchesWithMappings() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'my/personal/path',
-        'my/alternate/path',
-    ]]);
-    /// end::log
-    /// tag::session_trees_list_session_tree_branches_with_mappings[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -50,14 +40,7 @@ export async function sessionTreesListSessionTreeBranchesWithMappings() {
     const sessionTrees = await session.sessionTrees.getSessionTreeBranchesWithMappings();
     for (const sessionTree of sessionTrees) {
         console.log(sessionTree);
-        /// tag::log
-        check.log(sessionTree);
-        /// end::log
     }
 
     await session.closeSession();
-    /// end::session_trees_list_session_tree_branches_with_mappings[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

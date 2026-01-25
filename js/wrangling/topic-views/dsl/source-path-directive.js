@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslSourcePathDirective() {
-    /// tag::topic_views_dsl_source_path_directive[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -70,17 +66,4 @@ export async function topicViewsDslSourcePathDirective() {
     console.log(`Topic View ${topicView3.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_source_path_directive[]
-    /// tag::log
-    const expectedValue = {
-        account: '1234',
-        balance: {
-            amount: 12.57,
-            currency: 'USD'
-        }
-    };
-    await expectJsonTopicToHaveValue('views/a/b/c/d/e/f/g', expectedValue);
-    await expectJsonTopicToHaveValue('views/c/d/e/f/g', expectedValue);
-    await expectJsonTopicToHaveValue('views/d/e/f/g', expectedValue);
-    /// end::log
 }

@@ -14,20 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../../test/util');
-/// end::log
 
 export async function subscribeSingleTopicExample() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Subscribed to my/topic/path'],
-        ['my/topic/path changed from undefined to {"diffusion":"data"}'],
-        ['my/topic/path changed from {"diffusion":"data"} to {"diffusion":"more data"}'],
-        ['Closed'],
-    ]);
-    /// end::log
-    /// tag::pub_sub_subscribe_single_topic_via_path[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -43,26 +31,12 @@ export async function subscribeSingleTopicExample() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
-            /// tag::log
-            check.log(`Unsubscribed from ${topic}: ${reason}`);
-            /// end::log
         },
-        /// tag::log
-        close : () => {
-            check.log(`Closed`);
-        },
-        /// end::log
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${JSON.stringify(oldValue?.get())} to ${JSON.stringify(newValue?.get())}`);
-            /// tag::log
-            check.log(`${topic} changed from ${JSON.stringify(oldValue?.get())} to ${JSON.stringify(newValue?.get())}`);
-            /// end::log
         }
     });
 
@@ -85,8 +59,4 @@ export async function subscribeSingleTopicExample() {
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     await session.closeSession();
-    /// end::pub_sub_subscribe_single_topic_via_path[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

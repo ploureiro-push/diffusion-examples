@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, FetchResult, topics } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../../test/util';
-/// end::log
 
 export async function pubSubFetchTopicViaPaging(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        Array.from({length: 25}). map((v, i) => `my/topic/path/${i}: diffusion data #${i}`)
-    ]);
-    /// end::log
-    /// tag::pub_sub_fetch_topic_via_paging[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -58,27 +49,14 @@ export async function pubSubFetchTopicViaPaging(): Promise<void> {
 
         for (const result of topicResults) {
             console.log(`${result.path()}: ${result.value()}`);
-            /// tag::log
-            check.log(`${result.path()}: ${result.value()}`);
-            /// end::log
         }
         if (fetchResult.hasMore()) {
-            /// tag::log
-            expect(topicResults.length).toBe(10);
-            /// end::log
             console.log('loading next page');
             lastTopicPath = topicResults[topicResults.length - 1].path();
         } else {
-            /// tag::log
-            expect(topicResults.length).toBe(5);
-            /// end::log
             console.log('done');
         }
     } while (fetchResult.hasMore());
 
     await session.closeSession();
-    /// end::pub_sub_fetch_topic_via_paging[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

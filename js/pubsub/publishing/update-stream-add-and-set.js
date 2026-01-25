@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue } = require('../../../../test/util');
-/// end::log
 
 export async function updateSreamAddAndSetExample() {
-    /// tag::pub_sub_publish_add_and_set_topic_via_update_stream[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -39,13 +35,6 @@ export async function updateSreamAddAndSetExample() {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult).toBe(diffusion.topicUpdate.TopicCreationResult.CREATED);
-    /// end::log
 
     await session.closeSession();
-    /// end::pub_sub_publish_add_and_set_topic_via_update_stream[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path/with/update/stream', { diffusion: 'data' });
-    /// end::log
 }
