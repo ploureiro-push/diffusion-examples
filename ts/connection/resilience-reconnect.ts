@@ -13,11 +13,10 @@
  * limitations under the License.
  *******************************************************************************/
 
-import { connect, Session } from 'diffusion';
+import { connect, Session, CloseReason } from 'diffusion';
 
 export async function connectionReconnectExample(): Promise<void> {
     let session: Session;
-    let attempts = 0;
 
     try {
         // Connect to the server.
@@ -31,8 +30,11 @@ export async function connectionReconnectExample(): Promise<void> {
                 timeout: 1000 * 60 * 10,
                 // The reconnection strategy is a function that is called when the session is
                 // disconnected unexpectedly
-                strategy: (reconnect: () => void, abort: () => void) => {
-                    if (attempts > 10) {
+                strategy: (reconnect: () => void,
+                           abort: () => void,
+                           closeReason: CloseReason,
+                           reconnectAttempts: number) => {
+                    if (reconnectAttempts >= 10) {
                         // abort after 10 attempts
                         abort();
                     } else {

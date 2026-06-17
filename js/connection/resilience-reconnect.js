@@ -17,7 +17,6 @@ const diffusion = require('diffusion');
 
 export async function connectionReconnectExample() {
     let session;
-    let attempts = 0;
 
     try {
         // Connect to the server.
@@ -31,8 +30,8 @@ export async function connectionReconnectExample() {
                 timeout: 1000 * 60 * 10,
                 // The reconnection strategy is a function that is called when the session is
                 // disconnected unexpectedly
-                strategy: (reconnect, abort) => {
-                    if (attempts > 10) {
+                strategy: (reconnect, abort, closeReason, reconnectAttempts) => {
+                    if (reconnectAttempts >= 10) {
                         // abort after 10 attempts
                         abort();
                     } else {
