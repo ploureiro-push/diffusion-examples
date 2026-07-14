@@ -66,7 +66,7 @@
     const NSTimeInterval maximumAttemptInterval = 60.0;
 
     // Compute delay for exponential backoff based on the number of attempts so far.
-    const NSTimeInterval delay = MIN(pow(2.0, _attemptCount++) * 0.1, maximumAttemptInterval);
+    const NSTimeInterval delay = MIN(pow(2.0, (double)_attemptCount++) * 0.1, maximumAttemptInterval);
 
     // Schedule asynchronous execution.
     NSLog(@"Reconnection attempt scheduled for %.2fs", delay);

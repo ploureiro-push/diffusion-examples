@@ -113,7 +113,7 @@
          }
 
          NSString *const author = eventMetadata.author;
-         NSDate *const timestamp = [NSDate dateWithTimeIntervalSince1970:eventMetadata.timestamp / 1000];
+         NSDate *const timestamp = [NSDate dateWithTimeIntervalSince1970:(double)eventMetadata.timestamp / 1000.0];
          NSDateFormatter *const dateFormatter = [[NSDateFormatter alloc] init];
          [dateFormatter setDateFormat:@"yyyy-MM-dd hh:mm:ss"];
          NSUInteger sequence = [NSNumber numberWithUnsignedLongLong:eventMetadata.sequence].unsignedIntegerValue;
@@ -147,7 +147,7 @@
         }
 
         NSString *const author = eventMetadata.author;
-        NSDate *const timestamp = [NSDate dateWithTimeIntervalSince1970:eventMetadata.timestamp / 1000];
+        NSDate *const timestamp = [NSDate dateWithTimeIntervalSince1970:(double)eventMetadata.timestamp / 1000.0];
         NSDateFormatter *const dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"yyyy-MM-dd hh:mm:ss"];
         NSUInteger sequence = [NSNumber numberWithUnsignedLongLong:eventMetadata.sequence].unsignedIntegerValue;
