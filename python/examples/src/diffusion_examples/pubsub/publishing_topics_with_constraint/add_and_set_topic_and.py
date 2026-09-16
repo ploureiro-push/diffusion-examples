@@ -22,6 +22,8 @@ from diffusion.features.topics.update.constraint_factory import (
 from diffusion.datatypes import JSON, STRING
 from diffusion_examples.utils.program import Example
 
+
+
 class AddAndSetTopicAnd(Example):
     topic = "my/topic/path"
 
@@ -31,9 +33,12 @@ class AddAndSetTopicAnd(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             json_data_1 = {"diffusion": "data"}
             # Add and set the topic with the first value
             result = await session.topics.add_and_set_topic(

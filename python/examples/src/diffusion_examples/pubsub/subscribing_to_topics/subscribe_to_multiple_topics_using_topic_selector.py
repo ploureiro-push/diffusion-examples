@@ -26,6 +26,7 @@ import diffusion.datatypes
 from diffusion_examples.utils.program import Example
 
 
+
 class SubscribeToMultipleTopicsUsingTopicSelector(Example):
     async def run(
         self,
@@ -33,9 +34,12 @@ class SubscribeToMultipleTopicsUsingTopicSelector(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_specification = diffusion.datatypes.JSON.with_properties()
             await add_topic(session, "my/topic/path", topic_specification)
             await add_topic(session, "my/other/topic/path", topic_specification)
@@ -46,9 +50,7 @@ class SubscribeToMultipleTopicsUsingTopicSelector(Example):
 
             await asyncio.sleep(5)
             print("Creating my/additional/topic/path")
-            await add_topic(
-                session, "my/additional/topic/path", topic_specification
-            )
+            await add_topic(session, "my/additional/topic/path", topic_specification)
             await asyncio.sleep(5)
             await session.topics.unsubscribe(topic_selector)
             await session.topics.remove_stream(json_stream)
@@ -61,6 +63,8 @@ async def add_topic(session, topic, topic_specification):
         print("Topic has been created.")
     else:
         print("Topic already exists.")
+
+
 
 
 class JSONStream(ValueStreamHandler):
@@ -76,11 +80,11 @@ class JSONStream(ValueStreamHandler):
 
 
     async def on_close(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            topic_value: typing.Optional[diffusion.datatypes.JSON],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        topic_value: typing.Optional[diffusion.datatypes.JSON],
+        **kwargs,
     ) -> None:
         pass
 
@@ -90,7 +94,7 @@ class JSONStream(ValueStreamHandler):
         topic_path: str,
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"Subscribed to {topic_path}.")
 
@@ -101,7 +105,7 @@ class JSONStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
         reason: typing.Any,
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"Unsubscribed from {topic_path}: {reason}.")
 
@@ -112,9 +116,11 @@ class JSONStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         old_value: typing.Optional[diffusion.datatypes.JSON],
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"{topic_path} changed from {old_value} to {topic_value}.")
+
+
 
 
 if __name__ == "__main__":

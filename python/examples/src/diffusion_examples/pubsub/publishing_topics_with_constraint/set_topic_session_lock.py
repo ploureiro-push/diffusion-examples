@@ -23,6 +23,7 @@ from diffusion.features.topics.update.constraint_factory import (
 from diffusion_examples.utils.program import Example
 
 
+
 class SetTopicSessionLock(Example):
     async def run(
         self,
@@ -30,9 +31,12 @@ class SetTopicSessionLock(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
             result = await session.topics.add_topic(topic, JSON)
 

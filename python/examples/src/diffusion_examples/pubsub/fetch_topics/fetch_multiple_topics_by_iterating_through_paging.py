@@ -21,6 +21,7 @@ from diffusion_examples.utils.program import Example
 import diffusion.datatypes
 
 
+
 class FetchMultipleTopicsByIteratingThroughPaging(Example):
     async def run(
         self,
@@ -28,9 +29,12 @@ class FetchMultipleTopicsByIteratingThroughPaging(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_specification = diffusion.datatypes.STRING.with_properties()
             for i in range(1, 26):
                 string_value = f"diffusion data #{i}"

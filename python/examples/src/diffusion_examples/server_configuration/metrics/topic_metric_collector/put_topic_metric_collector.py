@@ -31,9 +31,12 @@ class PutTopicMetricCollector(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_selector = "?my/topic//"
             builder = TopicMetricCollectorBuilder()
             builder = builder.export_to_prometheus(False)
@@ -41,9 +44,7 @@ class PutTopicMetricCollector(Example):
             builder = builder.group_by_topic_view(True)
             builder = builder.group_by_path_prefix_parts(15)
             builder = builder.maximum_groups(10)
-            collector = builder.create(
-                "Topic Metric Collector 1", topic_selector
-            )
+            collector = builder.create("Topic Metric Collector 1", topic_selector)
             await session.metrics.put_topic_metric_collector(collector)
             print(f"Topic metric collector '{collector.name}' added.")
 

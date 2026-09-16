@@ -34,23 +34,30 @@ class MessageToSessionFilter(Example):
     ) -> None:
         path = "my/message/path"
 
-        async with sessions().principal("admin").credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal("admin")
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             request_stream = SimpleRequestStream()
-            session.messaging.add_stream_handler(
-                path, request_stream, addressed=True
-            )
+            session.messaging.add_stream_handler(path, request_stream, addressed=True)
 
-            async with sessions().principal("control").credentials(
-                Credentials(password)
-            ).open(server_url) as session2:
+            async with (
+                sessions()
+                .principal("control")
+                .credentials(Credentials(password))
+                .open(server_url) as session2
+            ):
                 request_stream2 = AnotherRequestStream()
                 session2.messaging.add_stream_handler(path, request_stream2, addressed=True)
 
-                async with sessions().principal("control").credentials(
-                    Credentials(password)
-                ).open(server_url) as session3:
+                async with (
+                    sessions()
+                    .principal("control")
+                    .credentials(Credentials(password))
+                    .open(server_url) as session3
+                ):
                     request_callback = RequestCallback()
                     session3.messaging.add_filter_response_handler(
                         "$Principal is 'admin'", request_callback
@@ -83,6 +90,8 @@ class SimpleRequestStream(RequestHandler):
         return "Goodbye"
 
 
+
+
 class AnotherRequestStream(RequestHandler):
     def __init__(self) -> None:
         super().__init__(
@@ -104,11 +113,11 @@ class AnotherRequestStream(RequestHandler):
         return "I'm not supposed to receive a message."
 
 
+
+
 class RequestCallback(EventStreamHandler):
     def __init__(self) -> None:
-        super().__init__(
-            error=self.on_response_error, response=self.on_response
-        )
+        super().__init__(error=self.on_response_error, response=self.on_response)
 
     # noinspection PyUnusedLocal
     async def on_response(
@@ -125,6 +134,8 @@ class RequestCallback(EventStreamHandler):
 
     async def on_response_error(self, code: int, description: str, **kwargs) -> None:
         pass
+
+
 
 
 if __name__ == "__main__":

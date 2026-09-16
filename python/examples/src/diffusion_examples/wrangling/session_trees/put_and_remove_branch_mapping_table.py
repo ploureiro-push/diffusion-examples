@@ -24,9 +24,12 @@ class PutAndRemoveBranchMappingTable(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(Credentials(password)).open(
-            server_url
-        ) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             table = (
                 BranchMappingTable.Builder()
                 .add_branch_mapping("$Principal is 'admin'", "my/topic/path/for/admin")
@@ -43,10 +46,11 @@ class PutAndRemoveBranchMappingTable(Example):
             print("Session tree mapping table and mappings removed.")
 
 
-
-if __name__ == '__main__':
-    asyncio.run(PutAndRemoveBranchMappingTable().run(
-        server_url="ws://localhost:8080",
-        principal="admin",
-        password="password",
-    ))
+if __name__ == "__main__":
+    asyncio.run(
+        PutAndRemoveBranchMappingTable().run(
+            server_url="ws://localhost:8080",
+            principal="admin",
+            password="password",
+        )
+    )

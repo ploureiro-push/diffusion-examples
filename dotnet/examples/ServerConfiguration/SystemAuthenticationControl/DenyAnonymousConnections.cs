@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2024 - 2025 Diffusion Data Ltd.
+ * Copyright © 2024 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using PushTechnology.ClientInterface.Client.Factories;
@@ -47,6 +48,14 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SystemAuth
             {
                 WriteLine($"{ex.Message}");
             }
+            await Task.Delay(2000);
+
+            updateScript = session.SystemAuthenticationControl.Script
+                .AllowAnonymousConnections(new List<string>())
+                .ToScript();
+
+            await session.SystemAuthenticationControl.UpdateStoreAsync(updateScript, cancellationToken);
+
 
             session.Close();
         }

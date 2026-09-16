@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2025 Diffusion Data Ltd.
+ * Copyright © 2025 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,40 +37,56 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
 
             ISession controlSession = null;
             IRegistration registration = null;
+            ISession session = null;
 
             var authenticator = new Authenticator();
 
             try
             {
-                controlSession = Diffusion.Sessions
-                    .Principal("control")
-                    .Password("password")
+                try
+                {
+                    controlSession = Diffusion.Sessions
+                        .Principal("control")
+                        .Password("password")
+                        .CertificateValidation((cert, chain, errors) => CertificateValidationResult.ACCEPT)
+                        .Open(serverUrl);
+
+                    registration = await controlSession.AuthenticationControl.SetAuthenticationHandlerAsync("before-system-handler", authenticator, cancellationToken);
+
+                    await Task.Delay(5000);
+                }
+                catch (Exception ex)
+                {
+                    WriteLine($"An error occurred when running the example : {ex}.");
+                }
+
+                session = Diffusion.Sessions.Principal("client")
+                    .Credentials(Diffusion.Credentials.Password("password"))
                     .CertificateValidation((cert, chain, errors) => CertificateValidationResult.ACCEPT)
                     .Open(serverUrl);
 
-                registration = await controlSession.AuthenticationControl.SetAuthenticationHandlerAsync("before-system-handler", authenticator, cancellationToken);
+                await Task.Delay(2000);
 
-                await Task.Delay(5000);
+                await controlSession.AuthenticationControl.RevokeAuthenticationAsync(session.SessionId);
+
+                await Task.Delay(2000);
+
+                if (registration != null)
+                {
+                    var closeRegistrationTask = registration.CloseAsync();
+                    if (await Task.WhenAny(closeRegistrationTask, Task.Delay(30_000)) != closeRegistrationTask)
+                    {
+                        throw new TimeoutException("registration.CloseAsync() did not complete within 30s");
+                    }
+                    await closeRegistrationTask;
+                    await Task.Delay(2000);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                WriteLine($"An error occurred when running the example : {ex}.");
+                session?.Close();
+                controlSession?.Close();
             }
-
-            var session = Diffusion.Sessions.Principal("client")
-                .Credentials(Diffusion.Credentials.Password("password"))
-                .CertificateValidation((cert, chain, errors) => CertificateValidationResult.ACCEPT)
-                .Open(serverUrl);
-
-            await Task.Delay(2000);
-
-            await controlSession.AuthenticationControl.RevokeAuthenticationAsync(session.SessionId);
-
-            await Task.Delay(2000);
-            
-            await registration.CloseAsync();
-
-            controlSession.Close();
         }
 
         private sealed class Authenticator : IControlAuthenticator

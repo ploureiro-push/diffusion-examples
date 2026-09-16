@@ -12,11 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 from __future__ import annotations
 import asyncio
 import typing
 
 from diffusion import sessions, Credentials
+
 if typing.TYPE_CHECKING:
     from diffusion.session import State
 
@@ -36,6 +38,8 @@ class Listener(SessionListener):
         print(f"State changed from {old_state} to {new_state}.")
 
 
+
+
 class SessionStateListener(Example):
     async def run(
         self,
@@ -43,9 +47,12 @@ class SessionStateListener(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             session.add_listener(Listener())
             print(f"Connected. Session Identifier: {session.session_id}.")
             # Insert work here...

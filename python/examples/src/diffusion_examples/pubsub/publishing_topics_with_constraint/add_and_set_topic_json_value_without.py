@@ -22,6 +22,8 @@ from diffusion.features.topics.update.constraint_factory import (
 from diffusion.datatypes import JSON
 from diffusion_examples.utils.program import Example
 
+
+
 class AddAndSetTopicJSONValueWithout(Example):
     async def run(
         self,
@@ -29,9 +31,12 @@ class AddAndSetTopicJSONValueWithout(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
             json_data = {"diffusion": "data"}
             constraint = ConstraintFactory().json_value.without("/bar")

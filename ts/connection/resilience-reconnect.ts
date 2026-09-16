@@ -13,14 +13,20 @@
  * limitations under the License.
  *******************************************************************************/
 
-import { connect, Session, CloseReason } from 'diffusion';
+import { CloseReason, connect, Session } from 'diffusion';
 
 export async function connectionReconnectExample(): Promise<void> {
-    let session: Session;
-
+    /*
+        This example illustrates provision of a custom reconnect strategy which attempts reconnection
+        at fixed intervals, a finite number of times (for a fixed max duration).
+        In most cases you can omit an explicit reconnect strategy and your session will be allocated a
+        default strategy. The default behaviour uses a randomised backoff approach
+        (retrying at increasing & randomly staggered intervals), for a maximum period of one minute.
+     */
+    let sessionWithCustomReconnectBehaviour: Session;
     try {
         // Connect to the server.
-        session = await connect({
+        sessionWithCustomReconnectBehaviour = await connect({
             host: 'localhost',
             port: 8080,
             principal: 'admin',
@@ -48,10 +54,51 @@ export async function connectionReconnectExample(): Promise<void> {
         console.error('Connection could not be established.', err);
         throw err;
     }
+    console.log(`Connected. Session Identifier: ${sessionWithCustomReconnectBehaviour.sessionId.toString()}`);
 
-    console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
+    /*
+       For clarity, the simple and most common / recommended case
+       - utilising the default randomised backoff reconnect behaviour
+     */
+    let sessionWithDefaultReconnectBehaviour: Session;
+    try {
+        // Connect to the server.
+        sessionWithDefaultReconnectBehaviour = await connect({
+            host: 'localhost',
+            port: 8080,
+            principal: 'admin',
+            credentials: 'password'
+        });
+    } catch (err) {
+        console.error('Connection could not be established.', err);
+        throw err;
+    }
+    console.log('Connected with staggered reconnect behaviour. Session Identifier: '
+        + sessionWithDefaultReconnectBehaviour.sessionId.toString());
+
+    /*
+       Or less common, explicitly disabling reconnection...
+     */
+    let sessionWithNoReconnectBehaviour: Session;
+    try {
+        // Connect to the server.
+        sessionWithNoReconnectBehaviour = await connect({
+            host: 'localhost',
+            port: 8080,
+            principal: 'admin',
+            credentials: 'password',
+            reconnect: false
+        });
+    } catch (err) {
+        console.error('Connection could not be established.', err);
+        throw err;
+    }
+    console.log('Connected without reconnect behaviour. Session Identifier: '
+        + sessionWithDefaultReconnectBehaviour.sessionId.toString());
 
     // Insert work here
 
-    await session.closeSession();
+    await sessionWithCustomReconnectBehaviour.closeSession();
+    await sessionWithDefaultReconnectBehaviour.closeSession();
+    await sessionWithNoReconnectBehaviour.closeSession();
 }

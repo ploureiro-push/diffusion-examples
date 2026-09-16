@@ -23,6 +23,7 @@ from diffusion.features.topics import TopicAddResponse
 from diffusion_examples.utils.program import Example, random_double
 
 
+
 class AppendToTimeSeriesTopicWithUserSuppliedTimestamp(Example):
     async def run(
         self,
@@ -30,12 +31,13 @@ class AppendToTimeSeriesTopicWithUserSuppliedTimestamp(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
-            specification = TimeSeries.of(
-                diffusion.datatypes.DOUBLE
-            ).with_properties(
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
+            specification = TimeSeries.of(diffusion.datatypes.DOUBLE).with_properties(
                 TIME_SERIES_RETAINED_RANGE="limit 15 last 10s",
                 TIME_SERIES_SUBSCRIPTION_RANGE="limit 3",
             )
@@ -56,9 +58,7 @@ class AppendToTimeSeriesTopicWithUserSuppliedTimestamp(Example):
                     topic,
                     new_value,
                     diffusion.datatypes.DOUBLE,
-                    datetime.datetime.fromtimestamp(
-                        millis, tz=datetime.timezone.utc
-                    ),
+                    datetime.datetime.fromtimestamp(millis, tz=datetime.timezone.utc),
                 )
 
 

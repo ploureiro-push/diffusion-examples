@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 import diffusion
 import asyncio
 import diffusion.datatypes
@@ -21,6 +22,7 @@ from diffusion.features.topics import TopicAddResponse
 from diffusion_examples.utils.program import Example
 
 
+
 class CreateTimeSeriesTopic(Example):
     async def run(
         self,
@@ -28,9 +30,12 @@ class CreateTimeSeriesTopic(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-                diffusion.Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(diffusion.Credentials(password))
+            .open(server_url) as session
+        ):
             specification = diffusion.features.timeseries.TimeSeries.of(
                 diffusion.datatypes.DOUBLE
             ).with_properties(
@@ -56,4 +61,3 @@ if __name__ == "__main__":
             password="password",
         )
     )
-

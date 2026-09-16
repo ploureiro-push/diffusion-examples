@@ -21,16 +21,20 @@ from diffusion.datatypes import JSON
 from diffusion_examples.utils.program import Example
 
 
+
 class SetTopicJSONValueWithout(Example):
     async def run(
-            self,
-            server_url: str = "<url>",
-            principal: str = "<principal>",
-            password: str = "<password>",
+        self,
+        server_url: str = "<url>",
+        principal: str = "<principal>",
+        password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-                Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
             result = await session.topics.add_topic(topic, JSON)
 

@@ -34,9 +34,12 @@ class SubscribeUsingFallbackStreams(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_specification = diffusion.datatypes.JSON.with_properties()
             await add_topic(session, "my/topic/path", topic_specification)
             await add_topic(session, "my/other/topic/path", topic_specification)
@@ -69,6 +72,8 @@ async def add_topic(session, topic, topic_specification):
         print("Topic already exists.")
 
 
+
+
 class FallbackStream(ValueStreamHandler):
     def __init__(self) -> None:
         super().__init__(
@@ -86,7 +91,7 @@ class FallbackStream(ValueStreamHandler):
         topic_path: str,
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"Subscribed to {topic_path}.")
 
@@ -97,7 +102,7 @@ class FallbackStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
         reason: typing.Optional[typing.Any],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"Unsubscribed from {topic_path}: {reason}.")
 
@@ -108,9 +113,11 @@ class FallbackStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         old_value: typing.Optional[diffusion.datatypes.JSON],
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"{topic_path} changed from {old_value} to {topic_value}.")
+
+
 
 
 if __name__ == "__main__":

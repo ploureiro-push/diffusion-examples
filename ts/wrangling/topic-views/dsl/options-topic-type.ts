@@ -48,7 +48,6 @@ export async function topicViewsDslOptionsTopicType(): Promise<void> {
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-
     const queryResult = await session.timeseries.rangeQuery()
         .fromStart()
         .selectFrom('views/archive/my/topic/path');

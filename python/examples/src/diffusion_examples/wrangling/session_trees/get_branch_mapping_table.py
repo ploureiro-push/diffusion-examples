@@ -22,6 +22,8 @@ from diffusion.features.control.session_trees.branch_mapping_table import (
 )
 from diffusion_examples.utils.program import Example
 
+
+
 class GetBranchMappingTable(Example):
     async def run(
         self,
@@ -38,15 +40,9 @@ class GetBranchMappingTable(Example):
             session_trees = session.session_trees
             table = (
                 BranchMappingTable.Builder()
-                .add_branch_mapping(
-                    "$Principal is 'admin'", "my/topic/path/for/admin"
-                )
-                .add_branch_mapping(
-                    "$Principal is 'control'", "my/topic/path/for/control"
-                )
-                .add_branch_mapping(
-                    "$Principal is ''", "my/topic/path/for/anonymous"
-                )
+                .add_branch_mapping("$Principal is 'admin'", "my/topic/path/for/admin")
+                .add_branch_mapping("$Principal is 'control'", "my/topic/path/for/control")
+                .add_branch_mapping("$Principal is ''", "my/topic/path/for/anonymous")
                 .create("my/personal/path")
             )
 
@@ -62,9 +58,7 @@ class GetBranchMappingTable(Example):
                     "$Transport is 'HTTP_LONG_POLL'",
                     "my/alternate/path/for/http",
                 )
-                .add_branch_mapping(
-                    "$Transport is 'TCP'", "my/alternate/path/for/tcp"
-                )
+                .add_branch_mapping("$Transport is 'TCP'", "my/alternate/path/for/tcp")
                 .create("my/alternate/path")
             )
 
@@ -75,10 +69,8 @@ class GetBranchMappingTable(Example):
             )
             for session_tree_branch in list_session_tree_branches:
                 print(f"{session_tree_branch}:")
-                branch_mapping_table = (
-                    await session_trees.get_branch_mapping_table(
-                        session_tree_branch
-                    )
+                branch_mapping_table = await session_trees.get_branch_mapping_table(
+                    session_tree_branch
                 )
                 for branch_mapping in branch_mapping_table.branch_mappings:
                     print(

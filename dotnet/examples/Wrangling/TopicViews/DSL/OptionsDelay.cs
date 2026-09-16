@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,12 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
                 await Task.Delay(1000);
             }
 
-            session.Close();
+            await Task.Delay(2000);
+
+            await session.TopicViews.RemoveTopicViewAsync("topic_view_1", cancellationToken);
+
+            await session.TopicControl.RemoveTopicsAsync("my/topic/path", cancellationToken);
+                        session.Close();
         }
 
         private sealed class ValueStream : IValueStream<long?>

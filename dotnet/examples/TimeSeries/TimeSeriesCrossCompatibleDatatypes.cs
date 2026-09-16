@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2025 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,7 @@ namespace PushTechnology.ClientInterface.Examples.TimeSeries
 
             await session.Topics.SubscribeAsync(topicSelector, cancellationToken);
 
+            await Task.Delay(2000);
             session.Close();
         }
 

@@ -22,6 +22,7 @@ import diffusion.datatypes
 import diffusion.features.timeseries
 
 
+
 class EditTimeSeriesTopic(Example):
     async def run(
         self,
@@ -29,9 +30,12 @@ class EditTimeSeriesTopic(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             specification = diffusion.features.timeseries.TimeSeries.of(
                 diffusion.datatypes.DOUBLE
             ).with_properties(
@@ -49,14 +53,9 @@ class EditTimeSeriesTopic(Example):
 
             for _ in range(0, 25):
                 new_value = random.random()
-                await session.time_series.append(
-                    topic, new_value, diffusion.datatypes.DOUBLE
-                )
+                await session.time_series.append(topic, new_value, diffusion.datatypes.DOUBLE)
 
-            await session.time_series.edit(
-                topic, 20, 3.14, diffusion.datatypes.DOUBLE
-            )
-
+            await session.time_series.edit(topic, 20, 3.14, diffusion.datatypes.DOUBLE)
 
 
 

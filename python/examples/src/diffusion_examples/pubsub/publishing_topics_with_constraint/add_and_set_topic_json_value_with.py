@@ -23,6 +23,7 @@ from diffusion_examples.utils.program import Example
 import diffusion.datatypes
 
 
+
 class AddAndSetTopicJSONValueWith(Example):
     async def run(
         self,
@@ -30,9 +31,12 @@ class AddAndSetTopicJSONValueWith(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
             json = {"diffusion": "bar"}
 

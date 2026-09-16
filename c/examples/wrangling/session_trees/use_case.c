@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,6 +107,8 @@ void run_example(
     VALUE_STREAM_T *control_value_stream_ptr =
         utils_subscribe(control_session, "my/personal/path", DATATYPE_STRING);
 
+    sleep(1);
+
     // Anonymous
     SESSION_T *anonymous_session = utils_open_session(url, "", NULL);
 
@@ -116,6 +118,8 @@ void run_example(
     // Sleep for a bit to see the notifications
     sleep(2);
 
+    utils_remove_branch_mapping_table(admin_session, "my/personal/path");
+    utils_remove_topic(admin_session, "?.*//");
 
     session_close(anonymous_session, NULL);
     session_free(anonymous_session);
@@ -128,4 +132,6 @@ void run_example(
     session_close(admin_session, NULL);
     session_free(admin_session);
     free(admin_value_stream_ptr);
+
+    coordinator_free(coordinator);
     }

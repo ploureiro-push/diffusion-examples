@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ namespace PushTechnology.ClientInterface.Examples.Messaging
             string response = await session2.Messaging.SendRequestAsync<string, string>(
                 path, "Hello", cancellationToken);
             WriteLine($"Received response: {response}.");
+            await registration.CloseAsync();
 
             session.Close();
             session2.Close();

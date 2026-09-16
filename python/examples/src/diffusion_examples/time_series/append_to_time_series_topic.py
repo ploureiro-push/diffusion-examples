@@ -19,16 +19,22 @@ import diffusion.datatypes
 from diffusion.features.topics import TopicAddResponse
 from diffusion_examples.utils.program import Example, random_double
 
+
+
 class AppendToTimeSeriesTopic(Example):
 
-    async def run(self,
+    async def run(
+        self,
         server_url: str = "<url>",
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-            diffusion.Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(diffusion.Credentials(password))
+            .open(server_url) as session
+        ):
             specification = diffusion.features.timeseries.TimeSeries.of(
                 diffusion.datatypes.DOUBLE
             ).with_properties(
@@ -43,9 +49,7 @@ class AppendToTimeSeriesTopic(Example):
                 print("Topic already exists.")
             for i in range(25):
                 new_value = random_double()
-                await session.time_series.append(
-                    topic, new_value, diffusion.datatypes.DOUBLE
-                )
+                await session.time_series.append(topic, new_value, diffusion.datatypes.DOUBLE)
 
 
 

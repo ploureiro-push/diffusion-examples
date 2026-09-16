@@ -25,6 +25,8 @@ from diffusion.features.topics import (
 import diffusion.datatypes
 from diffusion_examples.utils.program import Example
 
+
+
 class SubscribeToSingleTopicUsingTopicPath(Example):
     async def run(
         self,
@@ -32,9 +34,12 @@ class SubscribeToSingleTopicUsingTopicPath(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
             topic_selector = ">my/topic/path"
             topic_specification = diffusion.datatypes.JSON.with_properties()
@@ -64,7 +69,7 @@ class JSONStream(ValueStreamHandler):
             subscribe=self.on_subscription,
             unsubscribe=self.on_unsubscription,
             update=self.on_update,
-            close=self.on_close
+            close=self.on_close,
         )
         self._stream_values: typing.List[str] = []
 
@@ -74,10 +79,9 @@ class JSONStream(ValueStreamHandler):
         topic_path: str,
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         pass
-
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     async def on_subscription(
@@ -85,7 +89,7 @@ class JSONStream(ValueStreamHandler):
         topic_path: str,
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"Subscribed to {topic_path}.")
 
@@ -96,7 +100,7 @@ class JSONStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
         reason: typing.Any,
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"Unsubscribed from {topic_path}: {reason}.")
 
@@ -107,9 +111,11 @@ class JSONStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         old_value: typing.Optional[diffusion.datatypes.JSON],
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"{topic_path} changed from {old_value} to {topic_value}.")
+
+
 
 
 if __name__ == "__main__":

@@ -23,6 +23,7 @@ from diffusion.features.control.session_trees.branch_mapping_table import (
 from diffusion_examples.utils.program import Example
 
 
+
 class PutBranchMappingTable(Example):
     async def run(
         self,
@@ -30,20 +31,17 @@ class PutBranchMappingTable(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-            diffusion.Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(diffusion.Credentials(password))
+            .open(server_url) as session
+        ):
             table = (
                 BranchMappingTable.Builder()
-                .add_branch_mapping(
-                    "$Principal is 'admin'", "my/topic/path/for/admin"
-                )
-                .add_branch_mapping(
-                    "$Principal is 'control'", "my/topic/path/for/control"
-                )
-                .add_branch_mapping(
-                    "$Principal is ''", "my/topic/path/for/anonymous"
-                )
+                .add_branch_mapping("$Principal is 'admin'", "my/topic/path/for/admin")
+                .add_branch_mapping("$Principal is 'control'", "my/topic/path/for/control")
+                .add_branch_mapping("$Principal is ''", "my/topic/path/for/anonymous")
                 .create("my/personal/path")
             )
 

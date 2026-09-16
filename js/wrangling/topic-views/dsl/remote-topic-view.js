@@ -23,7 +23,7 @@ export async function topicViewsDslRemoteTopicView() {
         credentials: 'password'
     });
 
-    const definition = diffusion.newRemoteServerBuilder()
+    const definition = diffusion.newRemoteServerBuilder(diffusion.RemoteServerType.SECONDARY_INITIATOR)
         .principal('admin')
         .credentials('password')
         .connectionOptions({
@@ -31,7 +31,7 @@ export async function topicViewsDslRemoteTopicView() {
             [diffusion.ConnectionOption.MAXIMUM_QUEUE_SIZE]: '1000',
             [diffusion.ConnectionOption.CONNECTION_TIMEOUT]: '15000'
         })
-        .create('Remote Server 1', 'ws://new.server.url.com');
+        .build('Remote Server 1', 'ws://new.server.url.com');
     await session.remoteServers.createRemoteServer(definition);
 
     const topicView = await session.topicViews.createTopicView(

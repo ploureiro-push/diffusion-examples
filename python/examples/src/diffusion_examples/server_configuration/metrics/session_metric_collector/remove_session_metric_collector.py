@@ -21,6 +21,7 @@ from diffusion import sessions, Credentials
 from diffusion_examples.utils.program import Example
 
 
+
 class RemoveSessionMetricCollector(Example):
     async def run(
         self,
@@ -28,9 +29,12 @@ class RemoveSessionMetricCollector(Example):
         principal="<principal>",
         password="<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             session_filter = "$Principal is 'control'"
             builder = (
                 SessionMetricCollectorBuilder()
@@ -39,13 +43,9 @@ class RemoveSessionMetricCollector(Example):
                 .remove_metrics_with_no_matches(True)
                 .maximum_groups(10)
             )
-            collector = builder.create(
-                "Session Metric Collector 1", session_filter
-            )
+            collector = builder.create("Session Metric Collector 1", session_filter)
             await session.metrics.put_session_metric_collector(collector)
-            await session.metrics.remove_session_metric_collector(
-                collector.name
-            )
+            await session.metrics.remove_session_metric_collector(collector.name)
             print(f"{collector.name} has been removed.")
 
 

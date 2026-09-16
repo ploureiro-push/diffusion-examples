@@ -1,12 +1,28 @@
+# All example sources are .c, not .cpp - CMAKE_CXX_FLAGS has no effect on them, so
+# CMAKE_BUILD_TYPE=Release's default "-O3 -DNDEBUG" was the actual, unintended optimization
+# level in effect. -O3 measurably increases clang's compile/link memory footprint across the
+# 100+ separate example binaries built here; these are illustrative examples with no need for
+# it, so cap it at -O1 instead via the C-specific variable. Must be set before any target below
+# is defined - CMake captures each target's flags at the point it's created.
+set(CMAKE_C_FLAGS_RELEASE "-O1 -DNDEBUG")
+
+# main.c/utils.c/coordinator.c are identical across every example (no per-target macros
+# differentiate them) - compile them once into a shared object library instead of once per
+# example, cutting ~100+ redundant recompiles of the same files down to one.
+add_library(example_common OBJECT
+    "${EXAMPLES_SOURCE_FOLDER}/main.c"
+    "${EXAMPLES_SOURCE_FOLDER}/utils/utils.c"
+    "${EXAMPLES_SOURCE_FOLDER}/utils/coordinator.c"
+)
+target_include_directories(example_common PUBLIC ${INCLUDE_DIRECTORIES})
+
 function(add_example FOLDER_PATH FILE_NAME COPY_RESOURCES)
     string(REPLACE "/" "_" EXAMPLE_PREFIX ${FOLDER_PATH})
     set(EXAMPLE_NAME "${EXAMPLE_PREFIX}_${FILE_NAME}")
     add_executable(
         ${EXAMPLE_NAME}
-        "${EXAMPLES_SOURCE_FOLDER}/main.c"
         "${EXAMPLES_SOURCE_FOLDER}/${FOLDER_PATH}/${FILE_NAME}.c"
-        "${EXAMPLES_SOURCE_FOLDER}/utils/utils.c"
-        "${EXAMPLES_SOURCE_FOLDER}/utils/coordinator.c"
+        $<TARGET_OBJECTS:example_common>
     )
     target_link_libraries(${EXAMPLE_NAME} PRIVATE ${DEPENDENCIES} Threads::Threads ${ADDITIONAL_LD_FLAGS})
     target_include_directories(${EXAMPLE_NAME} PUBLIC ${INCLUDE_DIRECTORIES})
@@ -46,8 +62,6 @@ function(add_example FOLDER_PATH FILE_NAME COPY_RESOURCES)
         endif()
     endif()
 endfunction()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -O1 -fsanitize=address -g -fno-omit-frame-pointer -Wdeprecated-declarations")
 
 # Examples
 file(GLOB_RECURSE SRCS ${EXAMPLES_SOURCE_FOLDER}/*.[hc])

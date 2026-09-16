@@ -25,6 +25,7 @@ import diffusion.features.timeseries
 from diffusion.features.topics.streams import ValueStreamHandler
 
 
+
 class SubscribeToTimeSeriesTopics(Example):
     async def run(
         self,
@@ -32,9 +33,12 @@ class SubscribeToTimeSeriesTopics(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             specification = diffusion.features.timeseries.TimeSeries.of(
                 diffusion.datatypes.DOUBLE
             ).with_properties(
@@ -53,9 +57,7 @@ class SubscribeToTimeSeriesTopics(Example):
 
             for _ in range(25):
                 new_value = random.random()
-                await session.time_series.append(
-                    topic, new_value, diffusion.datatypes.DOUBLE
-                )
+                await session.time_series.append(topic, new_value, diffusion.datatypes.DOUBLE)
 
             value_stream = self.ValueStream()
             session.topics.add_value_stream(topic_selector, value_stream)
@@ -78,13 +80,12 @@ class SubscribeToTimeSeriesTopics(Example):
             self._stream_values: typing.List[str] = []
 
 
-
         async def on_close(
-                self,
-                topic_path: str,
-                topic_spec: TopicSpecification,
-                topic_value: typing.Optional[diffusion.datatypes.DOUBLE],
-                **kwargs
+            self,
+            topic_path: str,
+            topic_spec: TopicSpecification,
+            topic_value: typing.Optional[diffusion.datatypes.DOUBLE],
+            **kwargs,
         ) -> None:
             pass
 
@@ -94,7 +95,7 @@ class SubscribeToTimeSeriesTopics(Example):
             topic_path: str,
             topic_spec: TopicSpecification,
             topic_value: typing.Optional[diffusion.datatypes.DOUBLE],
-            **kwargs
+            **kwargs,
         ) -> None:
             message = f"Subscribed to {topic_path}."
             print(message)
@@ -106,7 +107,7 @@ class SubscribeToTimeSeriesTopics(Example):
             topic_spec: TopicSpecification,
             topic_value: typing.Optional[diffusion.datatypes.DOUBLE],
             reason: typing.Any,
-            **kwargs
+            **kwargs,
         ) -> None:
             message = f"Unsubscribed from {topic_path}: {reason}."
             print(message)
@@ -124,6 +125,7 @@ class SubscribeToTimeSeriesTopics(Example):
                 f"{'NULL' if old_value is None else old_value} to {topic_value}."
             )
             print(message)
+
 
 
 if __name__ == "__main__":

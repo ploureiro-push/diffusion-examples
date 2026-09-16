@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 import asyncio
+
 from diffusion import Session, sessions, Credentials
 from diffusion_examples.utils.program import Example
 from diffusion.features.topics import TopicAddResponse, TopicSpecification
@@ -27,9 +28,12 @@ class RemovingASingleTopicUsingTopicPath(Example):
         principal: str = "<pricipal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_control = session.topics
 
             topic = "my/topic/path/to/be/removed"
@@ -74,6 +78,7 @@ class RemovingASingleTopicUsingTopicPath(Example):
             print("Topic already exists.")
 
         await topic_update.set_topic(topic, JSON(json_data), topic_specification)
+
 
 
 if __name__ == "__main__":

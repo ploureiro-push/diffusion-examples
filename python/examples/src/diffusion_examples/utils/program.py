@@ -21,7 +21,6 @@ import struct
 
 
 
-
 def random_double():
     # Generate a random 64-bit integer
     random_bits = random.getrandbits(64)
@@ -40,6 +39,5 @@ class Example:
         server_url: str = "<url>",
         principal: str = "<principal>",
         password: str = "<password>",
-    ):
-        ...
+    ): ...
 

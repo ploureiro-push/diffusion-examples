@@ -32,9 +32,13 @@ class InitialSessionEstablishmentRetryMechanism(Example):
         # It will attempt 5 times to connect to the Diffusion server,
         # with 250 milliseconds interval between attempts.
         retry_strategy = RetryStrategy(interval=250, attempts=5)
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).initial_retry_strategy(retry_strategy).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .initial_retry_strategy(retry_strategy)
+            .open(server_url) as session
+        ):
             print(f"Connected. Session Identifier: {session.session_id}.")
             # Insert work here...
 

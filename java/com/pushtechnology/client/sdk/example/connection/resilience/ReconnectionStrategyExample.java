@@ -56,13 +56,13 @@ public class ReconnectionStrategyExample {
 
     static class MyReconnectionStrategy implements ReconnectionStrategy {
 
-        private int retries = 0;
         private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
         @Override
         public void performReconnection(ReconnectionAttempt reconnectionAttempt) {
-            if (retries < 10) {
-                retries++;
+            // The attempt number is provided by the reconnection attempt,
+            // restarting at 1 for each new disconnection
+            if (reconnectionAttempt.getAttempt() <= 10) {
                 scheduler.schedule(reconnectionAttempt::start, 3000, TimeUnit.MILLISECONDS);
             }
             else {

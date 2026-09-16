@@ -18,10 +18,7 @@ import typing
 
 import diffusion.datatypes
 from diffusion import sessions, Credentials
-from diffusion.features.topics import (
-    TopicAddResponse,
-    TopicSpecification
-)
+from diffusion.features.topics import TopicAddResponse, TopicSpecification
 from diffusion.datatypes import JSON
 from diffusion_examples.utils.program import Example
 
@@ -34,9 +31,12 @@ class RemovingMultipleTopicsUsingATopicSelector(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_specification = JSON.with_properties()
             await self.add_and_set_topic(
                 session,

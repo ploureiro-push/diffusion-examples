@@ -30,15 +30,16 @@ class SetTopicValue(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-                Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
 
             topic_specification = diffusion.datatypes.JSON.with_properties()
-            result = await session.topics.add_topic(
-                topic, topic_specification
-            )
+            result = await session.topics.add_topic(topic, topic_specification)
             if result == TopicAddResponse.CREATED:
                 print("Topic has been created.")
             else:

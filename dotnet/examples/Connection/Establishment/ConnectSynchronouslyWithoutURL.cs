@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2025 Diffusion Data Ltd.
+ * Copyright © 2025 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Establishment
 {
      public sealed class ConnectSynchronouslyWithoutURL: Example
      {
+#pragma warning disable CS1998
         public override async Task Run(CancellationToken cancellationToken, string[] args)
         {
             string serverUrl = args[0];
@@ -42,6 +43,7 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Establishment
             // Insert work here...
 
             session.Close();
+#pragma warning restore CS1998
         }
     }
 }

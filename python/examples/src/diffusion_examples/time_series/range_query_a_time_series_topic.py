@@ -22,16 +22,20 @@ import diffusion.datatypes
 import diffusion.features.timeseries
 
 
+
 class RangeQueryATimeSeriesTopic(Example):
     async def run(
-            self,
-            server_url: str = "<url>",
-            principal: str = "<principal>",
-            password: str = "<password>",
+        self,
+        server_url: str = "<url>",
+        principal: str = "<principal>",
+        password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-                Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             specification = diffusion.features.timeseries.TimeSeries.of(
                 diffusion.datatypes.DOUBLE
             ).with_properties(
@@ -50,17 +54,11 @@ class RangeQueryATimeSeriesTopic(Example):
 
             for _ in range(0, 25):
                 new_value = random.random()
-                await session.time_series.append(
-                    topic, new_value, diffusion.datatypes.DOUBLE
-                )
+                await session.time_series.append(topic, new_value, diffusion.datatypes.DOUBLE)
 
-            await session.time_series.edit(
-                topic, 10, 3.14, diffusion.datatypes.DOUBLE
-            )
+            await session.time_series.edit(topic, 10, 3.14, diffusion.datatypes.DOUBLE)
 
-            range_query = session.time_series.range_query().as_(
-                diffusion.datatypes.DOUBLE
-            )
+            range_query = session.time_series.range_query().as_(diffusion.datatypes.DOUBLE)
 
             # Create a time series range query from values 5 to 15.
 

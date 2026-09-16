@@ -34,9 +34,12 @@ class SubscribeWithCrossCompatibleValueStream(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/int/topic/path"
             topic_selector = ">my/int/topic/path"
             topic_specification = diffusion.datatypes.INT64.with_properties()
@@ -65,17 +68,17 @@ class JSONStream(ValueStreamHandler):
             subscribe=self.on_subscription,
             unsubscribe=self.on_unsubscription,
             update=self.on_update,
-            close=self.on_close
+            close=self.on_close,
         )
         self._stream_values: typing.List[str] = []
 
 
     def on_close(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            topic_value: typing.Optional[diffusion.datatypes.JSON],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        topic_value: typing.Optional[diffusion.datatypes.JSON],
+        **kwargs,
     ) -> None:
         pass
 
@@ -85,7 +88,7 @@ class JSONStream(ValueStreamHandler):
         topic_path: str,
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"JSON stream subscribed to {topic_path}.")
 
@@ -96,7 +99,7 @@ class JSONStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.JSON],
         reason: typing.Any,
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"JSON stream unsubscribed from {topic_path}: {reason}.")
 
@@ -109,6 +112,8 @@ class JSONStream(ValueStreamHandler):
         topic_value: typing.Optional[diffusion.datatypes.JSON],
     ) -> None:
         print(f"JSON stream {topic_path} changed from {old_value} to {topic_value}.")
+
+
 
 
 class StringStream(ValueStreamHandler):
@@ -128,7 +133,7 @@ class StringStream(ValueStreamHandler):
         topic_path: str,
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.STRING],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"String stream subscribed to {topic_path}.")
 
@@ -139,7 +144,7 @@ class StringStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.STRING],
         reason: typing.Any,
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"String stream unsubscribed from {topic_path}: {reason}.")
 
@@ -150,9 +155,11 @@ class StringStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         old_value: typing.Optional[diffusion.datatypes.STRING],
         topic_value: typing.Optional[diffusion.datatypes.STRING],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"String stream {topic_path} changed from {old_value} to {topic_value}.")
+
+
 
 
 if __name__ == "__main__":

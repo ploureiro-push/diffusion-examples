@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 import asyncio
+
 from diffusion import sessions, Credentials
 from diffusion.features.topics import TopicAddResponse
 from diffusion.datatypes import JSON
@@ -34,9 +35,12 @@ class SetTopicNoValue(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_specification = JSON.with_properties()
 
             result = await session.topics.add_topic(self.TOPIC, topic_specification)

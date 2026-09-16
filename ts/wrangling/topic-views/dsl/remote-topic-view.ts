@@ -13,7 +13,7 @@
  * limitations under the License.
  *******************************************************************************/
 
-import { connect, ConnectionOption, newRemoteServerBuilder } from 'diffusion';
+import { connect, ConnectionOption, newRemoteServerBuilder, RemoteServerType } from 'diffusion';
 
 export async function topicViewsDslRemoteTopicView(): Promise<void> {
     // Connect to the server.
@@ -24,7 +24,7 @@ export async function topicViewsDslRemoteTopicView(): Promise<void> {
         credentials: 'password'
     });
 
-    const definition = newRemoteServerBuilder()
+    const definition = newRemoteServerBuilder(RemoteServerType.SECONDARY_INITIATOR)
         .principal('admin')
         .credentials('password')
         .connectionOptions({
@@ -32,7 +32,7 @@ export async function topicViewsDslRemoteTopicView(): Promise<void> {
             [ConnectionOption.MAXIMUM_QUEUE_SIZE]: '1000',
             [ConnectionOption.CONNECTION_TIMEOUT]: '15000'
         })
-        .create('Remote Server 1', 'ws://new.server.url.com');
+        .build('Remote Server 1', 'ws://new.server.url.com');
     await session.remoteServers.createRemoteServer(definition);
 
     const topicView = await session.topicViews.createTopicView(

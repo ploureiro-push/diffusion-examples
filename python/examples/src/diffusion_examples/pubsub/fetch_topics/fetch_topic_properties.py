@@ -28,9 +28,12 @@ class FetchTopicsProperties(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topics = session.topics
             for i in range(1, 6):
                 await topics.add_and_set_topic(
