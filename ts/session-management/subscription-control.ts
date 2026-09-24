@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Diffusion Data Ltd.
+ * Copyright (C) 2024 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ export async function sessionManagementSubscriptionControl(): Promise<void> {
             if (
                 event.type === clients.SessionEventStreamEventType.STATE
                 && event.state === clients.SessionState.ACTIVE
-                && event.sessionId.toString() !== session1.sessionId.toString()
             ) {
                 session1.clients.subscribe(event.sessionId, '?my/topic/path//');
                 setTimeout(async () => {
@@ -66,7 +65,9 @@ export async function sessionManagementSubscriptionControl(): Promise<void> {
         onClose: () => {},
         onError: () => {}
     };
-    await session1.clients.addSessionEventListener(sessionEventStream, {});
+    await session1.clients.addSessionEventListener(sessionEventStream, {
+        filter: `$Principal is 'client'`
+    });
 
     // Connect to the server.
     const session2 = await connect({
