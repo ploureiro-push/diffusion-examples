@@ -31,18 +31,19 @@ class RemoveTopicMetricCollector(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_selector = "?my/topic//"
             builder = TopicMetricCollectorBuilder().export_to_prometheus(False)
             builder = builder.group_by_topic_type(True)
             builder = builder.group_by_topic_view(True)
             builder = builder.group_by_path_prefix_parts(15)
             builder = builder.maximum_groups(10)
-            collector = builder.create(
-                "Topic Metric Collector 1", topic_selector
-            )
+            collector = builder.create("Topic Metric Collector 1", topic_selector)
             await session.metrics.put_topic_metric_collector(collector)
             await session.metrics.remove_topic_metric_collector(collector.name)
             print(f"{collector.name} has been removed.")

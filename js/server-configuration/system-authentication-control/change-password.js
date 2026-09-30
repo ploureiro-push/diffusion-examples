@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function changePassword() {
-    /// tag::system_authentication_control_change_password[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -35,12 +34,5 @@ export async function changePassword() {
         .build();
     await session.security.updateAuthenticationStore(authenticationScript2);
 
-    /// tag::log
-    const restoreScript = session.security.authenticationScriptBuilder()
-        .removePrincipal('super_user')
-        .build();
-    await session.security.updateAuthenticationStore(restoreScript);
-    /// end::log
     await session.closeSession();
-    /// end::system_authentication_control_change_password[]
 }

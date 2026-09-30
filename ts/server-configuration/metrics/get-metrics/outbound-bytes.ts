@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function metricsGetOutboundBytes(): Promise<void> {
-    /// tag::metrics_get_metrics_outbound_bytes[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -31,16 +30,9 @@ export async function metricsGetOutboundBytes(): Promise<void> {
         .fetch();
 
     const servers = metricsResult.getServerNames();
-    /// tag::log
-    expect(servers.size).toBe(1);
-    /// end::log
     const collections = metricsResult.getMetrics([...servers.values()][0]);
-    /// tag::log
-    expect(collections[0].samples.length).toBe(1);
-    /// end::log
     const sample = collections[0].samples[0];
     console.log(`${collections[0].name}: ${sample.value} ${collections[0].unit} (${collections[0].type})`);
 
     await session.closeSession();
-    /// end::metrics_get_metrics_outbound_bytes[]
 }

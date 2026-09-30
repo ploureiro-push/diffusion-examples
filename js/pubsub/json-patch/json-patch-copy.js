@@ -14,31 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester, promiseWithResolvers } = require('../../../../test/util');
-/// end::log
 
 export async function jsonPatchCopyExample() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Subscribed to my/topic/path'],
-        ['my/topic/path changed'],
-        [
-            'old value Meet the Flintstones/Fred: Flintstone',
-            'old value Meet the Flintstones/Barney: Rubble',
-            'old value The Jetsons/George: Jetson'
-        ],
-        [
-            'new value Meet the Flintstones/Fred: Flintstone',
-            'new value Meet the Flintstones/Barney: Rubble',
-            'new value The Jetsons/George: Jetson',
-            'new value The Jetsons/Fred: Flintstone'
-        ],
-        ['Closed'],
-    ]);
-    const valuePromise = promiseWithResolvers();
-    /// end::log
-    /// tag::pub_sub_json_patch_copy[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -68,36 +45,12 @@ export async function jsonPatchCopyExample() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
-        /// tag::log
-        close : () => {
-            check.log(`Closed`);
-        },
-        /// end::log
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${JSON.stringify(oldValue.get())} to ${JSON.stringify(newValue.get())}`);
-            /// tag::log
-            check.log(`${topic} changed`);
-            const oldJson = oldValue.get();
-            const newJson = newValue.get();
-            for (const key of Object.keys(oldJson)) {
-                for (const name of Object.keys(oldJson[key])) {
-                    check.log(`old value ${key}/${name}: ${oldJson[key][name]}`);
-                }
-            }
-            for (const key of Object.keys(newJson)) {
-                for (const name of Object.keys(newJson[key])) {
-                    check.log(`new value ${key}/${name}: ${newJson[key][name]}`);
-                }
-            }
-            valuePromise.resolve();
-            /// end::log
         }
     });
 
@@ -111,13 +64,6 @@ export async function jsonPatchCopyExample() {
         }]
     );
 
-    /// tag::log
-    await valuePromise.promise;
-    /// end::log
     await session.closeSession();
-    /// end::pub_sub_json_patch_copy[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }
 

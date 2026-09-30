@@ -32,9 +32,12 @@ class ListTopicMetricCollectors(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_selector = "?my/topic//"
 
             # Create first collector
@@ -56,9 +59,7 @@ class ListTopicMetricCollectors(Example):
             builder.maximum_groups(250)
             collector = builder.create("Topic Metric Collector 2", topic_selector)
             await session.metrics.put_topic_metric_collector(collector)
-            list_topic_metric_collectors = (
-                await session.metrics.list_topic_metric_collectors()
-            )
+            list_topic_metric_collectors = await session.metrics.list_topic_metric_collectors()
             for topic_metric_collector in list_topic_metric_collectors:
                 result_str = (
                     f"{topic_metric_collector.name}: "
@@ -72,9 +73,12 @@ class ListTopicMetricCollectors(Example):
                 print(result_str)
 
 
+
 # noinspection PyMethodMayBeStatic
 def get_answer(result: typing.Optional[bool]):
     return "Yes" if result else "No"
+
+
 
 
 if __name__ == "__main__":

@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function clientControlChangeRolesViaSessionFilter(): Promise<void> {
-    /// tag::client_control_change_roles_via_session_filter[]
     // Connect to the server.
     const session1 = await connect({
         host: 'localhost',
@@ -38,9 +37,6 @@ export async function clientControlChangeRolesViaSessionFilter(): Promise<void> 
         ['$Roles']
     );
     console.log(`Original session roles: ${properties1['$Roles']}`);
-    /// tag::log
-    expect(properties1['$Roles']).toBe('"CLIENT"');
-    /// end::log
 
     await session1.clients.changeRoles('$Principal is "client"', [], ['TOPIC_CONTROL']);
 
@@ -49,11 +45,7 @@ export async function clientControlChangeRolesViaSessionFilter(): Promise<void> 
         ['$Roles']
     );
     console.log(`Changed session roles: ${properties2['$Roles']}`);
-    /// tag::log
-    expect(properties2['$Roles']).toBe('"CLIENT","TOPIC_CONTROL"');
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
-    /// end::client_control_change_roles_via_session_filter[]
 }

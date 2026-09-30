@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,12 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
 
             var view1 = await session.TopicViews.CreateTopicViewAsync("topic_view_1", "map ?my/topic/path// to views/<path(0)> with properties 'CONFLATION':'off', 'COMPRESSION':'false', 'DONT_RETAIN_VALUE':'true'", cancellationToken);
             WriteLine($"Topic View {view1.Name} has been created.");
-            
+            await Task.Delay(2000);
+
+            await session.TopicViews.RemoveTopicViewAsync("topic_view_1", cancellationToken);
+
+            await session.TopicControl.RemoveTopicsAsync("my/topic/path", cancellationToken);
+                        
             session.Close();
         }
 

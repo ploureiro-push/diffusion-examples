@@ -14,20 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { expectTopicCounts, PartiallyOrderedCheckpointTester } from '../../../../../test/util';
-/// end::log
 
 export async function topicViewsApiList(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [
-            'Topic View topic_view_1: map my/topic/path to views/<path(0)> (ADMINISTRATOR)',
-            'Topic View topic_view_2: map my/topic/path/array to views/<path(0)> (ADMINISTRATOR)'
-        ]
-    ]);
-    /// end::log
-    /// tag::topic_views_api_list[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -68,19 +56,7 @@ export async function topicViewsApiList(): Promise<void> {
     const topicViews = await session.topicViews.listTopicViews();
     for (const topicView of topicViews) {
         console.log(`Topic View ${topicView.name}: ${topicView.specification} (${[...topicView.roles]})`);
-        /// tag::log
-        check.log(`Topic View ${topicView.name}: ${topicView.specification} (${[...topicView.roles]})`);
-        /// end::log
     }
 
     await session.closeSession();
-    /// end::topic_views_api_list[]
-    /// tag::log
-    await expectTopicCounts({
-        'views/my/topic/path': 1,
-        'views/my/topic/path/array': 1,
-
-    });
-    await check.done();
-    /// end::log
 }

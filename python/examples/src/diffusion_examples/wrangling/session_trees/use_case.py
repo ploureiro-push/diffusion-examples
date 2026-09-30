@@ -36,9 +36,12 @@ class UseCase(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic_specification = diffusion.datatypes.STRING
             await session.topics.add_and_set_topic(
                 "my/topic/path/for/admin",
@@ -58,15 +61,9 @@ class UseCase(Example):
 
             table = (
                 BranchMappingTable.Builder()
-                .add_branch_mapping(
-                    "$Principal is 'admin'", "my/topic/path/for/admin"
-                )
-                .add_branch_mapping(
-                    "$Principal is 'control'", "my/topic/path/for/control"
-                )
-                .add_branch_mapping(
-                    "$Principal is ''", "my/topic/path/for/anonymous"
-                )
+                .add_branch_mapping("$Principal is 'admin'", "my/topic/path/for/admin")
+                .add_branch_mapping("$Principal is 'control'", "my/topic/path/for/control")
+                .add_branch_mapping("$Principal is ''", "my/topic/path/for/anonymous")
                 .create("my/personal/path")
             )
             await session.session_trees.put_branch_mapping_table(table)
@@ -80,9 +77,7 @@ class UseCase(Example):
 
             async with sessions().open(server_url) as session2:
                 another_string_stream = AnotherStringStream()
-                session2.topics.add_value_stream(
-                    topic_selector, another_string_stream
-                )
+                session2.topics.add_value_stream(topic_selector, another_string_stream)
                 await session2.topics.subscribe(topic_selector)
 
                 await asyncio.sleep(5)
@@ -92,10 +87,8 @@ class UseCase(Example):
                 )
                 for session_tree_branch in list_session_tree_branches:
                     print(f"{session_tree_branch}:")
-                    branch_mapping_table = (
-                        await session.session_trees.get_branch_mapping_table(
-                            session_tree_branch
-                        )
+                    branch_mapping_table = await session.session_trees.get_branch_mapping_table(
+                        session_tree_branch
                     )
                     for branch_mapping in branch_mapping_table.branch_mappings:
                         print(
@@ -109,6 +102,7 @@ class UseCase(Example):
 
 
 
+
 class StringStream(ValueStreamHandler):
     def __init__(self) -> None:
         super().__init__(
@@ -119,16 +113,14 @@ class StringStream(ValueStreamHandler):
         )
 
     async def on_update(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            old_value: typing.Optional[diffusion.datatypes.JSON],
-            topic_value: typing.Optional[diffusion.datatypes.JSON],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        old_value: typing.Optional[diffusion.datatypes.JSON],
+        topic_value: typing.Optional[diffusion.datatypes.JSON],
+        **kwargs,
     ) -> None:
-        print(
-            f"{topic_path} changed from {old_value or 'NULL'} to {topic_value}."
-        )
+        print(f"{topic_path} changed from {old_value or 'NULL'} to {topic_value}.")
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     async def on_subscription(
@@ -136,7 +128,7 @@ class StringStream(ValueStreamHandler):
         topic_path: str,
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.STRING],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"Subscribed to {topic_path}.")
 
@@ -147,9 +139,11 @@ class StringStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         topic_value: typing.Optional[diffusion.datatypes.STRING],
         reason: typing.Optional[typing.Any],
-        **kwargs
+        **kwargs,
     ) -> None:
         print(f"Unsubscribed from {topic_path}: {reason}.")
+
+
 
 
 class AnotherStringStream(ValueStreamHandler):
@@ -162,37 +156,37 @@ class AnotherStringStream(ValueStreamHandler):
         )
 
     async def on_update(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            old_value: typing.Optional[diffusion.datatypes.STRING],
-            topic_value: typing.Optional[diffusion.datatypes.STRING],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        old_value: typing.Optional[diffusion.datatypes.STRING],
+        topic_value: typing.Optional[diffusion.datatypes.STRING],
+        **kwargs,
     ) -> None:
-        print(
-            f"{topic_path} changed from {old_value or 'NULL'} to {topic_value}."
-        )
+        print(f"{topic_path} changed from {old_value or 'NULL'} to {topic_value}.")
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     async def on_subscription(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            topic_value: typing.Optional[diffusion.datatypes.STRING],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        topic_value: typing.Optional[diffusion.datatypes.STRING],
+        **kwargs,
     ):
         print(f"Subscribed to {topic_path}.")
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     async def on_unsubscription(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            topic_value: typing.Optional[diffusion.datatypes.STRING],
-            reason: typing.Optional[typing.Any],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        topic_value: typing.Optional[diffusion.datatypes.STRING],
+        reason: typing.Optional[typing.Any],
+        **kwargs,
     ):
         print(f"Unsubscribed from {topic_path}: {reason}.")
+
+
 
 
 if __name__ == "__main__":

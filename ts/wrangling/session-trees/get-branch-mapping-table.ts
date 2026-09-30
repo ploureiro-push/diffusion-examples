@@ -14,24 +14,8 @@
  *******************************************************************************/
 
 import { connect, newBranchMappingTableBuilder, Session } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../../test/util';
-/// end::log
 
 export async function sessionTreesGetBranchMappingTable(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'my/personal/path',
-        '$Principal is "admin": my/topic/path/for/admin',
-        '$Principal is "control": my/topic/path/for/control',
-        '$Principal is "": my/topic/path/for/anonymous',
-        'my/alternate/path',
-        '$Transport is "WEBSOCKET": my/alternate/path/for/websocket',
-        '$Transport is "HTTP_LONG_POLL": my/alternate/path/for/http',
-        '$Transport is "TCP": my/alternate/path/for/tcp'
-    ]]);
-    /// end::log
-    /// tag::session_trees_get_branch_mapping_table[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -57,21 +41,11 @@ export async function sessionTreesGetBranchMappingTable(): Promise<void> {
     const sessionTrees = await session.sessionTrees.getSessionTreeBranchesWithMappings();
     for (const sessionTreeBranch of sessionTrees) {
         console.log(`${sessionTreeBranch}:`);
-        /// tag::log
-        check.log(sessionTreeBranch);
-        /// end::log
         const mappingTable = await session.sessionTrees.getBranchMappingTable(sessionTreeBranch);
         for (const branchMapping of mappingTable.getBranchMappings()) {
             console.log(`    ${branchMapping.sessionFilter}: ${branchMapping.topicTreeBranch}`);
-            /// tag::log
-            check.log(`${branchMapping.sessionFilter}: ${branchMapping.topicTreeBranch}`);
-            /// end::log
         }
     }
 
     await session.closeSession();
-    /// end::session_trees_get_branch_mapping_table[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

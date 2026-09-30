@@ -4,7 +4,7 @@ project(diffusion_sdk_c_examples)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type")
 set(CMAKE_OSX_ARCHITECTURES "${ARCHITECTURE}")
 
 cmake_path(SET DEPENDENCIES_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
@@ -21,8 +21,18 @@ cmake_path(SET CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TARGET}/bin/${ARCHITECTURE})
 # =============================================================================
 # Debug
 
-add_compile_options(-fsanitize=undefined -fsanitize=address)
-add_link_options(-fsanitize=undefined -fsanitize=address)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(MSVC)
+        # The prebuilt uci/apr libs ship no PDBs: ~90k warnings, truncating the log.
+        add_link_options(/ignore:4099)
+        # Those libs are release /MD; Debug's default /MDd links a second CRT (LNK4098).
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+    else()
+        # link.exe rejects -fsanitize, so MSVC only ever got half an instrumented build.
+        add_compile_options(-fsanitize=undefined -fsanitize=address)
+        add_link_options(-fsanitize=undefined -fsanitize=address)
+    endif()
+endif()
 
 
 # =============================================================================

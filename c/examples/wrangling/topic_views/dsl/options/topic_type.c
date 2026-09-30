@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,8 @@ void run_example(
         session, "views/archive/my/topic/path"
     );
 
+    utils_remove_topic_view(session, "topic_view_1");
+    utils_remove_topic(session, "?.*//");
 
     session_close(session, NULL);
     session_free(session);

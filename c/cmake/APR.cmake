@@ -2,6 +2,10 @@ add_library(apr STATIC IMPORTED)
 add_library(apr-util STATIC IMPORTED)
 
 if(WIN32)
+    # Without these, APR_DECLARE is __declspec(dllimport) and every call into the
+    # static apr warns (LNK4217). Directory scope: example_common does not link apr.
+    add_compile_definitions(APR_DECLARE_STATIC APU_DECLARE_STATIC)
+
     cmake_path(SET APR_PATH ${APR_ROOT_PATH}/${ARCHITECTURE})
     cmake_path(SET APR_LIB_PATH ${APR_PATH}/lib/apr.lib)
     cmake_path(SET APR_UTIL_LIB_PATH ${APR_PATH}/lib/aprutil.lib)

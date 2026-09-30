@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectTopicExists } = require('../../../../test/util');
-/// end::log
 
 export async function addTopicExample() {
-    /// tag::pub_sub_publish_add_topic[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -35,13 +31,6 @@ export async function addTopicExample() {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicAddResult.added).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::pub_sub_publish_add_topic[]
-    /// tag::log
-    await expectTopicExists('my/topic/path');
-    /// end::log
 }

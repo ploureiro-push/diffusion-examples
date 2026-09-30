@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function securityControlSetDefaultRolesForNamedSessions(): Promise<void> {
-    /// tag::security_control_set_default_roles_for_named_sessions[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -38,5 +37,4 @@ export async function securityControlSetDefaultRolesForNamedSessions(): Promise<
         .build();
     await session.security.updateSecurityStore(securityScriptCleanup);
     await session.closeSession();
-    /// end::security_control_set_default_roles_for_named_sessions[]
 }

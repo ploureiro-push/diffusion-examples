@@ -14,26 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../../test/util'
-/// end::log
 
 export async function subscribeTopicSelectionScopesExample(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [
-            'componentA: Subscribed to my/topic/path',
-            'componentB: Subscribed to my/topic/path'
-        ],
-        ['componentB: Subscribed to my/other/path'],
-        [
-            'componentA: Unsubscribed from my/topic/path',
-            'componentB: Unsubscribed from my/topic/path',
-            'componentB: Unsubscribed from my/other/path'
-        ]
-    ]);
-    /// end::log
-    /// tag::pub_sub_subscribe_selection_scopes[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -56,15 +38,9 @@ export async function subscribeTopicSelectionScopesExample(): Promise<void> {
     componentAStream.on({
         subscribe : (topic, specification) => {
             console.log(`componentA: Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`componentA: Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`componentA: Unsubscribed from ${topic}`);
-            /// tag::log
-            check.log(`componentA: Unsubscribed from ${topic}`);
-            /// end::log
         },
         close : () => {
             console.log(`componentA: stream closed`);
@@ -77,15 +53,9 @@ export async function subscribeTopicSelectionScopesExample(): Promise<void> {
     componentBStream.on({
         subscribe : (topic, specification) => {
             console.log(`componentB: Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`componentB: Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`componentB: Unsubscribed from ${topic}`);
-            /// tag::log
-            check.log(`componentB: Unsubscribed from ${topic}`);
-            /// end::log
         },
         close : () => {
             console.log(`componentB: stream closed`);
@@ -121,8 +91,4 @@ export async function subscribeTopicSelectionScopesExample(): Promise<void> {
     await session.clients.unsubscribeAllScopes(session.sessionId, 'my/other/path');
 
     await session.closeSession();
-    /// end::pub_sub_subscribe_selection_scopes[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

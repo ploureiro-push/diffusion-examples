@@ -14,28 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../test/util');
-/// end::log
 
 export async function getPathPermissionsExample() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [
-            'SELECT_TOPIC',
-            'READ_TOPIC',
-            'UPDATE_TOPIC',
-            'MODIFY_TOPIC',
-            'SEND_TO_MESSAGE_HANDLER',
-            'SEND_TO_SESSION',
-            'EDIT_TIME_SERIES_EVENTS',
-            'ACQUIRE_LOCK',
-            'EXPOSE_BRANCH'
-
-        ]
-    ]);
-    /// end::log
-    /// tag::security_get_path_permissions[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -47,14 +27,7 @@ export async function getPathPermissionsExample() {
     const pathPermissions = await session.security.getPathPermissions('.*//');
     for (const permission of pathPermissions) {
         console.log(permission);
-        /// tag::log
-        check.log(permission);
-        /// end::log
     }
 
     await session.closeSession();
-    /// end::security_get_path_permissions[]
-    /// tag::log
-    check.done();
-    /// end::log
 }

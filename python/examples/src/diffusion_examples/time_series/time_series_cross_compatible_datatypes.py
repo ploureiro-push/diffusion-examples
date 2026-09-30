@@ -23,6 +23,8 @@ from diffusion.features.topics import TopicAddResponse, ValueStreamHandler, Topi
 import diffusion.features.timeseries
 from diffusion_examples.utils.program import Example
 
+
+
 class TimeSeriesCrossCompatibleDatatypes(Example):
     async def run(
         self,
@@ -30,9 +32,12 @@ class TimeSeriesCrossCompatibleDatatypes(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with diffusion.sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            diffusion.sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             specification = diffusion.features.timeseries.TimeSeries.of(
                 diffusion.datatypes.DOUBLE
             ).with_properties(
@@ -52,9 +57,7 @@ class TimeSeriesCrossCompatibleDatatypes(Example):
 
             for i in range(25):
                 new_value = random.random()
-                await session.time_series.append(
-                    topic, new_value, diffusion.datatypes.DOUBLE
-                )
+                await session.time_series.append(topic, new_value, diffusion.datatypes.DOUBLE)
 
             json_stream = JSONStream()
             session.topics.add_value_stream(topic_selector, json_stream)
@@ -63,6 +66,7 @@ class TimeSeriesCrossCompatibleDatatypes(Example):
 
             await session.topics.unsubscribe(topic_selector)
             await session.topics.remove_stream(json_stream)
+
 
 
 class JSONStream(ValueStreamHandler):
@@ -76,31 +80,31 @@ class JSONStream(ValueStreamHandler):
         )
 
     def on_close(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            topic_value: typing.Optional[diffusion.datatypes.JSON],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        topic_value: typing.Optional[diffusion.datatypes.JSON],
+        **kwargs,
     ) -> None:
         pass
 
     def on_subscription(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            topic_value: typing.Optional[diffusion.datatypes.JSON],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        topic_value: typing.Optional[diffusion.datatypes.JSON],
+        **kwargs,
     ) -> None:
 
         print(f"Subscribed to {topic_path}.")
 
     def on_unsubscription(
-            self,
-            topic_path: str,
-            topic_spec: TopicSpecification,
-            topic_value: typing.Optional[diffusion.datatypes.JSON],
-            reason: typing.Optional[typing.Any],
-            **kwargs
+        self,
+        topic_path: str,
+        topic_spec: TopicSpecification,
+        topic_value: typing.Optional[diffusion.datatypes.JSON],
+        reason: typing.Optional[typing.Any],
+        **kwargs,
     ) -> None:
         print(f"Unsubscribed from {topic_path}: {reason}.")
 
@@ -110,7 +114,7 @@ class JSONStream(ValueStreamHandler):
         topic_spec: TopicSpecification,
         old_value: typing.Optional[diffusion.datatypes.JSON],
         topic_value: typing.Optional[diffusion.datatypes.JSON],
-        **kwargs
+        **kwargs,
     ) -> None:
         addition = (
             f"{topic_path} changed from "
@@ -118,6 +122,8 @@ class JSONStream(ValueStreamHandler):
             f" to {'NULL' if topic_value is None else topic_value.value}."
         )
         print(addition)
+
+
 
 
 if __name__ == "__main__":

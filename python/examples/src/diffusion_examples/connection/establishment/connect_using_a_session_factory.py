@@ -17,6 +17,7 @@ from diffusion import sessions, Credentials
 from diffusion_examples.utils.program import Example
 
 
+
 class ConnectUsingASessionFactory(Example):
     async def run(
         self,
@@ -24,16 +25,21 @@ class ConnectUsingASessionFactory(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             print(f"Connected. Session Identifier: {session.session_id}.")
 
 
 
-if __name__ == '__main__':
-    asyncio.run(ConnectUsingASessionFactory().run(
-        server_url="ws://localhost:8080",
-        principal="admin",
-        password="password",
-    ))
+if __name__ == "__main__":
+    asyncio.run(
+        ConnectUsingASessionFactory().run(
+            server_url="ws://localhost:8080",
+            principal="admin",
+            password="password",
+        )
+    )

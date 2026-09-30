@@ -14,21 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester, promiseWithResolvers } = require('../../../test/util');
-/// end::log
 
 export async function timeSeriesSubscribe() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Subscribed to my/time/series/topic/path'],
-    ]);
-
-    const valuePromise = promiseWithResolvers();
-    let valueCount = 0;
-    let oldValue = 'undefined';
-    /// end::log
-    /// tag::time_series_subscribe[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -52,26 +39,12 @@ export async function timeSeriesSubscribe() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
-        /// tag::log
-        close : () => {
-            check.log(`Closed`);
-        },
-        /// end::log
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue?.value} to ${newValue.value}`);
-            /// tag::log
-            if (++valueCount >= 25) {
-                valuePromise.resolve();
-            }
-            check.log(`${topic} changed from ${oldValue?.value} to ${newValue.value}`);
-            /// end::log
         }
     });
 
@@ -79,20 +52,8 @@ export async function timeSeriesSubscribe() {
 
     for (let count = 0; count < 25; count++) {
         const value = Math.random();
-        /// tag::log
-        check.appendExpected([`my/time/series/topic/path changed from ${oldValue} to ${value}`]);
-        oldValue = `${value}`;
-        /// end::log
         await session.timeseries.append('my/time/series/topic/path', value, diffusion.datatypes.double());
     }
 
-    /// tag::log
-    check.appendExpected([`Closed`]);
-    await valuePromise.promise;
-    /// end::log
     await session.closeSession();
-    /// end::time_series_subscribe[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

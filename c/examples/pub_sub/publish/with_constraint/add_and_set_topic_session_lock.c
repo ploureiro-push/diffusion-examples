@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ static int on_lock_acquired(
 {
     g_session_lock = (DIFFUSION_SESSION_LOCK_T *) session_lock;
     printf("Session lock acquired.\n");
+    coordinator_broadcast((COORDINATOR_T *) context);
     return HANDLER_SUCCESS;
 }
 
@@ -63,10 +64,11 @@ void run_example(
     CREDENTIALS_T *credentials)
 {
 
-    char *topic_path = "my/topic/path ";
+    char *topic_path = "my/topic/path";
 
+    CREDENTIALS_T *admin_credentials = credentials_create_password("password");
     SESSION_T *session = session_create(
-        url, principal, credentials, NULL, NULL, NULL
+        url, "admin", admin_credentials, NULL, NULL, NULL
     );
 
     char *lock_name = "session_lock_1";
@@ -103,6 +105,7 @@ void run_example(
 
     session_close(session, NULL);
     session_free(session);
+    credentials_free(admin_credentials);
 
     coordinator_free(coordinator);
     diffusion_topic_update_constraint_free(constraint);

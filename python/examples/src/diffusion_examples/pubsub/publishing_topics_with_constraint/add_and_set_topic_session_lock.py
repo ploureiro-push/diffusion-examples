@@ -23,6 +23,7 @@ from diffusion.datatypes import JSON
 from diffusion_examples.utils.program import Example
 
 
+
 class AddAndSetTopicSessionLock(Example):
     async def run(
         self,
@@ -30,9 +31,12 @@ class AddAndSetTopicSessionLock(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
             json_data = {"diffusion": "data"}
             session_lock = await session.lock("SessionLock1")
@@ -45,6 +49,7 @@ class AddAndSetTopicSessionLock(Example):
             else:
                 print("Topic already exists.")
             await session_lock.unlock()
+
 
 
 

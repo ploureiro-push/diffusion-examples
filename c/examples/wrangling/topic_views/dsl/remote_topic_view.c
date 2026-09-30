@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,8 @@ void run_example(
         "map my/topic/path from 'Remote Server 1' to views/remote/<path(0)>"
     );
 
+    utils_remove_topic_view(session, "remote_topic_view_1");
+    utils_remove_remote_server(session, "Remote Server 1");
 
     session_close(session, NULL);
     session_free(session);

@@ -1,5 +1,5 @@
 ﻿/**
-* Copyright © 2023 - 2025 Diffusion Data Ltd.
+* Copyright © 2023 - 2026 Diffusion Data Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -62,6 +62,8 @@ namespace PushTechnology.ClientInterface.Examples
             var url = "ws://localhost:8080";
             var secureUrl = "wss://localhost:8080";
 
+            try
+            {
             using (var runner = new ExampleRunner())
             {
                 // Start the connect synchronously example
@@ -490,6 +492,12 @@ namespace PushTechnology.ClientInterface.Examples
                 // Start the remove remote servers example
                 //runner.Start(new RemoveRemoteServers(), url);
             }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"One or more examples failed: {ex}");
+                Environment.ExitCode = 1;
+            }
         }
 
         /// <summary>
@@ -518,8 +526,14 @@ namespace PushTechnology.ClientInterface.Examples
 
             public async Task RunWrapper(CancellationToken cancel, string[] args)
             {
-                await Run(cancel, args);
-                CompletedEvent.Set();
+                try
+                {
+                    await Run(cancel, args);
+                }
+                finally
+                {
+                    CompletedEvent.Set();
+                }
             }
 
             public abstract Task Run(CancellationToken cancel, string[] args);

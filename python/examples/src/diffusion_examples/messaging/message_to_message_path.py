@@ -31,15 +31,21 @@ class MessageToMessagePath(Example):
     ) -> None:
         path = "my/message/path"
 
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             request_handler = SimpleRequestHandler()
             await session.messaging.add_request_handler(path, request_handler)
 
-            async with sessions().principal(principal).credentials(
-                Credentials(password)
-            ).open(server_url) as session2:
+            async with (
+                sessions()
+                .principal(principal)
+                .credentials(Credentials(password))
+                .open(server_url) as session2
+            ):
                 response = await session2.messaging.send_request_to_path(
                     path, diffusion.datatypes.STRING("Hello")
                 )
@@ -65,6 +71,8 @@ class SimpleRequestHandler(RequestHandler):
     ) -> str:
         print(f"Received message: {request}.")
         return "Goodbye"
+
+
 
 
 

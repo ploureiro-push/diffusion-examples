@@ -14,20 +14,8 @@
  *******************************************************************************/
 
 import { connect, RequestStream } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester, promiseWithResolvers } from '../../../test/util';
-/// end::log
 
 export async function messagingSendToSessionFilter(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Received message: Hello'],
-        ['Received response: Goodbye'],
-    ]);
-
-    const responsePromise = promiseWithResolvers<void>();
-    /// end::log
-    /// tag::messaging_send_to_session_filter[]
     // Connect to the server.
     const session1 = await connect({
         host: 'localhost',
@@ -39,9 +27,6 @@ export async function messagingSendToSessionFilter(): Promise<void> {
     const stream1: RequestStream = {
         onRequest: (path, request, responder) => {
             console.log(`Received message: ${request}`);
-            /// tag::log
-            check.log(`Received message: ${request}`);
-            /// end::log
             responder.respond('Goodbye');
         },
         onError: (error) => {
@@ -66,9 +51,6 @@ export async function messagingSendToSessionFilter(): Promise<void> {
         onRequest: (path, request, responder) => {
             console.log(`Received message: ${request}`);
             responder.respond('I\'m not supposed to receive a message.');
-            /// tag::log
-            check.log('I\'m not supposed to receive a message.');
-            /// end::log
         },
         onError: (error) => {
             console.error('An error occurred.', error);
@@ -95,25 +77,14 @@ export async function messagingSendToSessionFilter(): Promise<void> {
         {
             onResponse: (sessionId, response)=> {
                 console.log(`Received response: ${response}`);
-                /// tag::log
-                check.log(`Received response: ${response}`);
-                responsePromise.resolve();
-                /// end::log
             },
             onResponseError: (sessionId, error) => {
                 console.error('Received an error response', error);
             }
         }
     );
-    /// tag::log
-    await responsePromise.promise;
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
     await session3.closeSession();
-    /// end::messaging_send_to_session_filter[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

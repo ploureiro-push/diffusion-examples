@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 import { connect, topics } from 'diffusion';
-/// tag::log
-import { expectTopicExists } from '../../../../test/util';
-/// end::log
 
 export async function addTopicExample(): Promise<void> {
-    /// tag::pub_sub_publish_add_topic[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -35,13 +31,6 @@ export async function addTopicExample(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicAddResult.added).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::pub_sub_publish_add_topic[]
-    /// tag::log
-    await expectTopicExists('my/topic/path');
-    /// end::log
 }

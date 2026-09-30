@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 import asyncio
 
 from diffusion import sessions, Credentials
@@ -23,20 +24,21 @@ import diffusion.datatypes
 
 class AddTopic(Example):
     async def run(
-            self,
-            server_url: str = "<url>",
-            principal: str = "<principal>",
-            password: str = "<password>",
+        self,
+        server_url: str = "<url>",
+        principal: str = "<principal>",
+        password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-                Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
 
             topic_specification = diffusion.datatypes.JSON.with_properties()
-            result = await session.topics.add_topic(
-                topic, topic_specification
-            )
+            result = await session.topics.add_topic(topic, topic_specification)
             if result == TopicAddResponse.CREATED:
                 print("Topic has been created.")
             else:
@@ -44,9 +46,8 @@ class AddTopic(Example):
 
 
 
+
 if __name__ == "__main__":
     asyncio.run(
-        AddTopic().run(
-            server_url="ws://localhost:8080", principal="admin", password="password"
-        )
+        AddTopic().run(server_url="ws://localhost:8080", principal="admin", password="password")
     )

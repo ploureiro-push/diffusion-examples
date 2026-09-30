@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function metricsListSessionMetricCollectors() {
-    /// tag::metrics_session_metric_collector_list[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -48,13 +47,6 @@ export async function metricsListSessionMetricCollectors() {
             `${collector.exportToPrometheus}, ${collector.removeMetricsWithNoMatches}, ` +
             `[${collector.groupByProperties.join(', ')}])`);
     }
-    /// tag::log
-    expect(sessionMetricCollectors.collectors.length).toBe(2);
-    expect(sessionMetricCollectors.collectors.map((c) => c.name)).toEqual(jasmine.arrayContaining(
-        ['Session Metric Collector 1', 'Session Metric Collector 2']
-    ));
-    /// end::log
 
     await session.closeSession();
-    /// end::metrics_session_metric_collector_list[]
 }

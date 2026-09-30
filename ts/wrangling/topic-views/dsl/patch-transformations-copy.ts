@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } from '../../../../../test/util';
-/// end::log
 
 export async function topicViewsDslPatchTransformationsCopy(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/my/topic/path'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_patch_transformations_copy[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -55,9 +46,6 @@ export async function topicViewsDslPatchTransformationsCopy(): Promise<void> {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -78,19 +66,4 @@ export async function topicViewsDslPatchTransformationsCopy(): Promise<void> {
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_patch_transformations_copy[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/my/topic/path', {
-        'Meet the Flintstones': {
-            Fred: 'Flintstone',
-            Barne: 'Rubble'
-        },
-        'The Jetsons': {
-            Fred: 'Flintstone',
-            George: 'Jetson'
-        }
-    });
-
-    await check.done();
-    /// end::log
 }

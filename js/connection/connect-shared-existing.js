@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function connectSharedExistingExample() {
-    /// tag::connection_establishment_connect_via_shared_worker[]
     // Connect to the server through an existing shared session.
     const session = await diffusion.connectShared(
         'my-shared-session',
@@ -26,11 +25,6 @@ export async function connectSharedExistingExample() {
     console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
 
     // Insert work here
-    /// tag::log
-    expect(session.sessionId).not.toBeNull();
-    expect(session.isConnected()).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::connection_establishment_connect_via_shared_worker[]
 }

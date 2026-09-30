@@ -24,24 +24,23 @@ import diffusion.datatypes
 
 class AddTopicWithCustomTopicProperties(Example):
     async def run(
-            self,
-            server_url: str = "<url>",
-            principal: str = "<principal>",
-            password: str = "<password>",
+        self,
+        server_url: str = "<url>",
+        principal: str = "<principal>",
+        password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-                Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path/with/properties"
 
             topic_specification = diffusion.datatypes.JSON.with_properties(
-                DONT_RETAIN_VALUE=True,
-                PERSISTENT=False,
-                PUBLISH_VALUES_ONLY=True
+                DONT_RETAIN_VALUE=True, PERSISTENT=False, PUBLISH_VALUES_ONLY=True
             )
-            result = await session.topics.add_topic(
-                topic, topic_specification
-            )
+            result = await session.topics.add_topic(topic, topic_specification)
 
             if result == TopicAddResponse.CREATED:
                 print("Topic has been created.")

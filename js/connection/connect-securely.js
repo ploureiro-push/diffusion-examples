@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function connectSecurelyExample() {
-    /// tag::connection_establishment_accept_all_certificates[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 443,
@@ -28,11 +27,6 @@ export async function connectSecurelyExample() {
     console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
 
     // Insert work here
-    /// tag::log
-    expect(session.sessionId).not.toBeNull();
-    expect(session.isConnected()).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::connection_establishment_accept_all_certificates[]
 }

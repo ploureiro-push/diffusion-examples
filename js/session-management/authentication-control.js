@@ -14,22 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../test/util');
-/// end::log
 
 export async function sessionManagementAuthenticationControl() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Rejecting anonymous connection attempt.'],
-        ['Anonymous connection failed.'],
-        ['Rejecting connection attempt from principal not statring with diffusion_.'],
-        ['control connection failed.'],
-        ['Accepting connection attempt from principal starting with diffusion_.'],
-        ['diffusion_control connection established.']
-    ]);
-    /// end::log
-    /// tag::session_management_authentication_control[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -42,21 +28,12 @@ export async function sessionManagementAuthenticationControl() {
         authenticate: (principal, credentials, sessionProperties, proposedPorperties, callback) => {
             if (principal === '') {
                 console.log('Anonymous connection attempt detected. Session establishment rejected.');
-                /// tag::log
-                check.log('Rejecting anonymous connection attempt.');
-                /// end::log
                 callback.deny();
             } else if (principal.startsWith('diffusion_')) {
                 console.log('Principal begins with diffusion_ prefix. Session establishment accepted.');
-                /// tag::log
-                check.log('Accepting connection attempt from principal starting with diffusion_.');
-                /// end::log
                 callback.allow();
             } else {
                 console.log('Principal does not begin with diffusion_ prefix. Session establishment rejected.');
-                /// tag::log
-                check.log('Rejecting connection attempt from principal not statring with diffusion_.');
-                /// end::log
                 callback.deny();
             }
         },
@@ -74,9 +51,6 @@ export async function sessionManagementAuthenticationControl() {
         });
     } catch (err) {
         console.error('Connection could not be established. (Expected)', err);
-        /// tag::log
-        check.log('Anonymous connection failed.');
-        /// end::log
     }
 
     let session3 = undefined;
@@ -90,9 +64,6 @@ export async function sessionManagementAuthenticationControl() {
         });
     } catch (err) {
         console.error('Connection could not be established. (Expected)', err);
-        /// tag::log
-        check.log('control connection failed.');
-        /// end::log
     }
 
     // Connect to the server.
@@ -102,16 +73,9 @@ export async function sessionManagementAuthenticationControl() {
         principal: 'diffusion_control',
         credentials: 'password'
     });
-    /// tag::log
-    check.log('diffusion_control connection established.');
-    /// end::log
 
     await session1.closeSession();
     await session2?.closeSession();
     await session3?.closeSession();
     await session4.closeSession();
-    /// end::session_management_authentication_control[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

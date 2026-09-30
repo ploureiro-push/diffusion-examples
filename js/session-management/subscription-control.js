@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Diffusion Data Ltd.
+ * Copyright (C) 2024 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester, promiseWithResolvers } = require('../../../test/util');
-/// end::log
 
 export async function sessionManagementSubscriptionControl() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['subscribed client'],
-        ['Subscribed to my/topic/path/hello'],
-        ['unsubscribed client', 'Unsubscribed from my/topic/path/hello']
-    ]);
-    const subscribedPromise = promiseWithResolvers();
-    const unsubscribeTopicPromise = promiseWithResolvers();
-    /// end::log
-    /// tag::session_management_subscription_control[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -60,20 +47,10 @@ export async function sessionManagementSubscriptionControl() {
             if (
                 event.type === diffusion.clients.SessionEventStreamEventType.STATE
                 && event.state === diffusion.clients.SessionState.ACTIVE
-                && event.sessionId.toString() !== session1.sessionId.toString()
             ) {
                 session1.clients.subscribe(event.sessionId, '?my/topic/path//');
-                /// tag::log
-                check.log('subscribed client');
-                /// end::log
                 setTimeout(async () => {
-                    /// tag::log
-                    await subscribedPromise.promise;
-                    /// end::log
                     await session1.clients.unsubscribe(event.sessionId, '?my/topic/path//');
-                    /// tag::log
-                    check.log('unsubscribed client');
-                    /// end::log
                     deferredUnsubscribeResolve();
                 }, 5000);
             }
@@ -81,13 +58,15 @@ export async function sessionManagementSubscriptionControl() {
         onClose: () => {},
         onError: () => {}
     };
-    await session1.clients.addSessionEventListener(sessionEventStream, {});
+    await session1.clients.addSessionEventListener(sessionEventStream, {
+        filter: `$Principal is 'client'`
+    });
 
     // Connect to the server.
     const session2 = await diffusion.connect({
         host: 'localhost',
         port: 8080,
-        principal: 'admin',
+        principal: 'client',
         credentials: 'password'
     });
 
@@ -95,17 +74,9 @@ export async function sessionManagementSubscriptionControl() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            subscribedPromise.resolve();
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
-            /// tag::log
-            check.log(`Unsubscribed from ${topic}`);
-            unsubscribeTopicPromise.resolve();
-            /// end::log
         },
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue.get()} to ${newValue.get()}`);
@@ -113,11 +84,7 @@ export async function sessionManagementSubscriptionControl() {
     });
 
     await unsubscribePromise;
-    /// tag::log
-    await unsubscribeTopicPromise.promise;
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
-    /// end::session_management_subscription_control[]
 }

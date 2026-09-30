@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,8 +101,8 @@ public class TimeSeriesCrossCompatibleDatatypesExample {
         public void onValue(String topicPath,
             TopicSpecification topicSpecification,
             TimeSeries.Event<JSON>  oldValue, TimeSeries.Event<JSON>  newValue) {
-            System.out.printf("%s changed from %f to %f\n",
-                topicPath, oldValue.value(), newValue.value());
+            System.out.printf("%s changed from %s to %s\n",
+                topicPath, oldValue == null ? null : oldValue.value(), newValue.value());
         }
 
         @Override

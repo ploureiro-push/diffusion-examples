@@ -26,6 +26,7 @@ from diffusion.datatypes import JSON
 from diffusion_examples.utils.program import Example
 
 
+
 class SetTopicJSONValueWith(Example):
     async def run(
         self,
@@ -33,9 +34,12 @@ class SetTopicJSONValueWith(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
             result = await session.topics.add_topic(topic, JSON)
 
@@ -51,9 +55,7 @@ class SetTopicJSONValueWith(Example):
             await session.topics.set_topic(topic, JSON(json_data), JSON)
 
             json_data2 = {"diffusion": "baz"}
-            await session.topics.set_topic(
-                topic, JSON(json_data2), JSON, constraint
-            )
+            await session.topics.set_topic(topic, JSON(json_data2), JSON, constraint)
 
             print("Topic value has been set.")
 

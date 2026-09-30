@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function ignoreClientProposedProperty() {
-    /// tag::system_authentication_control_ignore_client_proposed_property[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -49,9 +48,6 @@ export async function ignoreClientProposedProperty() {
     for (const key of Object.keys(properties2)) {
         console.log(`  ${key}: ${properties2[key]}`);
     }
-    /// tag::log
-    expect(properties2['Rubble']).toBeUndefined();
-    /// end::log
 
     await session2.closeSession();
 
@@ -73,18 +69,8 @@ export async function ignoreClientProposedProperty() {
     for (const key of Object.keys(properties3)) {
         console.log(`  ${key}: ${properties3[key]}`);
     }
-    /// tag::log
-    expect(properties3['Flintstone']).toBe('Fred_Flintstone');
-    /// end::log
 
     await session3.closeSession();
 
-    /// tag::log
-    const restoreScript = session1.security.authenticationScriptBuilder()
-        .ignoreClientProposedProperty('Flintstone')
-        .build();
-    await session1.security.updateAuthenticationStore(restoreScript);
-    /// end::log
     await session1.closeSession();
-    /// end::system_authentication_control_ignore_client_proposed_property[]
 }

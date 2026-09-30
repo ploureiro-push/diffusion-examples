@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
 package com.pushtechnology.client.sdk.example.topicviews.dsl;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +69,7 @@ public class TopicViewsDslOptionsPreserveTopicsExample {
                 JSON.class, value1)
             .join();
 
-        final Topics.ValueStream<JSON> valueStream = new MyStream();
+        final MyStream valueStream = new MyStream();
         topics.addStream(viewSelector, JSON.class, valueStream);
         topics.subscribe(viewSelector).join();
 
@@ -80,16 +83,28 @@ public class TopicViewsDslOptionsPreserveTopicsExample {
 
         LOG.info("Topic view created: {}", view2.getName());
 
+        // Without "preserve topics", views/not_preserved/<scalar(/name)> only ever has one
+        // derived topic at a time - wait for each update to actually be seen before the next
+        // one replaces it, so every intermediate value is reliably observed.
         topics.set(topicPath, JSON.class, value2).join();
-        topics.set(topicPath, JSON.class, value3).join();
+        valueStream.awaitValue("views/not_preserved/Wilma Flintstone");
 
-        SECONDS.sleep(1);
+        topics.set(topicPath, JSON.class, value3).join();
+        valueStream.awaitValue("views/not_preserved/Pebbles Flintstone");
+        valueStream.awaitValue("views/preserved/Pebbles Flintstone");
 
         topics.removeStream(valueStream);
         session.close();
     }
 
     static class MyStream implements Topics.ValueStream<JSON> {
+        private final ConcurrentHashMap<String, CompletableFuture<Void>> valuesSeen =
+            new ConcurrentHashMap<>();
+
+        void awaitValue(String topicPath) throws Exception {
+            valuesSeen.computeIfAbsent(topicPath, path -> new CompletableFuture<>())
+                .get(5, SECONDS);
+        }
 
         @Override
         public void onValue(
@@ -98,6 +113,8 @@ public class TopicViewsDslOptionsPreserveTopicsExample {
             JSON oldValue,
             JSON newValue) {
             LOG.info("{} new value {}", topicPath, newValue.toJsonString());
+            valuesSeen.computeIfAbsent(topicPath, path -> new CompletableFuture<>())
+                .complete(null);
         }
 
         @Override

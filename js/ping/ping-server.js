@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function pingExample() {
-    /// tag::ping_server[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -29,5 +28,4 @@ export async function pingExample() {
     console.log('Received Ping response.');
 
     await session.closeSession();
-    /// end::ping_server[]
 }

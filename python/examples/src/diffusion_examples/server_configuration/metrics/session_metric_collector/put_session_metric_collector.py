@@ -41,9 +41,12 @@ class PutSessionMetricCollector(Example):
         """
         session_filter = "$Principal is 'control'"
 
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             collector_name = "Session Metric Collector 1"
             # Put session metric collector asynchronously and wait
             builder = SessionMetricCollectorBuilder()

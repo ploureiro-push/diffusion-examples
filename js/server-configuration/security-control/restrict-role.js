@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function securityControlRestrictRole() {
-    /// tag::security_control_restrict_role_edit_permissions[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -39,5 +38,4 @@ export async function securityControlRestrictRole() {
         .build();
     await session.security.updateAuthenticationStore(securityScriptCleanup);
     await session.closeSession();
-    /// end::security_control_restrict_role_edit_permissions[]
 }

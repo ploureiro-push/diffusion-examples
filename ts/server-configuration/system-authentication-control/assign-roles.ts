@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function assignRoles(): Promise<void> {
-    /// tag::system_authentication_control_assign_roles[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -35,12 +34,5 @@ export async function assignRoles(): Promise<void> {
         .build();
     await session.security.updateAuthenticationStore(authenticationScript2);
 
-    /// tag::log
-    const restoreScript = session.security.authenticationScriptBuilder()
-        .removePrincipal('super_user')
-        .build();
-    await session.security.updateAuthenticationStore(restoreScript);
-    /// end::log
     await session.closeSession();
-    /// end::system_authentication_control_assign_roles[]
 }

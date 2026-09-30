@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function securityControlIsolatePath(): Promise<void> {
-    /// tag::security_control_isolate_path[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -38,5 +37,4 @@ export async function securityControlIsolatePath(): Promise<void> {
         .build();
     await session.security.updateSecurityStore(securityScriptCleanup);
     await session.closeSession();
-    /// end::security_control_isolate_path[]
 }

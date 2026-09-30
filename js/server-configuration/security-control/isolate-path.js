@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function securityControlIsolatePath() {
-    /// tag::security_control_isolate_path[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -38,5 +37,4 @@ export async function securityControlIsolatePath() {
         .build();
     await session.security.updateSecurityStore(securityScriptCleanup);
     await session.closeSession();
-    /// end::security_control_isolate_path[]
 }

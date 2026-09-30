@@ -16,13 +16,17 @@
 const diffusion = require('diffusion');
 
 export async function connectionReconnectExample() {
-    /// tag::connection_resilience_reconnection_strategy[]
-    let session;
-    let attempts = 0;
-
+    /*
+        This example illustrates provision of a custom reconnect strategy which attempts reconnection
+        at fixed intervals, a finite number of times (for a fixed max duration).
+        In most cases you can omit an explicit reconnect strategy and your session will be allocated a
+        default strategy. The default behaviour uses a randomised backoff approach
+        (retrying at increasing & randomly staggered intervals), for a maximum period of one minute.
+     */
+    let sessionWithCustomReconnectBehaviour;
     try {
         // Connect to the server.
-        session = await diffusion.connect({
+        sessionWithCustomReconnectBehaviour = await diffusion.connect({
             host: 'localhost',
             port: 8080,
             principal: 'admin',
@@ -32,8 +36,8 @@ export async function connectionReconnectExample() {
                 timeout: 1000 * 60 * 10,
                 // The reconnection strategy is a function that is called when the session is
                 // disconnected unexpectedly
-                strategy: (reconnect, abort) => {
-                    if (attempts > 10) {
+                strategy: (reconnect, abort, closeReason, reconnectAttempts) => {
+                    if (reconnectAttempts >= 10) {
                         // abort after 10 attempts
                         abort();
                     } else {
@@ -47,15 +51,53 @@ export async function connectionReconnectExample() {
         console.error('Connection could not be established.', err);
         throw err;
     }
+    console.log(`Connected. Session Identifier: ${sessionWithCustomReconnectBehaviour.sessionId.toString()}`);
 
-    console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
+
+    /*
+       For clarity, the simple and most common / recommended case
+       - utilising the default randomised backoff reconnect behaviour
+     */
+    let sessionWithDefaultReconnectBehaviour;
+    try {
+        // Connect to the server.
+        sessionWithDefaultReconnectBehaviour = await diffusion.connect({
+            host: 'localhost',
+            port: 8080,
+            principal: 'admin',
+            credentials: 'password'
+        });
+    } catch (err) {
+        console.error('Connection could not be established.', err);
+        throw err;
+    }
+    console.log('Connected with staggered reconnect behaviour. Session Identifier: '
+        + sessionWithDefaultReconnectBehaviour.sessionId.toString());
+
+    /*
+       Or less common, explicitly disabling reconnection...
+     */
+    let sessionWithNoReconnectBehaviour;
+    try {
+        // Connect to the server.
+        sessionWithNoReconnectBehaviour = await diffusion.connect({
+            host: 'localhost',
+            port: 8080,
+            principal: 'admin',
+            credentials: 'password',
+            reconnect: false
+        });
+    } catch (err) {
+        console.error('Connection could not be established.', err);
+        throw err;
+    }
+    console.log('Connected without reconnect behaviour. Session Identifier: '
+        + sessionWithNoReconnectBehaviour.sessionId.toString());
+
 
     // Insert work here
-    /// tag::log
-    expect(session.sessionId).not.toBeNull();
-    expect(session.isConnected()).toBe(true);
-    /// end::log
 
-    await session.closeSession();
-    /// end::connection_resilience_reconnection_strategy[]
+    await sessionWithCustomReconnectBehaviour.closeSession();
+    await sessionWithDefaultReconnectBehaviour.closeSession();
+    await sessionWithNoReconnectBehaviour.closeSession();
 }

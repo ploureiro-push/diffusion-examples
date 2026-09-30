@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../test/util');
-/// end::log
 
 export async function sessionStateListenerExample() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['close']
-    ]);
-    /// end::log
-    /// tag::connection_session_state_listener[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -37,35 +28,19 @@ export async function sessionStateListenerExample() {
     session.on({
         disconnect : () => {
             console.log('State changed to disconnected');
-            /// tag::log
-            check.log('disconnect');
-            /// end::log
         },
         reconnect : () => {
             console.log('State changed to reconnected');
-            /// tag::log
-            check.log('reconnect');
-            /// end::log
         },
         error : (error) => {
             console.log('An error occured', error);
-            /// tag::log
-            check.log('error');
-            /// end::log
         },
         close : (reason) => {
             console.log('State changed to closed', reason);
-            /// tag::log
-            check.log('close');
-            /// end::log
         }
     });
 
     // Insert work here
 
     await session.closeSession();
-    /// end::connection_session_state_listener[]
-    /// tag::log
-    check.done();
-    /// end::log
 }

@@ -14,27 +14,8 @@
  *******************************************************************************/
 
 import { connect } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../test/util'
-/// end::log
 
 export async function getGlobalPermissionsExample(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [
-            'VIEW_SESSION',
-            'MODIFY_SESSION',
-            'REGISTER_HANDLER',
-            'VIEW_SERVER',
-            'CONTROL_SERVER',
-            'VIEW_SECURITY',
-            'MODIFY_SECURITY',
-            'READ_TOPIC_VIEWS',
-            'MODIFY_TOPIC_VIEWS'
-        ]
-    ]);
-    /// end::log
-    /// tag::security_get_global_permissions[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -46,14 +27,7 @@ export async function getGlobalPermissionsExample(): Promise<void> {
     const globalPermissions = await session.security.getGlobalPermissions();
     for (const permission of globalPermissions) {
         console.log(permission);
-        /// tag::log
-        check.log(permission);
-        /// end::log
     }
 
     await session.closeSession();
-    /// end::security_get_global_permissions[]
-    /// tag::log
-    check.done();
-    /// end::log
 }

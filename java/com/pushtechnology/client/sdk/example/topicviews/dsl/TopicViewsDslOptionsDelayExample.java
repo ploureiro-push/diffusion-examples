@@ -70,6 +70,11 @@ public class TopicViewsDslOptionsDelayExample {
             SECONDS.sleep(1);
         }
 
+        // Wait out the delay, plus a margin for network/processing latency,
+        // so the final update has been forwarded to the view topic before
+        // the stream and session are closed.
+        SECONDS.sleep(8);
+
         topics.removeStream(valueStream);
         session.close();
     }

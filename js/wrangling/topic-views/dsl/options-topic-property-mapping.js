@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectTopicToHaveProperties, PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslOptionsTopicPropertyMapping() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/my/topic/path'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_options_topic_property_mapping[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -50,9 +41,6 @@ export async function topicViewsDslOptionsTopicPropertyMapping() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -68,16 +56,4 @@ export async function topicViewsDslOptionsTopicPropertyMapping() {
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_options_topic_property_mapping[]
-    /// tag::log
-    await expectTopicToHaveProperties('views/my/topic/path', {
-        CONFLATION: 'off',
-        COMPRESSION: 'false',
-        DONT_RETAIN_VALUE: 'true',
-        PERSISTENT: 'false',
-        _VIEW: 'topic_view_1'
-    });
-
-    await check.done();
-    /// end::log
 }

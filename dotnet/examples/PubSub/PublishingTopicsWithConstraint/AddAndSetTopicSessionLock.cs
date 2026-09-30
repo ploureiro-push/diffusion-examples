@@ -17,6 +17,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using PushTechnology.ClientInterface.Client.Factories;
+using PushTechnology.ClientInterface.Client.Session;
 using PushTechnology.ClientInterface.Client.Topics;
 using static System.Console;
 using static PushTechnology.ClientInterface.Examples.Program;
@@ -30,9 +31,12 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
         {
             string serverUrl = args[0];
 
+            ISession session = null;
+            ISessionLock sessionLock = null;
+
             try
             {
-                var session = Diffusion.Sessions
+                session = Diffusion.Sessions
                     .Principal("admin")
                     .Credentials(Diffusion.Credentials.Password("password"))
                     .Open(serverUrl);
@@ -42,7 +46,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
                 string json = "{\"diffusion\":\"data\"}";
                 var topicSpecification = Diffusion.NewSpecification(TopicType.JSON);
 
-                var sessionLock = await session.LockAsync(topic, cancellationToken);
+                sessionLock = await session.LockAsync(topic, cancellationToken);
                 var constraint = Diffusion.UpdateConstraints.Locked(sessionLock);
                 var result = await session.TopicUpdate.AddAndSetAsync(topic, topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), constraint, cancellationToken);
 
@@ -54,13 +58,19 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.PublishingTopicsWithCon
                 {
                     WriteLine("Topic already exists.");
                 }
-
-                session.Close();
             }
             catch (Exception ex)
             {
                 WriteLine($"An error occurred when running the example : {ex}.");
                 throw;
+            }
+            finally
+            {
+                if (sessionLock != null)
+                {
+                    await sessionLock.UnlockAsync(cancellationToken);
+                }
+                session?.Close();
             }
         }
     }

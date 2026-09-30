@@ -21,6 +21,7 @@ from diffusion.features.control.metrics.session_metrics import (
 from diffusion_examples.utils.program import Example
 
 
+
 class ListSessionMetricCollectors(Example):
     async def run(
         self,
@@ -28,9 +29,12 @@ class ListSessionMetricCollectors(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             session_filter = "$Principal is 'control'"
 
             collector = (
@@ -70,6 +74,7 @@ class ListSessionMetricCollectors(Example):
 
     def get_answer(self, result):
         return "Yes" if result else "No"
+
 
 
 

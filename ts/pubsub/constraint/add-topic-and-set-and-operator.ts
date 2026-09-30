@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics, topicUpdate, updateConstraints } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue } from '../../../../test/util';
-/// end::log
 
 export async function addTopicAndSetAndConstraintExample(): Promise<void> {
-    /// tag::pub_sub_publish_with_constraint_add_and_set_topic_and[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -44,9 +40,6 @@ export async function addTopicAndSetAndConstraintExample(): Promise<void> {
         } else {
             console.log('Topic already exists.');
         }
-        /// tag::log
-        expect(topicCreationResult).toBe(topicUpdate.TopicCreationResult.CREATED);
-        /// end::log
 
         const updateConstraintA = updateConstraints()
             .jsonValue()
@@ -70,8 +63,4 @@ export async function addTopicAndSetAndConstraintExample(): Promise<void> {
     }
 
     await session.closeSession();
-    /// end::pub_sub_publish_with_constraint_add_and_set_topic_and[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path', { diffusion: 'baz' });
-    /// end::log
 }

@@ -34,23 +34,30 @@ class MessageToSessionID(Example):
     ):
         path = "my/message/path"
 
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             request_stream = SimpleRequestStream()
             session.messaging.add_stream_handler(path, request_stream, addressed=True)
 
-            async with sessions().principal(principal).credentials(
-                Credentials(password)
-            ).open(server_url) as session2:
+            async with (
+                sessions()
+                .principal(principal)
+                .credentials(Credentials(password))
+                .open(server_url) as session2
+            ):
                 request_stream2 = AnotherRequestStream()
-                session2.messaging.add_stream_handler(
-                    path, request_stream2, addressed=True
-                )
+                session2.messaging.add_stream_handler(path, request_stream2, addressed=True)
 
-                async with sessions().principal(principal).credentials(
-                    Credentials(password)
-                ).open(server_url) as session3:
+                async with (
+                    sessions()
+                    .principal(principal)
+                    .credentials(Credentials(password))
+                    .open(server_url) as session3
+                ):
                     response = await session3.messaging.send_request_to_session(
                         path,
                         session.session_id,
@@ -78,6 +85,7 @@ class SimpleRequestStream(RequestHandler):
     ) -> str:
         print(f"Received message: {request}.")
         return "Goodbye"
+
 
 
 

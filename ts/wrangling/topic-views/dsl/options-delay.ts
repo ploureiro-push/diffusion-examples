@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../../../test/util';
-/// end::log
 
 export async function topicViewsDslOptionsDelay(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [ 'Subscribed to my/topic/path' ]
-    ]);
-    /// end::log
-    /// tag::topic_views_dsl_options_delay[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -46,20 +37,12 @@ export async function topicViewsDslOptionsDelay(): Promise<void> {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue} to ${newValue}`);
-            /// tag::log
-            if (topic !== 'my/topic/path') {
-                check.log(`${topic} changed from ${oldValue}`);
-            }
-            /// end::log
         }
     });
 
@@ -82,8 +65,4 @@ export async function topicViewsDslOptionsDelay(): Promise<void> {
     }
 
     await session.closeSession();
-    /// end::topic_views_dsl_options_delay[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

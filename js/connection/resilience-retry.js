@@ -16,7 +16,11 @@
 const diffusion = require('diffusion');
 
 export async function initialConnectRetryExample() {
-    /// tag::connection_resilience_session_establishment_retry_mechanism[]
+
+    /*
+        A retry strategy provided within the connection options is employed when establishing
+        a connection across the requested transport options.
+     */
     let session;
     try {
         // Connect to the server.
@@ -25,24 +29,50 @@ export async function initialConnectRetryExample() {
             port: 8080,
             principal: 'admin',
             credentials: 'password',
+            // Optional transports property stated for clarity only (this is where retry logic will apply).
+            transports: ['WS'],
+            // Fixed RetryDescriptor based strategy (10 attempts, at fixed intervals)
             retry: {
                 attempts: 10,
                 interval: 250
             }
         });
     } catch (err) {
-        console.error('Connection could not be established.', err);
+        console.error('Connection could not be established despite retries.', err);
         throw err;
     }
-
     console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
 
+
+    /*
+        An alternative form of retry strategy, allowing more control
+     */
+    let session2;
+    try {
+        // Connect to the server.
+        session2 = await diffusion.connect({
+            host: 'localhost',
+            port: 8080,
+            principal: 'admin',
+            credentials: 'password',
+            // Optional transports property stated for clarity only (this is where retry logic will apply).
+            transports: ['WS'],
+            // Dynamic RetryController (10 attempts, increasing intervals)
+            retry: (retryAttempts) => {
+                if (retryAttempts > 9) {
+                    return null;
+                }
+                return (retryAttempts + 1) * 250;
+            }
+        });
+    } catch (err) {
+        console.error('Connection could not be established despite retries.', err);
+        throw err;
+    }
+    console.log(`Connected. Session Identifier: ${session2.sessionId.toString()}`);
+
     // Insert work here
-    /// tag::log
-    expect(session.sessionId).not.toBeNull();
-    expect(session.isConnected()).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::connection_resilience_session_establishment_retry_mechanism[]
+    await session2.closeSession();
 }

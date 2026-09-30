@@ -23,6 +23,7 @@ from diffusion.datatypes import JSON
 from diffusion_examples.utils.program import Example
 
 
+
 class AddAndSetTopicNoTopic(Example):
     async def run(
         self,
@@ -30,9 +31,12 @@ class AddAndSetTopicNoTopic(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        async with sessions().principal(principal).credentials(
-            Credentials(password)
-        ).open(server_url) as session:
+        async with (
+            sessions()
+            .principal(principal)
+            .credentials(Credentials(password))
+            .open(server_url) as session
+        ):
             topic = "my/topic/path"
             json_data = {"diffusion": "data"}
             constraint = ConstraintFactory().no_topic()
@@ -43,6 +47,7 @@ class AddAndSetTopicNoTopic(Example):
                 print("Topic has been created.")
             else:
                 print("Topic already exists.")
+
 
 
 

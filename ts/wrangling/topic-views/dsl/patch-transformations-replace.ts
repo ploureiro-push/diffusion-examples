@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } from '../../../../../test/util';
-/// end::log
 
 export async function topicViewsDslPatchTransformationsReplace(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/my/topic/path'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_patch_transformations_replace[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -51,9 +42,6 @@ export async function topicViewsDslPatchTransformationsReplace(): Promise<void> 
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -74,14 +62,4 @@ export async function topicViewsDslPatchTransformationsReplace(): Promise<void> 
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_patch_transformations_replace[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/my/topic/path', {
-        Fred: 'Flintstone',
-        Barney: 'Rubble',
-        George: 'Bedrock'
-    });
-
-    await check.done();
-    /// end::log
 }

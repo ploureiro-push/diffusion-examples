@@ -14,18 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslProcessTransformationsRemove() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/1',
-        'Subscribed to views/2'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_process_transformations_remove[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -61,9 +51,6 @@ export async function topicViewsDslProcessTransformationsRemove() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -84,17 +71,4 @@ export async function topicViewsDslProcessTransformationsRemove() {
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_process_transformations_remove[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/1', {
-        name: 'APPL',
-        total: 1234
-    });
-    await expectJsonTopicToHaveValue('views/2', {
-        name: 'AMZN',
-        total: 256*87.65
-    });
-
-    await check.done();
-    /// end::log
 }

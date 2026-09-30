@@ -16,7 +16,6 @@
 import { connect, newSessionMetricCollectorBuilder } from 'diffusion';
 
 export async function metricsPutSessionMetricCollector(): Promise<void> {
-    /// tag::metrics_session_metric_collector_put[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -32,12 +31,6 @@ export async function metricsPutSessionMetricCollector(): Promise<void> {
         .groupByProperty('$Location')
         .create('Session Metric Collector 1', '$Principal is "control"');
     await session.metrics.putSessionMetricCollector(sessionMetricCollector);
-    /// tag::log
-    const sessionMetricCollectors = await session.metrics.listSessionMetricCollectors();
-    expect(sessionMetricCollectors.collectors.length).toBe(1);
-    expect(sessionMetricCollectors.collectors[0].name).toBe('Session Metric Collector 1');
-    /// end::log
 
     await session.closeSession();
-    /// end::metrics_session_metric_collector_put[]
 }
