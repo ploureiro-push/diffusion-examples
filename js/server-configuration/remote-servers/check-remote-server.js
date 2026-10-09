@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Diffusion Data Ltd.
+ * Copyright (C) 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,28 @@ export async function remoteServersCheck() {
         principal: 'admin',
         credentials: 'password'
     });
+
+    // Describe a remote server's connection state.
+    const describeStatus = (status) => {
+        switch (status.connectionState) {
+            case diffusion.ConnectionState.INACTIVE:
+                return 'inactive';
+            case diffusion.ConnectionState.CONNECTED:
+                return 'connected';
+            case diffusion.ConnectionState.MISSING:
+                return 'missing';
+            case diffusion.ConnectionState.FAILED:
+                return `connection failed (${status.failureMessage})`;
+            case diffusion.ConnectionState.RETRYING:
+                return `retrying (${status.failureMessage})`;
+            default:
+                return 'unknown';
+        }
+    };
+
+    // Query the state of a remote server that has not been created yet.
+    const stateBefore = await session.remoteServers.getRemoteServerState('Remote Server 1');
+    console.log(`Remote Server 1 before it has been created: ${describeStatus(stateBefore)}`);
 
     const builder = diffusion.newRemoteServerBuilder(diffusion.RemoteServerType.SECONDARY_INITIATOR)
         .principal('admin')
@@ -50,26 +72,13 @@ export async function remoteServersCheck() {
 
     const remoteServers = await session.remoteServers.listRemoteServers();
     for (const remoteServer of remoteServers) {
+        // checkRemoteServer retries a failed connection before reporting its state
         const status = await session.remoteServers.checkRemoteServer(remoteServer.name);
-        let statusMessage = '';
-        switch (status.connectionState) {
-            case diffusion.ConnectionState.INACTIVE:
-                statusMessage = 'inactive';
-                break;
-            case diffusion.ConnectionState.CONNECTED:
-                statusMessage = 'connected';
-                break;
-            case diffusion.ConnectionState.MISSING:
-                statusMessage = 'missing';
-                break;
-            case diffusion.ConnectionState.FAILED:
-                statusMessage = `connection failed (${status.failureMessage})`;
-                break;
-            case diffusion.ConnectionState.RETRYING:
-                statusMessage = `retrying (${status.failureMessage})`;
-                break;
-        }
-        console.log(`${remoteServer.name} (${remoteServer.url}): ${statusMessage}`);
+        // getRemoteServerState only reports the current state
+        const state = await session.remoteServers.getRemoteServerState(remoteServer.name);
+        console.log(
+            `${remoteServer.name} (${remoteServer.url}): ${describeStatus(status)}, state: ${describeStatus(state)}`
+        );
     }
 
     // Clean up

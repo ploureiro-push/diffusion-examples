@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,10 @@ public class CheckRemoteServersExample {
         final RemoteServers remoteServersControl =
             adminSession.feature(RemoteServers.class);
 
+        LOG.info("Before remote connection has been built: '{}'",
+            remoteServersControl.getRemoteServerState("Remote Server 1")
+            .join());
+
         final SecondaryInitiatorBuilder builder =
             Diffusion.newRemoteServerBuilder(SecondaryInitiatorBuilder.class);
 
@@ -88,11 +92,14 @@ public class CheckRemoteServersExample {
             final CheckRemoteServerResult result =
                 remoteServersControl.checkRemoteServer(name).join();
 
+            final CheckRemoteServerResult remoteServerState =
+                remoteServersControl.getRemoteServerState(name).join();
+
             final String status = result.getConnectionState().name();
             final String failureMessage = result.getFailureMessage();
 
-            LOG.info(
-                "<{}>: <{}> ({})\n", name, status, failureMessage);
+            LOG.info("<{}>: <{}> ({}) <{}>\n",
+                name, status, failureMessage, remoteServerState);
         });
 
         remoteServersControl.removeRemoteServer("Remote Server 1").join();

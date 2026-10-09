@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Diffusion Data Ltd.
+ * Copyright (C) 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import {
     ConnectionOption,
     ConnectionState,
     newRemoteServerBuilder,
+    RemoteServerStatus,
     RemoteServerType,
     SecondaryInitiatorDefinition,
 } from 'diffusion';
@@ -31,6 +32,28 @@ export async function remoteServersCheck(): Promise<void> {
         credentials: 'password'
     });
 
+    // Describe a remote server's connection state.
+    const describeStatus = (status: RemoteServerStatus): string => {
+        switch (status.connectionState) {
+            case ConnectionState.INACTIVE:
+                return 'inactive';
+            case ConnectionState.CONNECTED:
+                return 'connected';
+            case ConnectionState.MISSING:
+                return 'missing';
+            case ConnectionState.FAILED:
+                return `connection failed (${status.failureMessage})`;
+            case ConnectionState.RETRYING:
+                return `retrying (${status.failureMessage})`;
+            default:
+                return 'unknown';
+        }
+    };
+
+    // Query the state of a remote server that has not been created yet.
+    const stateBefore = await session.remoteServers.getRemoteServerState('Remote Server 1');
+    console.log(`Remote Server 1 before it has been created: ${describeStatus(stateBefore)}`);
+
     const builder = newRemoteServerBuilder(RemoteServerType.SECONDARY_INITIATOR)
         .principal('admin')
         .credentials('password')
@@ -40,6 +63,7 @@ export async function remoteServersCheck(): Promise<void> {
             [ConnectionOption.CONNECTION_TIMEOUT]: '15000'
         })
         .missingTopicNotificationFilter('?abc');
+
     await session.remoteServers.createRemoteServer(
         builder.build('Remote Server 1', 'ws://new.server.url.com')
     );
@@ -57,26 +81,13 @@ export async function remoteServersCheck(): Promise<void> {
 
     const remoteServers = await session.remoteServers.listRemoteServers();
     for (const remoteServer of remoteServers as SecondaryInitiatorDefinition[]) {
+        // checkRemoteServer retries a failed connection before reporting its state
         const status = await session.remoteServers.checkRemoteServer(remoteServer.name);
-        let statusMessage = '';
-        switch (status.connectionState) {
-            case ConnectionState.INACTIVE:
-                statusMessage = 'inactive';
-                break;
-            case ConnectionState.CONNECTED:
-                statusMessage = 'connected';
-                break;
-            case ConnectionState.MISSING:
-                statusMessage = 'missing';
-                break;
-            case ConnectionState.FAILED:
-                statusMessage = `connection failed (${status.failureMessage})`;
-                break;
-            case ConnectionState.RETRYING:
-                statusMessage = `retrying (${status.failureMessage})`;
-                break;
-        }
-        console.log(`${remoteServer.name} (${remoteServer.url}): ${statusMessage}`);
+        // getRemoteServerState only reports the current state
+        const state = await session.remoteServers.getRemoteServerState(remoteServer.name);
+        console.log(
+            `${remoteServer.name} (${remoteServer.url}): ${describeStatus(status)}, state: ${describeStatus(state)}`
+        );
     }
 
     // Clean up

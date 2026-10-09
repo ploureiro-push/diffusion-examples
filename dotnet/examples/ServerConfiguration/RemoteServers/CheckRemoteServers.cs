@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2025 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,11 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
                 .Principal("admin")
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .Open(serverUrl);
+
+            // Query the state of a remote server that has not been created yet.
+            var stateBefore = await session.RemoteServers.GetRemoteServerStateAsync("Remote Server 1", cancellationToken);
+
+            WriteLine($"Remote Server 1 before it has been created: {stateBefore.ConnectionState}");
 
             IRemoteServer server = null, server2 = null;
 
@@ -72,8 +77,9 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
             foreach (var remoteServer in listServers)
             {
                 var result = await session.RemoteServers.CheckRemoteServerAsync(remoteServer.Name, cancellationToken);
+                var remoteServerState = await session.RemoteServers.GetRemoteServerStateAsync(remoteServer.Name);
 
-                WriteLine($"{remoteServer.Name} ({(remoteServer as ISecondaryInitiator).ServerUrl}): {result.ConnectionState} ({result.FailureMessage})");
+                WriteLine($"{remoteServer.Name} ({(remoteServer as ISecondaryInitiator).ServerUrl}): {result.ConnectionState} ({result.FailureMessage} {remoteServerState})");
             }
 
             session.Close();
