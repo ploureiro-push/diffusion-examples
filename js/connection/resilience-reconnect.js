@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Diffusion Data Ltd.
+ * Copyright (C) 2024 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ const diffusion = require('diffusion');
 
 export async function connectionReconnectExample() {
     /*
-        This example illustrates provision of a custom reconnect strategy which attempts reconnection
+        This example illustrates provision of a reconnection policy which attempts reconnection
         at fixed intervals, a finite number of times (for a fixed max duration).
-        In most cases you can omit an explicit reconnect strategy and your session will be allocated a
-        default strategy. The default behaviour uses a randomised backoff approach
+        In most cases you can omit an explicit reconnection policy and your session will use the
+        default policy. The default behaviour uses a randomised backoff approach
         (retrying at increasing & randomly staggered intervals), for a maximum period of one minute.
      */
     let sessionWithCustomReconnectBehaviour;
@@ -31,20 +31,14 @@ export async function connectionReconnectExample() {
             port: 8080,
             principal: 'admin',
             credentials: 'password',
-            reconnect: {
+            reconnectionPolicy: {
+                // Make up to 10 reconnection attempts, 3 seconds apart
+                retryPolicy: {
+                    attempts: 10,
+                    interval: 3000
+                },
                 // Set the maximum amount of time the client will try and reconnect for to 10 minutes
-                timeout: 1000 * 60 * 10,
-                // The reconnection strategy is a function that is called when the session is
-                // disconnected unexpectedly
-                strategy: (reconnect, abort, closeReason, reconnectAttempts) => {
-                    if (reconnectAttempts >= 10) {
-                        // abort after 10 attempts
-                        abort();
-                    } else {
-                        // retry after 3 seconds
-                        setTimeout(reconnect, 3000);
-                    }
-                }
+                timeout: 1000 * 60 * 10
             }
         });
     } catch (err) {
@@ -85,7 +79,8 @@ export async function connectionReconnectExample() {
             port: 8080,
             principal: 'admin',
             credentials: 'password',
-            reconnect: false
+            // A retry policy with no attempts disables reconnection
+            reconnectionPolicy: { retryPolicy: { attempts: 0 } }
         });
     } catch (err) {
         console.error('Connection could not be established.', err);

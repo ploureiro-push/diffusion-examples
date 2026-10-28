@@ -27,9 +27,10 @@
 
     PTDiffusionMutableSessionConfiguration *const configuration = [[PTDiffusionMutableSessionConfiguration alloc] init];
 
-    // Create an initial session establishment retry strategy.
-    // It will attempt 10 times to connect to the Diffusion server, with 500 milliseconds interval between attempts.
-    configuration.initialRetryStrategy = [[PTDiffusionRetryStrategy alloc] initWithInterval:500 andAttempts:10];
+    // Create an initial session establishment retry policy.
+    // It will retry up to 10 times to connect to the Diffusion server, with an interval of 500 milliseconds
+    // between attempts.
+    configuration.initialRetryPolicy = [[PTDiffusionRetryPolicy alloc] initWithInterval:500 attempts:10];
 
     [PTDiffusionSession openWithURL:url
                       configuration:configuration

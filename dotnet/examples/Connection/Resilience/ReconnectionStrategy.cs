@@ -30,15 +30,10 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Resilience
         {
             string serverUrl = args[0];
 
-            // Set the maximum amount of time the client will try and reconnect for to 10 minutes.
-            int maximumTimeoutDuration = 1000 * 60 * 10;
-            var reconnectionStrategy = new SessionReconnectionStrategy();
-
             var session = Diffusion.Sessions
                 .Principal("admin")
                 .Credentials(Diffusion.Credentials.Password("password"))
-                .ReconnectionTimeout(maximumTimeoutDuration)
-                .ReconnectionStrategy(reconnectionStrategy)
+                .ReconnectionPolicy(CreateReconnectionPolicy())
                 .Open(serverUrl);
 
             WriteLine($"Connected. Session Identifier: {session.SessionId}.");
@@ -50,33 +45,21 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Resilience
         }
 
         /// <summary>
-        /// This class is used to reconnect to the server when the session is disconnected unexpectedly.
+        /// Creates the policy used to reconnect to the server when the session is disconnected unexpectedly.
         /// </summary>
-        private class SessionReconnectionStrategy : IReconnectionStrategy
+        private static IReconnectionPolicy CreateReconnectionPolicy()
         {
-            public int Retries { get; set; }
+            // Make up to 10 reconnection attempts, 3 seconds apart, for up to
+            // 10 minutes. The attempts restart for each new disconnection.
+            var retryPolicy = Diffusion.NewRetryPolicyBuilder()
+                .Interval(TimeSpan.FromSeconds(3))
+                .Attempts(10)
+                .Build();
 
-            public SessionReconnectionStrategy() => Retries = 0;
-
-            public async Task PerformReconnection(IReconnectionAttempt reconnection)
-            {
-                if (Retries > 10) 
-                {
-                    // Abort after 10 attempts.
-                    throw new Exception();
-                }
-                else
-                {
-                    Retries++;
-
-                    // Retry after 3 seconds.
-                    await Task.Delay(TimeSpan.FromMilliseconds(3000));
-
-                    WriteLine("Attempting to reconnect...");
-                   
-                    reconnection.Start();
-                }
-            }
+            return Diffusion.NewReconnectionPolicyBuilder()
+                .RetryPolicy(retryPolicy)
+                .Timeout(TimeSpan.FromMinutes(10))
+                .Build();
         }
     }
 }

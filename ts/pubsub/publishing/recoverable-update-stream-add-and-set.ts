@@ -26,19 +26,18 @@ export async function recoverableUpdateSreamAddAndSetExample(): Promise<void> {
 
     const specification = new topics.TopicSpecification(topics.TopicType.JSON);
 
-    // A recoverable update stream is defined by a RetryStrategy. This example uses a RetryController,
-    // providing access to the retryAttempts counter (zero based) for dynamic control.
+    // A recoverable update stream is defined by a retry policy, whose backoff can adjust the interval
+    // before each attempt. The first attempt is number 1.
     // Cater for up to 10 errors during streamed updates, with each successive retry waiting a second longer.
-    const retryStrategy = (retryAttempts: number) => {
-        if (retryAttempts > 9) {
-            return null;
-        }
-        return (retryAttempts + 1) * 1000;
+    const retryPolicy = {
+        interval: 1000,
+        attempts: 10,
+        backoff: (interval: number, attempt: number) => interval * attempt
     };
 
     const updateStream = session.topicUpdate.newUpdateStreamBuilder()
         .specification(specification)
-        .build('my/topic/path/with/recoverable/update/stream', datatypes.json(), retryStrategy);
+        .build('my/topic/path/with/recoverable/update/stream', datatypes.json(), { retryPolicy: retryPolicy });
 
     const promises = [ ...Array(10).keys() ]
         .map((i) => {

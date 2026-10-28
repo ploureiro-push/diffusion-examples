@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,18 +28,23 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    RECONNECTION_STRATEGY_T reconnection_strategy = {
-        .retry_count = 3,
-        .retry_delay = 1000
-    };
+    // Make up to 3 reconnection attempts, 1 second apart. As no timeout is
+    // specified, it is calculated from the retry policy.
+    DIFFUSION_RETRY_POLICY_T *retry_policy = diffusion_retry_policy_create(1000, 3, NULL);
+    DIFFUSION_RECONNECTION_POLICY_T *reconnection_policy = diffusion_reconnection_policy_create(retry_policy, NULL);
 
-    DIFFUSION_ERROR_T error = { 0 };
-    SESSION_T *session = session_create(
-        url, principal, credentials, NULL, &reconnection_strategy, &error
-    );
+    DIFFUSION_SESSION_FACTORY_T *session_factory = diffusion_session_factory_init();
+    diffusion_session_factory_principal(session_factory, principal);
+    diffusion_session_factory_credentials(session_factory, credentials);
+    diffusion_session_factory_reconnection_policy(session_factory, reconnection_policy);
+
+    SESSION_T *session = session_create_with_session_factory(session_factory, url);
 
     // Insert work here
 
     session_close(session, NULL);
     session_free(session);
+    diffusion_session_factory_free(session_factory);
+    diffusion_reconnection_policy_free(reconnection_policy);
+    diffusion_retry_policy_free(retry_policy);
 }

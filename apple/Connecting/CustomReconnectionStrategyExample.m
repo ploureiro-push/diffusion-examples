@@ -17,9 +17,6 @@
 
 @import Diffusion;
 
-@interface ExponentialBackoffReconnectionStrategy : NSObject <PTDiffusionSessionReconnectionStrategy>
-@end
-
 @implementation CustomReconnectionStrategyExample {
     PTDiffusionSession* _session;
 }
@@ -30,11 +27,23 @@
     PTDiffusionMutableSessionConfiguration *const sessionConfiguration =
         [PTDiffusionMutableSessionConfiguration new];
 
-    // Set the maximum amount of time we'll try and reconnect for to 10 minutes.
-    sessionConfiguration.reconnectionTimeout = @(10.0 * 60.0); // seconds
+    // Reconnect up to 10 times, doubling the interval between attempts from
+    // 100 milliseconds, up to a maximum of 60 seconds.
+    PTDiffusionRetryPolicy *const retryPolicy =
+        [[PTDiffusionRetryPolicy alloc] initWithInterval:100
+                                                attempts:10
+                                                 backoff:^NSUInteger(const NSUInteger interval, const NSUInteger attempt)
+    {
+        return MIN(interval << MIN(attempt - 1, 10), 60000);
+    }];
 
-    // Set the reconnection strategy to be used.
-    sessionConfiguration.reconnectionStrategy = [ExponentialBackoffReconnectionStrategy new];
+    // Set the maximum amount of time we'll try and reconnect for to 10 minutes.
+    // If no timeout is specified, using initWithRetryPolicy:, it is calculated
+    // from the retry policy.
+    sessionConfiguration.reconnectionPolicy =
+        [[PTDiffusionReconnectionPolicy alloc] initWithRetryPolicy:retryPolicy
+                                                           timeout:10.0 * 60.0 // seconds
+                                                recoveryBufferSize:[PTDiffusionSessionConfiguration defaultRecoveryBufferSize]];
 
     // Start connecting asynchronously.
     [PTDiffusionSession openWithURL:url
@@ -52,30 +61,6 @@
         // Set ivar to maintain a strong reference to the session.
         self->_session = session;
     }];
-}
-
-@end
-
-@implementation ExponentialBackoffReconnectionStrategy {
-    NSUInteger _attemptCount;
-}
-
--(void)         diffusionSession:(PTDiffusionSession *const)session
-    wishesToReconnectWithAttempt:(PTDiffusionSessionReconnectionAttempt *const)attempt {
-    // Limit the maximum time to delay between reconnection attempts to 60 seconds.
-    const NSTimeInterval maximumAttemptInterval = 60.0;
-
-    // Compute delay for exponential backoff based on the number of attempts so far.
-    const NSTimeInterval delay = MIN(pow(2.0, (double)_attemptCount++) * 0.1, maximumAttemptInterval);
-
-    // Schedule asynchronous execution.
-    NSLog(@"Reconnection attempt scheduled for %.2fs", delay);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)),
-        dispatch_get_main_queue(), ^
-    {
-        NSLog(@"Attempting reconnection.");
-        [attempt start];
-    });
 }
 
 @end

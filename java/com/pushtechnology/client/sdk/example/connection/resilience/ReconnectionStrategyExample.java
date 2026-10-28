@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.connection.resilience;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -23,14 +21,14 @@ import org.slf4j.LoggerFactory;
 
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.session.Session;
-import com.pushtechnology.diffusion.client.session.reconnect.ReconnectionStrategy;
+import com.pushtechnology.diffusion.client.session.reconnect.ReconnectionPolicy;
 
 /**
- * This example demonstrates how to implement a custom reconnection strategy
- * for a Diffusion session.
+ * This example demonstrates how to configure a reconnection policy for a
+ * Diffusion session.
  * <P>
- * The example defines a custom ReconnectionStrategy that limits the number of
- * reconnection attempts and schedules each attempt with a fixed delay.
+ * The example defines a reconnection policy that limits the number of
+ * reconnection attempts and makes each attempt after a fixed interval.
  *
  * @author DiffusionData Limited
  */
@@ -44,7 +42,7 @@ public class ReconnectionStrategyExample {
         final Session session = Diffusion.sessions()
             .principal("admin")
             .password("password")
-            .reconnectionStrategy(new MyReconnectionStrategy())
+            .reconnectionPolicy(reconnectionPolicy())
             .open("ws://localhost:8080");
 
         LOG.info("Connected, session identifier: '{}'.", session.getSessionId());
@@ -54,20 +52,15 @@ public class ReconnectionStrategyExample {
         session.close();
     }
 
-    static class MyReconnectionStrategy implements ReconnectionStrategy {
-
-        private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-        @Override
-        public void performReconnection(ReconnectionAttempt reconnectionAttempt) {
-            // The attempt number is provided by the reconnection attempt,
-            // restarting at 1 for each new disconnection
-            if (reconnectionAttempt.getAttempt() <= 10) {
-                scheduler.schedule(reconnectionAttempt::start, 3000, TimeUnit.MILLISECONDS);
-            }
-            else {
-                reconnectionAttempt.abort();
-            }
-        }
+    static ReconnectionPolicy reconnectionPolicy() {
+        // Make up to 10 reconnection attempts, 3 seconds apart. The attempts
+        // restart for each new disconnection. As no timeout is specified, it
+        // is calculated from the retry policy.
+        return Diffusion.newReconnectionPolicyBuilder()
+            .retryPolicy(Diffusion.newRetryPolicyBuilder()
+                .interval(3, TimeUnit.SECONDS)
+                .attempts(10)
+                .build())
+            .build();
     }
 }

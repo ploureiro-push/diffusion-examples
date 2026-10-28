@@ -1,5 +1,5 @@
 """
-Copyright © 2024 Diffusion Data Ltd.
+Copyright © 2024 - 2026 Diffusion Data Ltd.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ limitations under the License.
 
 import asyncio
 from diffusion import sessions, Credentials
-from diffusion.session.retry_strategy import RetryStrategy
+from diffusion.session import RetryPolicy
 
 from diffusion_examples.utils.program import Example
 
@@ -28,15 +28,15 @@ class InitialSessionEstablishmentRetryMechanism(Example):
         principal: str = "<principal>",
         password: str = "<password>",
     ):
-        # Create an initial session establishment retry strategy.
-        # It will attempt 5 times to connect to the Diffusion server,
-        # with 250 milliseconds interval between attempts.
-        retry_strategy = RetryStrategy(interval=250, attempts=5)
+        # Create an initial session establishment retry policy.
+        # It will retry up to 5 times to connect to the Diffusion server,
+        # with an interval of 250 milliseconds (0.25 seconds) between attempts.
+        retry_policy = RetryPolicy(interval=0.25, attempts=5)
         async with (
             sessions()
             .principal(principal)
             .credentials(Credentials(password))
-            .initial_retry_strategy(retry_strategy)
+            .initial_retry_policy(retry_policy)
             .open(server_url) as session
         ):
             print(f"Connected. Session Identifier: {session.session_id}.")

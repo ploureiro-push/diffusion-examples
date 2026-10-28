@@ -29,15 +29,18 @@ namespace PushTechnology.ClientInterface.Examples.Connection.Resilience
         {
             string serverUrl = args[0];
 
-            // Create an initial session establishment retry strategy.
-            // It will attempt 5 times to connect to the Diffusion server,
-            // with 250 milliseconds interval between attempts. 
-            var retryStrategy = new RetryStrategy(250, 5);
+            // Create an initial session establishment retry policy.
+            // It will retry up to 5 times to connect to the Diffusion server,
+            // with an interval of 250 milliseconds between attempts.
+            var retryPolicy = Diffusion.NewRetryPolicyBuilder()
+                .Interval(TimeSpan.FromMilliseconds(250))
+                .Attempts(5)
+                .Build();
 
             var session = Diffusion.Sessions
                 .Principal("admin")
                 .Credentials(Diffusion.Credentials.Password("password"))
-                .InitialRetryStrategy(retryStrategy)
+                .InitialRetryPolicy(retryPolicy)
                 .Open(serverUrl);
 
             WriteLine($"Connected. Session Identifier: {session.SessionId}.");

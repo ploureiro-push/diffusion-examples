@@ -55,13 +55,13 @@
         PTDiffusionTopicSpecification * const specification = [[PTDiffusionTopicSpecification alloc] initWithType:PTDiffusionTopicType_JSON];
         [builder topicSpecification:specification];
 
-        // define a RetryStrategy in case the update stream needs to recover from a transient error
+        // define a retry policy in case the update stream needs to recover from a transient error
         // 250ms interval between attempts, for a total of 10 attempts
-        PTDiffusionRetryStrategy *const retryStrategy = [[PTDiffusionRetryStrategy alloc] initWithInterval:250 andAttempts:10];
+        PTDiffusionRetryPolicy *const retryPolicy = [[PTDiffusionRetryPolicy alloc] initWithInterval:250 attempts:10];
 
         // create a Recoverable Update Stream
         PTDiffusionRecoverableUpdateStream<PTDiffusionJSON*>* const updateStream =
-            [builder recoverableJsonUpdateStreamWithPath:@"a/b/c" retryStrategy:retryStrategy];
+            [builder recoverableJsonUpdateStreamWithPath:@"a/b/c" retryPolicy:retryPolicy];
 
         // define a completion handler for processing the asynchronous response
         __weak PTDiffusionRecoverableUpdateStream<PTDiffusionJSON*>* const weakUpdateStream = updateStream;

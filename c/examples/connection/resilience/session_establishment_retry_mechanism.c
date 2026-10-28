@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,13 @@ void run_example(
     const char *principal,
     CREDENTIALS_T *credentials)
 {
-    DIFFUSION_RETRY_STRATEGY_T *strategy = diffusion_retry_strategy_create(250, 10, NULL);
+    // Retry up to 10 times to establish the session, 250 milliseconds apart
+    DIFFUSION_RETRY_POLICY_T *retry_policy = diffusion_retry_policy_create(250, 10, NULL);
 
     DIFFUSION_SESSION_FACTORY_T *session_factory = diffusion_session_factory_init();
     diffusion_session_factory_principal(session_factory, principal);
     diffusion_session_factory_credentials(session_factory, credentials);
-    diffusion_session_factory_initial_retry_strategy(session_factory, strategy);
+    diffusion_session_factory_initial_retry_policy(session_factory, retry_policy);
 
     SESSION_T *session = session_create_with_session_factory(session_factory, url);
 
@@ -42,5 +43,5 @@ void run_example(
     session_close(session, NULL);
     session_free(session);
     diffusion_session_factory_free(session_factory);
-    diffusion_retry_strategy_free(strategy);
+    diffusion_retry_policy_free(retry_policy);
 }

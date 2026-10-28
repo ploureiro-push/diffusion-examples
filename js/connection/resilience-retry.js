@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Diffusion Data Ltd.
+ * Copyright (C) 2024 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ const diffusion = require('diffusion');
 export async function initialConnectRetryExample() {
 
     /*
-        A retry strategy provided within the connection options is employed when establishing
+        A retry policy provided within the connection options is employed when establishing
         a connection across the requested transport options.
      */
     let session;
@@ -31,8 +31,8 @@ export async function initialConnectRetryExample() {
             credentials: 'password',
             // Optional transports property stated for clarity only (this is where retry logic will apply).
             transports: ['WS'],
-            // Fixed RetryDescriptor based strategy (10 attempts, at fixed intervals)
-            retry: {
+            // Retry up to 10 times, at a fixed interval
+            retryPolicy: {
                 attempts: 10,
                 interval: 250
             }
@@ -45,7 +45,7 @@ export async function initialConnectRetryExample() {
 
 
     /*
-        An alternative form of retry strategy, allowing more control
+        A retry policy with a backoff, which adjusts the interval before each attempt
      */
     let session2;
     try {
@@ -57,12 +57,11 @@ export async function initialConnectRetryExample() {
             credentials: 'password',
             // Optional transports property stated for clarity only (this is where retry logic will apply).
             transports: ['WS'],
-            // Dynamic RetryController (10 attempts, increasing intervals)
-            retry: (retryAttempts) => {
-                if (retryAttempts > 9) {
-                    return null;
-                }
-                return (retryAttempts + 1) * 250;
+            // Retry up to 10 times, at an interval that increases by 250 milliseconds with each attempt
+            retryPolicy: {
+                attempts: 10,
+                interval: 250,
+                backoff: (interval, attempt) => interval * attempt
             }
         });
     } catch (err) {
