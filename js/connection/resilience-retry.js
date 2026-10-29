@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function initialConnectRetryExample() {
-    /// tag::connection_resilience_session_establishment_retry_mechanism[]
     let session;
     try {
         // Connect to the server.
@@ -38,11 +37,6 @@ export async function initialConnectRetryExample() {
     console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
 
     // Insert work here
-    /// tag::log
-    expect(session.sessionId).not.toBeNull();
-    expect(session.isConnected()).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::connection_resilience_session_establishment_retry_mechanism[]
 }

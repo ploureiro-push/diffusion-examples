@@ -21,7 +21,6 @@ import {
 } from 'diffusion';
 
 export async function remoteServersCreatePrimaryInitiator(): Promise<void> {
-    /// tag::remote_servers_create_primary_initiator[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -38,14 +37,8 @@ export async function remoteServersCreatePrimaryInitiator(): Promise<void> {
             'High Volume Connector'
         );
     await session.remoteServers.createRemoteServer(definition);
-    /// tag::log
-    const remoteServers = await session.remoteServers.listRemoteServers();
-    expect(remoteServers.length).toBe(1);
-    expect(remoteServers[0].name).toBe('Remote Server 1');
-    /// end::log
 
     // Clean up
     await session.remoteServers.removeRemoteServer('Remote Server 1');
     await session.closeSession();
-    /// end::remote_servers_create_primary_initiator[]
 }

@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue } from '../../../../../test/util';
-/// end::log
 
 export async function topicViewsDslSourcePathDirective(): Promise<void> {
-    /// tag::topic_views_dsl_source_path_directive[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -71,17 +67,4 @@ export async function topicViewsDslSourcePathDirective(): Promise<void> {
     console.log(`Topic View ${topicView3.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_source_path_directive[]
-    /// tag::log
-    const expectedValue = {
-        account: '1234',
-        balance: {
-            amount: 12.57,
-            currency: 'USD'
-        }
-    };
-    await expectJsonTopicToHaveValue('views/a/b/c/d/e/f/g', expectedValue);
-    await expectJsonTopicToHaveValue('views/c/d/e/f/g', expectedValue);
-    await expectJsonTopicToHaveValue('views/d/e/f/g', expectedValue);
-    /// end::log
 }

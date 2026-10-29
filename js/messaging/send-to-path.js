@@ -14,21 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester, promiseWithResolvers } = require('../../../test/util');
-/// end::log
 
 export async function messagingSendToPath() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Received message: Hello'],
-        ['Received response: Goodbye'],
-        ['Message handler was closed.'],
-    ]);
-
-    const closedPromise = promiseWithResolvers();
-    /// end::log
-    /// tag::messaging_send_to_path[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -40,9 +27,6 @@ export async function messagingSendToPath() {
     const handler = {
         onRequest: (request, context, responder) => {
             console.log(`Received message: ${request}`);
-            /// tag::log
-            check.log(`Received message: ${request}`);
-            /// end::log
             responder.respond('Goodbye');
         },
         onError: (error) => {
@@ -50,10 +34,6 @@ export async function messagingSendToPath() {
         },
         onClose: () => {
             console.log('Message handler was closed.');
-            /// tag::log
-            check.log('Message handler was closed.');
-            closedPromise.resolve();
-            /// end::log
         }
     };
 
@@ -69,15 +49,7 @@ export async function messagingSendToPath() {
 
     const response = await session2.messages.sendRequest('my/message/path', 'Hello');
     console.log(`Received response: ${response}`);
-    /// tag::log
-    check.log(`Received response: ${response}`);
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
-    /// end::messaging_send_to_path[]
-    /// tag::log
-    await closedPromise.promise;
-    await check.done();
-    /// end::log
 }

@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function securityControlSetGlobalPermissions(): Promise<void> {
-    /// tag::security_control_set_global_permissions[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -38,5 +37,4 @@ export async function securityControlSetGlobalPermissions(): Promise<void> {
         .build();
     await session.security.updateSecurityStore(securityScriptCleanup);
     await session.closeSession();
-    /// end::security_control_set_global_permissions[]
 }

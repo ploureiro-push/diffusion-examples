@@ -14,18 +14,8 @@
  *******************************************************************************/
 
 import { connect, newBranchMappingTableBuilder, Session } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../../test/util';
-/// end::log
 
 export async function sessionTreesListSessionTreeBranchesWithMappings(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'my/personal/path',
-        'my/alternate/path',
-    ]]);
-    /// end::log
-    /// tag::session_trees_list_session_tree_branches_with_mappings[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -51,14 +41,7 @@ export async function sessionTreesListSessionTreeBranchesWithMappings(): Promise
     const sessionTrees = await session.sessionTrees.getSessionTreeBranchesWithMappings();
     for (const sessionTree of sessionTrees) {
         console.log(sessionTree);
-        /// tag::log
-        check.log(sessionTree);
-        /// end::log
     }
 
     await session.closeSession();
-    /// end::session_trees_list_session_tree_branches_with_mappings[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

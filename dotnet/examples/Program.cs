@@ -1,5 +1,5 @@
 ﻿/**
-* Copyright © 2023 - 2025 Diffusion Data Ltd.
+* Copyright © 2023 - 2026 Diffusion Data Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ using PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityContro
 using PushTechnology.ClientInterface.Examples.SessionManagement;
 using PushTechnology.ClientInterface.Examples.SessionManagement.ClientControl;
 using PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL;
+using NUnit.Framework;
 
 namespace PushTechnology.ClientInterface.Examples
 {
@@ -61,6 +62,8 @@ namespace PushTechnology.ClientInterface.Examples
             var url = "ws://localhost:8080";
             var secureUrl = "wss://localhost:8080";
 
+            try
+            {
             using (var runner = new ExampleRunner())
             {
                 // Start the connect synchronously example
@@ -336,6 +339,12 @@ namespace PushTechnology.ClientInterface.Examples
                 // Start the subscription control example
                 //runner.Start(new SubscriptionControl(), url);
 
+                // Start the revoke authentication example
+                //runner.Start(new RevokeAuthentication(), url);
+
+                // Start the session expiry example
+                //runner.Start(new SessionExpiry(), url);
+
                 // Start the authentication control example
                 //runner.Start(new AuthenticationControl(), url);
 
@@ -483,6 +492,12 @@ namespace PushTechnology.ClientInterface.Examples
                 // Start the remove remote servers example
                 //runner.Start(new RemoveRemoteServers(), url);
             }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"One or more examples failed: {ex}");
+                Environment.ExitCode = 1;
+            }
         }
 
         /// <summary>
@@ -511,8 +526,14 @@ namespace PushTechnology.ClientInterface.Examples
 
             public async Task RunWrapper(CancellationToken cancel, string[] args)
             {
-                await Run(cancel, args);
-                CompletedEvent.Set();
+                try
+                {
+                    await Run(cancel, args);
+                }
+                finally
+                {
+                    CompletedEvent.Set();
+                }
             }
 
             public abstract Task Run(CancellationToken cancel, string[] args);

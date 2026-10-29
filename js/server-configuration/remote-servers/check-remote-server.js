@@ -14,18 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../../test/util');
-/// end::log
 
 export async function remoteServersCheck() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Remote Server 1 (ws://new.server.url.com): connection failed (Feature \'REMOTE_CONNECTIONS\' is not licensed.)',
-        'Remote Server 2 (ws://another.server.url.com): connection failed (Feature \'REMOTE_CONNECTIONS\' is not licensed.)'
-    ]]);
-    /// end::log
-    /// tag::remote_servers_check[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -80,17 +70,10 @@ export async function remoteServersCheck() {
                 break;
         }
         console.log(`${remoteServer.name} (${remoteServer.url}): ${statusMessage}`);
-        /// tag::log
-        check.log(`${remoteServer.name} (${remoteServer.url}): ${statusMessage}`);
-        /// end::log
     }
 
     // Clean up
     await session.remoteServers.removeRemoteServer('Remote Server 1');
     await session.remoteServers.removeRemoteServer('Remote Server 2');
     await session.closeSession();
-    /// end::remote_servers_check[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

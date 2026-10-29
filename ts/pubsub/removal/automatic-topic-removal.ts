@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics, topicUpdate } from 'diffusion';
-/// tag::log
-import { expectTopicCounts } from '../../../../test/util';
-/// end::log
 
 export async function pubSubAutomaticTopicRemoval(): Promise<void> {
-    /// tag::pub_sub_remove_automatic_topic_removal[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -37,9 +33,6 @@ export async function pubSubAutomaticTopicRemoval(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult1.added).toBeTrue();
-    /// end::log
 
     const specification2 = new topics.TopicSpecification(topics.TopicType.JSON, {
         REMOVAL: 'when subscriptions < 1 for 10m'
@@ -50,9 +43,6 @@ export async function pubSubAutomaticTopicRemoval(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult2.added).toBeTrue();
-    /// end::log
 
     const specification3 = new topics.TopicSpecification(topics.TopicType.JSON, {
         REMOVAL: 'when local subscriptions < 1 for 10m'
@@ -63,9 +53,6 @@ export async function pubSubAutomaticTopicRemoval(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult3.added).toBeTrue();
-    /// end::log
 
     const specification4 = new topics.TopicSpecification(topics.TopicType.JSON, {
         REMOVAL: 'when no updates for 10m'
@@ -76,9 +63,6 @@ export async function pubSubAutomaticTopicRemoval(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult4.added).toBeTrue();
-    /// end::log
 
     const specification5 = new topics.TopicSpecification(topics.TopicType.JSON, {
         REMOVAL: 'when no session has \'$Principal is "client"\' for 1h'
@@ -89,9 +73,6 @@ export async function pubSubAutomaticTopicRemoval(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult5.added).toBeTrue();
-    /// end::log
 
     const specification6 = new topics.TopicSpecification(topics.TopicType.JSON, {
         REMOVAL: 'when no local session has \'Department is "Accounts"\' for 1h after 1d'
@@ -102,9 +83,6 @@ export async function pubSubAutomaticTopicRemoval(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult6.added).toBeTrue();
-    /// end::log
 
     const specification7 = new topics.TopicSpecification(topics.TopicType.JSON, {
         REMOVAL: 'when subscriptions < 1 for 10m or no updates for 20m'
@@ -115,9 +93,6 @@ export async function pubSubAutomaticTopicRemoval(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult7.added).toBeTrue();
-    /// end::log
 
     const specification8 = new topics.TopicSpecification(topics.TopicType.JSON, {
         REMOVAL: 'when subscriptions < 1 for 10m and no updates for 20m'
@@ -128,22 +103,6 @@ export async function pubSubAutomaticTopicRemoval(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult8.added).toBeTrue();
-    /// end::log
 
     await session.closeSession();
-    /// end::pub_sub_remove_automatic_topic_removal[]
-    /// tag::log
-    await expectTopicCounts({
-        'my/topic/path/to/be/removed/time/after': 1,
-        'my/topic/path/to/be/removed/subscriptions': 1,
-        'my/topic/path/to/be/removed/local/subscriptions': 1,
-        'my/topic/path/to/be/removed/no/updates': 1,
-        'my/topic/path/to/be/removed/no/session': 1,
-        'my/topic/path/to/be/removed/no/local/session': 1,
-        'my/topic/path/to/be/removed/subcriptions/or/updates': 1,
-        'my/topic/path/to/be/removed/subcriptions/and/updates': 1
-    });
-    /// end::log
 }

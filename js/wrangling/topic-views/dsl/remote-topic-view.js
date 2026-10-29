@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function topicViewsDslRemoteTopicView() {
-    /// tag::topic_views_dsl_remote_topic_view[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -43,5 +42,4 @@ export async function topicViewsDslRemoteTopicView() {
 
     await session.remoteServers.removeRemoteServer('Remote Server 1');
     await session.closeSession();
-    /// end::topic_views_dsl_remote_topic_view[]
 }

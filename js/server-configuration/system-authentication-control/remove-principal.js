@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function removePrincipal() {
-    /// tag::system_authentication_control_remove_principal[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -36,5 +35,4 @@ export async function removePrincipal() {
     await session.security.updateAuthenticationStore(authenticationScript2);
 
     await session.closeSession();
-    /// end::system_authentication_control_remove_principal[]
 }

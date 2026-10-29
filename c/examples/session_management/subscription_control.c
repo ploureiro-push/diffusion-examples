@@ -51,7 +51,7 @@ static int on_session_open(
 {
     char *principal = hash_get(request->properties, "$Principal");
 
-    if (strcmp(principal, "client") != 0) {
+    if (principal == NULL || strcmp(principal, "client") != 0) {
         // Not the right type of principal, nothing to do.
         return HANDLER_SUCCESS;
     }

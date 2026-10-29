@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,6 +117,9 @@ void run_example(
 
     diffusion_session_trees_get_branch_mapping_table(session, get_table_params_2, NULL);
     coordinator_wait(coordinator);
+    utils_remove_branch_mapping_table(session, "my/personal/path");
+    utils_remove_branch_mapping_table(session, "my/alternate/path");
+    utils_remove_topic(session, "?.*//");
 
     session_close(session, NULL);
     session_free(session);

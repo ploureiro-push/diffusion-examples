@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ static int on_path_permissions_received(
             printf("\t%s\n", utils_print_path_permission(permission));
         }
         free(values);
+        coordinator_broadcast((COORDINATOR_T *) context);
         return HANDLER_SUCCESS;
 }
 

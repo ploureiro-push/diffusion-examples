@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue } = require('../../../../test/util');
-/// end::log
 
 export async function updateSreamSetExample() {
-    /// tag::pub_sub_publish_set_topic_via_update_stream[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -38,8 +34,4 @@ export async function updateSreamSetExample() {
     console.log('Topic value has been set.');
 
     await session.closeSession();
-    /// end::pub_sub_publish_set_topic_via_update_stream[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path/with/update/stream', { diffusion: ['data', 'more data'] });
-    /// end::log
 }

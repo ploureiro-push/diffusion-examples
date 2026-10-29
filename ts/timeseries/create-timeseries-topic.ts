@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 import { connect, topics } from 'diffusion';
-/// tag::log
-import { expectTopicExists } from '../../../test/util';
-/// end::log
 
 export async function timeSeriesCreateTopic(): Promise<void> {
-    /// tag::time_series_create_topic[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -40,13 +36,6 @@ export async function timeSeriesCreateTopic(): Promise<void> {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(addResult.added).toBeTrue();
-    /// end::log
 
     await session.closeSession();
-    /// end::time_series_create_topic[]
-    /// tag::log
-    await expectTopicExists('my/time/series/topic/path');
-    /// end::log
 }

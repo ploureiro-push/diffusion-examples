@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,13 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.API
             {
                 WriteLine($"Topic View {topicView.Name}: {topicView.Specification} ({string.Join(",", topicView.Roles.ToList())})");
             }
-            session.Close();
+
+            await session.TopicViews.RemoveTopicViewAsync("topic_view_1", cancellationToken);
+            await session.TopicViews.RemoveTopicViewAsync("topic_view_2", cancellationToken);
+
+            await session.TopicControl.RemoveTopicsAsync("my/topic/path", cancellationToken);
+            await session.TopicControl.RemoveTopicsAsync("my/topic/path/array", cancellationToken);
+                        session.Close();
         }
     }
 }

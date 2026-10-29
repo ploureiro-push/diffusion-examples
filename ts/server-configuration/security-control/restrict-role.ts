@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function securityControlRestrictRole(): Promise<void> {
-    /// tag::security_control_restrict_role_edit_permissions[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -39,5 +38,4 @@ export async function securityControlRestrictRole(): Promise<void> {
         .build();
     await session.security.updateAuthenticationStore(securityScriptCleanup);
     await session.closeSession();
-    /// end::security_control_restrict_role_edit_permissions[]
 }

@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function connectExample(): Promise<void> {
-    /// tag::connection_establishment_connect_async[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -28,11 +27,6 @@ export async function connectExample(): Promise<void> {
     console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
 
     // Insert work here
-    /// tag::log
-    expect(session.sessionId).not.toBeNull();
-    expect(session.isConnected()).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::connection_establishment_connect_async[]
 }

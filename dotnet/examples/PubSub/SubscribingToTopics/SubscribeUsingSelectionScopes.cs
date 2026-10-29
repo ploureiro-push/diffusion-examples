@@ -95,6 +95,8 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.SubscribingToTopics
             await session.SubscriptionControl.UnsubscribeAllScopesAsync(session.SessionId, myOtherPath);
 
             componentB.RemoveStream(streamB);
+
+            session.Close();
         }
 
         private async Task AddTopic(ISession session, string topic, TopicType type, CancellationToken cancellationToken)

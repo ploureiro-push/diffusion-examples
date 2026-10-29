@@ -16,7 +16,6 @@
 import { clients, connect } from 'diffusion';
 
 export async function trustClientProposedPropertyIn(): Promise<void> {
-    /// tag::system_authentication_control_trust_client_proposed_property_in[]
     // Connect to the server.
     const session1 = await connect({
         host: 'localhost',
@@ -48,9 +47,6 @@ export async function trustClientProposedPropertyIn(): Promise<void> {
     for (const key of Object.keys(properties2)) {
         console.log(`  ${key}: ${properties2[key]}`);
     }
-    /// tag::log
-    expect(properties2['Flintstone']).toBeUndefined();
-    /// end::log
 
     await session2.closeSession();
 
@@ -72,18 +68,8 @@ export async function trustClientProposedPropertyIn(): Promise<void> {
     for (const key of Object.keys(properties3)) {
         console.log(`  ${key}: ${properties3[key]}`);
     }
-    /// tag::log
-    expect(properties3['Flintstone']).toBe('Fred');
-    /// end::log
 
     await session3.closeSession();
 
-    /// tag::log
-    const restoreScript = session1.security.authenticationScriptBuilder()
-        .ignoreClientProposedProperty('Flintstone')
-        .build();
-    await session1.security.updateAuthenticationStore(restoreScript);
-    /// end::log
     await session1.closeSession();
-    /// end::system_authentication_control_trust_client_proposed_property_in[]
 }

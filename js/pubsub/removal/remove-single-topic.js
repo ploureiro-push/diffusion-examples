@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectTopicCounts } = require('../../../../test/util');
-/// end::log
 
 export async function pubSubRemoveSingleTopicViaPath() {
-    /// tag::pub_sub_remove_single_topic_via_path[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -41,9 +37,6 @@ export async function pubSubRemoveSingleTopicViaPath() {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult1).toBe(diffusion.topicUpdate.TopicCreationResult.CREATED);
-    /// end::log
 
     const jsonData2 = diffusion.datatypes.json().from({ diffusion: [ 'no data' ] });
     const topicCreationResult2 = await session.topicUpdate.set(
@@ -57,9 +50,6 @@ export async function pubSubRemoveSingleTopicViaPath() {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult2).toBe(diffusion.topicUpdate.TopicCreationResult.CREATED);
-    /// end::log
 
     const jsonData3 = diffusion.datatypes.json().from({ diffusion: [ 'no data either' ] });
     const topicCreationResult3 = await session.topicUpdate.set(
@@ -73,20 +63,9 @@ export async function pubSubRemoveSingleTopicViaPath() {
     } else {
         console.log('Topic already exists.');
     }
-    /// tag::log
-    expect(topicCreationResult3).toBe(diffusion.topicUpdate.TopicCreationResult.CREATED);
-    /// end::log
 
     await session.topics.remove('my/topic/path/to/be/removed');
     console.log('Topic has been removed.');
 
     await session.closeSession();
-    /// end::pub_sub_remove_single_topic_via_path[]
-    /// tag::log
-    await expectTopicCounts({
-        'my/topic/path/to/be/removed': 0,
-        'my/topic/path/will/not/be/removed': 1,
-        'my/topic/path/will/not/be/removed/either': 1
-    });
-    /// end::log
 }

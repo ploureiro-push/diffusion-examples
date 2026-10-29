@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function verifyPassword() {
-    /// tag::system_authentication_control_verify_password[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -58,21 +57,11 @@ export async function verifyPassword() {
             principal: 'control',
             credentials: 'new_password'
         });
-        /// tag::log
-        fail('Connection should be denied');
-        /// end::log
     }
     catch (err) {
         // expected to fail
         console.error('Could not connect', err.message);
     }
 
-    /// tag::log
-    const restoreScript = session1.security.authenticationScriptBuilder()
-        .setPassword('control', 'password')
-        .build();
-    await session1.security.updateAuthenticationStore(restoreScript);
-    /// end::log
     await session1.closeSession();
-    /// end::system_authentication_control_verify_password[]
 }

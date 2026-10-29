@@ -1194,7 +1194,7 @@ const char *utils_print_global_permission(void *value)
     if (value == NULL) {
         return "Unknown value";
     }
-    return SECURITY_GLOBAL_PERMISSIONS_NAMES[*((uint32_t *)value)];
+    return SECURITY_GLOBAL_PERMISSIONS_NAMES[*((unsigned char *)value)];
 }
 
 const char *utils_print_path_permission(void *value)
@@ -1202,7 +1202,7 @@ const char *utils_print_path_permission(void *value)
     if (value == NULL) {
         return "Unknown value";
     }
-    return SECURITY_PATH_PERMISSIONS_NAMES[*((uint32_t *)value)];
+    return SECURITY_PATH_PERMISSIONS_NAMES[*((unsigned char *)value)];
 }
 
 const char *utils_print_string(void *value)

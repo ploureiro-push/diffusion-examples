@@ -14,19 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../../test/util');
-/// end::log
 
 export async function sessionTreesPutAndRemoveBranchMappingTable() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        '$Principal is "admin": my/topic/path/for/admin',
-        '$Principal is "control": my/topic/path/for/control',
-        '$Principal is "": my/topic/path/for/anonymous'
-    ]]);
-    /// end::log
-    /// tag::session_trees_put_and_remove_branch_mapping_table[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -41,24 +30,10 @@ export async function sessionTreesPutAndRemoveBranchMappingTable() {
         .addBranchMapping('$Principal is ""', 'my/topic/path/for/anonymous')
         .create('my/personal/path');
     await session.sessionTrees.putBranchMappingTable(branchMappingTable);
-    /// tag::log
-    const mappingTable = await session.sessionTrees.getBranchMappingTable('my/personal/path');
-    for (const branchMapping of mappingTable.getBranchMappings()) {
-        check.log(`${branchMapping.sessionFilter}: ${branchMapping.topicTreeBranch}`);
-    }
-    /// end::log
 
     const emptyBranchMappingTable = diffusion.newBranchMappingTableBuilder()
         .create('my/personal/path');
     await session.sessionTrees.putBranchMappingTable(emptyBranchMappingTable);
-    /// tag::log
-    const mappingTable2 = await session.sessionTrees.getBranchMappingTable('my/personal/path');
-    expect(mappingTable2.getBranchMappings().length).toBe(0);
-    /// end::log
 
     await session.closeSession();
-    /// end::session_trees_put_and_remove_branch_mapping_table[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

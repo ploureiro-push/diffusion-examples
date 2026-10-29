@@ -16,10 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function timeSeriesRangeQuery() {
-    /// tag::log
-    const values = [];
-    /// end::log
-    /// tag::time_series_range_query[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -45,9 +41,6 @@ export async function timeSeriesRangeQuery() {
             diffusion.datatypes.double()
         );
         metaData.push(result);
-        /// tag::log
-        values.push(value);
-        /// end::log
     }
 
     const eventToEdit = metaData[10];
@@ -62,26 +55,10 @@ export async function timeSeriesRangeQuery() {
         .from(metaData[5].sequence)
         .to(metaData[15].sequence)
         .selectFrom('my/time/series/topic/path');
-    /// tag::log
-    let count = 0;
-    expect(queryResult.events.length).toBe(11);
-    /// end::log
     for (const event of queryResult.events) {
         const value = diffusion.datatypes.double().readValue(event.value);
         console.log(`${event.sequence} (${event.timestamp}): ${value}`);
-        /// tag::log
-        if (count === 5) {
-            expect(value).toBe(3.14);
-            expect(event.sequence).toBe(25);
-        } else {
-            expect(value).toBe(values[5 + count]);
-            expect(event.sequence).toBe(metaData[5 + count].sequence);
-            expect(event.timestamp).toBe(metaData[5 + count].timestamp);
-        }
-        count++;
-        /// end::log
     }
 
     await session.closeSession();
-    /// end::time_series_range_query[]
 }

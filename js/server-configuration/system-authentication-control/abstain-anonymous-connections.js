@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function abstainAnonymousConnections() {
-    /// tag::system_authentication_control_abstain_anonymous_connections[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -61,23 +60,12 @@ export async function abstainAnonymousConnections() {
             host: 'localhost',
             port: 8080
         });
-        /// tag::log
-        fail('Anonymous connection should be denied');
-        /// end::log
     }
     catch (err) {
         // expected to fail
         console.error('Could not connect', err.message);
     }
 
-    /// tag::log
-    const restoreScript = session1.security.authenticationScriptBuilder()
-        .denyAnonymousConnections()
-        .allowAnonymousConnections(['CLIENT'])
-        .build();
-    await session1.security.updateAuthenticationStore(restoreScript);
-    /// end::log
     await session1.closeSession();
     await session2.closeSession();
-    /// end::system_authentication_control_abstain_anonymous_connections[]
 }

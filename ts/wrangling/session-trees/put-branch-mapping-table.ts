@@ -14,19 +14,8 @@
  *******************************************************************************/
 
 import { connect, newBranchMappingTableBuilder } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../../test/util';
-/// end::log
 
 export async function sessionTreesPutBranchMappingTable(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        '$Principal is "admin": my/topic/path/for/admin',
-        '$Principal is "control": my/topic/path/for/control',
-        '$Principal is "": my/topic/path/for/anonymous'
-    ]]);
-    /// end::log
-    /// tag::session_trees_put_branch_mapping_table[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -41,16 +30,6 @@ export async function sessionTreesPutBranchMappingTable(): Promise<void> {
         .addBranchMapping('$Principal is ""', 'my/topic/path/for/anonymous')
         .create('my/personal/path');
     await session.sessionTrees.putBranchMappingTable(branchMappingTable);
-    /// tag::log
-    const mappingTable = await session.sessionTrees.getBranchMappingTable('my/personal/path');
-    for (const branchMapping of mappingTable.getBranchMappings()) {
-        check.log(`${branchMapping.sessionFilter}: ${branchMapping.topicTreeBranch}`);
-    }
-    /// end::log
 
     await session.closeSession();
-    /// end::session_trees_put_branch_mapping_table[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

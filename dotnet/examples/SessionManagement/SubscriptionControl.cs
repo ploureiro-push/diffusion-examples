@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2025 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,8 +63,14 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
 
             var valueStream = new ValueStream();
             session2.Topics.AddStream(topicSelector, valueStream);
+            await Task.Delay(10_000);
+
+            session2.Topics.RemoveStream(valueStream);
+            var result = await session.TopicControl.RemoveTopicsAsync("?my/", cancellationToken);
 
             session2.Close();
+            await registration.CloseAsync();
+
             session.Close();
         }
 

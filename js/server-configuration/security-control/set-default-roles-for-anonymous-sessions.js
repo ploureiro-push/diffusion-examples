@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function securityControlSetDefaultRolesForAnonymousSessions() {
-    /// tag::security_control_set_default_roles_for_anonymous_sessions[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -38,5 +37,4 @@ export async function securityControlSetDefaultRolesForAnonymousSessions() {
         .build();
     await session.security.updateSecurityStore(securityScriptCleanup);
     await session.closeSession();
-    /// end::security_control_set_default_roles_for_anonymous_sessions[]
 }

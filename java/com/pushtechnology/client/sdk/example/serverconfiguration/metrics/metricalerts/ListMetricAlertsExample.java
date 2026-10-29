@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.pushtechnology.diffusion.client.Diffusion;
 import com.pushtechnology.diffusion.client.features.control.Metrics;
+import com.pushtechnology.diffusion.client.features.control.topics.TopicControl;
 import com.pushtechnology.diffusion.client.session.Session;
 
 /**
@@ -52,6 +53,11 @@ public class ListMetricAlertsExample {
 
         final List<Metrics.MetricAlert> alerts = metrics.listMetricAlerts().join();
         alerts.forEach(alert -> LOG.info(alert.getName()));
+
+        for (int i = 0; i < 5; i++) {
+            metrics.removeMetricAlert("alert" + i).join();
+        }
+        session.feature(TopicControl.class).removeTopics("?my/topic/path//").join();
 
         session.close();
     }

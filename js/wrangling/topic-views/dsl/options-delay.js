@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslOptionsDelay() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [ 'Subscribed to my/topic/path' ]
-    ]);
-    /// end::log
-    /// tag::topic_views_dsl_options_delay[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -44,20 +35,12 @@ export async function topicViewsDslOptionsDelay() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue} to ${newValue}`);
-            /// tag::log
-            if (topic !== 'my/topic/path') {
-                check.log(`${topic} changed from ${oldValue}`);
-            }
-            /// end::log
         }
     });
 
@@ -80,8 +63,4 @@ export async function topicViewsDslOptionsDelay() {
     }
 
     await session.closeSession();
-    /// end::topic_views_dsl_options_delay[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

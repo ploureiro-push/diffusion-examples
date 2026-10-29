@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function allowAnonymousConnections() {
-    /// tag::system_authentication_control_allow_anonymous_connections[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -36,14 +35,6 @@ export async function allowAnonymousConnections() {
     });
     console.log(`Anonymous session has been established: ${anonymous.sessionId}`);
 
-    /// tag::log
-    const restoreScript = session.security.authenticationScriptBuilder()
-        .denyAnonymousConnections()
-        .allowAnonymousConnections(['CLIENT'])
-        .build();
-    await session.security.updateAuthenticationStore(restoreScript);
-    /// end::log
     await anonymous.closeSession();
     await session.closeSession();
-    /// end::system_authentication_control_allow_anonymous_connections[]
 }

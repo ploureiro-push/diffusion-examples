@@ -20,12 +20,8 @@ import {
     topicUpdate,
     updateConstraints
 } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue } from '../../../../test/util';
-/// end::log
 
 export async function addTopicAndSetJsonValueWithoutConstraintExample(): Promise<void> {
-    /// tag::pub_sub_publish_with_constraint_add_and_set_topic_json_value_without[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -50,9 +46,6 @@ export async function addTopicAndSetJsonValueWithoutConstraintExample(): Promise
         } else {
             throw new Error('Topic already exists.');
         }
-        /// tag::log
-        expect(topicCreationResult).toBe(topicUpdate.TopicCreationResult.CREATED);
-        /// end::log
 
         const updateConstraint = updateConstraints()
             .jsonValue().without('/bar');
@@ -72,8 +65,4 @@ export async function addTopicAndSetJsonValueWithoutConstraintExample(): Promise
     }
 
     await session.closeSession();
-    /// end::pub_sub_publish_with_constraint_add_and_set_topic_json_value_without[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path', { diffusion: 'baz' });
-    /// end::log
 }
