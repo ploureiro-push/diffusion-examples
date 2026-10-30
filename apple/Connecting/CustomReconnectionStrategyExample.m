@@ -27,15 +27,14 @@
     PTDiffusionMutableSessionConfiguration *const sessionConfiguration =
         [PTDiffusionMutableSessionConfiguration new];
 
-    // Reconnect up to 10 times, doubling the interval between attempts from
-    // 100 milliseconds, up to a maximum of 60 seconds.
+    // Reconnect up to 10 times, using the built-in exponential backoff to
+    // double the interval between attempts from 100 milliseconds, up to a
+    // maximum of 60 seconds.
     PTDiffusionRetryPolicy *const retryPolicy =
         [[PTDiffusionRetryPolicy alloc] initWithInterval:100
                                                 attempts:10
-                                                 backoff:^NSUInteger(const NSUInteger interval, const NSUInteger attempt)
-    {
-        return MIN(interval << MIN(attempt - 1, 10), 60000);
-    }];
+                                              multiplier:2
+                                         maximumInterval:60000];
 
     // Set the maximum amount of time we'll try and reconnect for to 10 minutes.
     // If no timeout is specified, using initWithRetryPolicy:, it is calculated
