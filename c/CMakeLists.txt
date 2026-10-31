@@ -22,8 +22,16 @@ cmake_path(SET CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TARGET}/bin/${ARCHITECTURE})
 # Debug
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-fsanitize=undefined -fsanitize=address)
-    add_link_options(-fsanitize=undefined -fsanitize=address)
+    if(MSVC)
+        # The prebuilt uci/apr libs ship no PDBs: ~90k warnings, truncating the log.
+        add_link_options(/ignore:4099)
+        # Those libs are release /MD; Debug's default /MDd links a second CRT (LNK4098).
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+    else()
+        # link.exe rejects -fsanitize, so MSVC only ever got half an instrumented build.
+        add_compile_options(-fsanitize=undefined -fsanitize=address)
+        add_link_options(-fsanitize=undefined -fsanitize=address)
+    endif()
 endif()
 
 

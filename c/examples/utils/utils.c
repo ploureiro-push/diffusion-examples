@@ -1372,22 +1372,33 @@ char *utils_path_to_folder(
     const char *path,
     const char *folder)
 {
+    // strtok writes into its argument, so tokenize a copy, not the caller's string.
+    char *path_copy = OS_STRDUP(path);
     LIST_T *components = list_create();
-    char *token = strtok((char *) path, OS_PATH_SEPARATOR);
+    char *token = strtok(path_copy, OS_PATH_SEPARATOR);
     size_t components_total_len = 0;
+
+    // The deepest match, not the first: a packaged bundle can be unpacked below a
+    // folder of the same name (packaging/test/target/c/target/bin).
+    int folder_size = 0;
+    size_t folder_len = 0;
 
     while (token != NULL) {
         list_append_last(components, OS_STRDUP(token));
         components_total_len += strlen(token);
         if (strcmp(token, folder) == 0) {
-            // we have the needed path, stop here
-            break;
+            folder_size = list_get_size(components);
+            folder_len = components_total_len;
         }
         token = strtok(NULL, OS_PATH_SEPARATOR);
     }
+    free(path_copy);
 
-    int size = list_get_size(components);
-    size_t string_len = components_total_len + (size + 1) * strlen(OS_PATH_SEPARATOR) + 1;
+    // No component matched - fall back to the whole path, as before.
+    int size = folder_size > 0 ? folder_size : list_get_size(components);
+    size_t total_len = folder_size > 0 ? folder_len : components_total_len;
+
+    size_t string_len = total_len + (size + 1) * strlen(OS_PATH_SEPARATOR) + 1;
     char *result = calloc(string_len + 1, sizeof(char));
 
     for (int i = 0; i < size; i++) {
@@ -1401,6 +1412,8 @@ char *utils_path_to_folder(
         #endif
         OS_STRCAT(result, string_len, component);
     }
+
+    list_free(components, free);
     return result;
 }
 
