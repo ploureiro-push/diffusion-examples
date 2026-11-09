@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,12 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
             var builder = (IPrimaryInitiatorBuilder)Diffusion<IPrimaryInitiatorBuilder>.NewRemoteServerBuilder(RemoteServerType.PRIMARY_INITIATOR);
 
             var initiator = builder
-                .RetryDelay(2500)
+                // Retry every 2.5 seconds at first, doubling the interval up to 5 minutes, indefinitely
+                .RetryPolicy(Diffusion.NewRetryPolicyBuilder()
+                    .Interval(TimeSpan.FromMilliseconds(2500))
+                    .Attempts(int.MaxValue)
+                    .ExponentialBackoff(2, TimeSpan.FromMinutes(5))
+                    .Build())
                 .Build("Remote Server 1", new List<string> { "ws://new.server.url.com:8080", "ws://new.server.url.com:8081", "ws://new.server.url.com:8082" }, "High Volume Connector");
 
             server = await session.RemoteServers.CreateRemoteServerAsync(initiator, cancellationToken);

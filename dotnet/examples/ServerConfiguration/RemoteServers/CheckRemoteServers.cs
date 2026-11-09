@@ -49,10 +49,17 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .ConnectionOptions(new Dictionary<RemoteServerConnectionOption, string>()
                                     {
-                                        { RemoteServerConnectionOption.RECONNECTION_TIMEOUT, "120000" },
                                         { RemoteServerConnectionOption.CONNECTION_TIMEOUT, "15000" },
                                         { RemoteServerConnectionOption.MAXIMUM_QUEUE_SIZE, "1000" }
                                     })
+                // Reconnect every second for up to 2 minutes
+                .ReconnectionPolicy(Diffusion.NewReconnectionPolicyBuilder()
+                    .RetryPolicy(Diffusion.NewRetryPolicyBuilder()
+                        .Interval(TimeSpan.FromSeconds(1))
+                        .Attempts(int.MaxValue)
+                        .Build())
+                    .Timeout(TimeSpan.FromMinutes(2))
+                    .Build())
                 .Build("Remote Server 1", "ws://new.server.url.com");
 
             server = await session.RemoteServers.CreateRemoteServerAsync(initiator, cancellationToken);
@@ -64,10 +71,17 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .ConnectionOptions(new Dictionary<RemoteServerConnectionOption, string>()
                                     {
-                                        { RemoteServerConnectionOption.RECONNECTION_TIMEOUT, "60000" },
                                         { RemoteServerConnectionOption.CONNECTION_TIMEOUT, "5000" },
                                         { RemoteServerConnectionOption.MAXIMUM_QUEUE_SIZE, "10000" }
                                     })
+                // Reconnect every second for up to a minute
+                .ReconnectionPolicy(Diffusion.NewReconnectionPolicyBuilder()
+                    .RetryPolicy(Diffusion.NewRetryPolicyBuilder()
+                        .Interval(TimeSpan.FromSeconds(1))
+                        .Attempts(int.MaxValue)
+                        .Build())
+                    .Timeout(TimeSpan.FromMinutes(1))
+                    .Build())
                 .Build("Remote Server 2", "ws://another.server.url.com");
 
             server2 = await session.RemoteServers.CreateRemoteServerAsync(initiator, cancellationToken);

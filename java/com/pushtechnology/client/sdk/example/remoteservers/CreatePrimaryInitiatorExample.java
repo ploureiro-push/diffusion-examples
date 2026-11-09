@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
  * limitations under the License.
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.remoteservers;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +58,13 @@ public class CreatePrimaryInitiatorExample {
 
         remoteServersControl.createRemoteServer(
             builder
-                .retryDelay(2500)
+                // Retry every 2.5 seconds at first, doubling the interval up
+                // to 5 minutes, indefinitely
+                .retryPolicy(Diffusion.newRetryPolicyBuilder()
+                    .interval(2500, MILLISECONDS)
+                    .attempts(Integer.MAX_VALUE)
+                    .exponentialBackoff(2, 5, MINUTES)
+                    .build())
                 .build("Remote Server 1", urls, "High Volume Connector")
         ).join();
 

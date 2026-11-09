@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
  * limitations under the License.
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.remoteservers;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +53,6 @@ public class CreateSecondaryInitiatorExample {
 
         final Map<RemoteServers.RemoteServer.ConnectionOption, String>
             myConnectionOptions = new HashMap<>();
-        myConnectionOptions.put(RemoteServers.RemoteServer.ConnectionOption.RECONNECTION_TIMEOUT, "120000");
         myConnectionOptions.put(RemoteServers.RemoteServer.ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
         myConnectionOptions.put(RemoteServers.RemoteServer.ConnectionOption.CONNECTION_TIMEOUT, "15000");
 
@@ -59,6 +61,21 @@ public class CreateSecondaryInitiatorExample {
                 .principal("admin")
                 .credentials(Diffusion.credentials().password("password"))
                 .connectionOptions(myConnectionOptions)
+                // Retry every second at first, doubling the interval up to a
+                // minute, indefinitely
+                .retryPolicy(Diffusion.newRetryPolicyBuilder()
+                    .interval(1, SECONDS)
+                    .attempts(Integer.MAX_VALUE)
+                    .exponentialBackoff(2, 1, MINUTES)
+                    .build())
+                // Reconnect every second for up to 2 minutes
+                .reconnectionPolicy(Diffusion.newReconnectionPolicyBuilder()
+                    .retryPolicy(Diffusion.newRetryPolicyBuilder()
+                        .interval(1, SECONDS)
+                        .attempts(Integer.MAX_VALUE)
+                        .build())
+                    .timeout(2, MINUTES)
+                    .build())
                 .missingTopicNotificationFilter("?abc")
                 .build("Remote Server 1", "ws://new.server.url.com")
         ).join();

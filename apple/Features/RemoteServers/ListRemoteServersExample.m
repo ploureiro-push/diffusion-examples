@@ -80,21 +80,27 @@
 
 
              /*
-              Creating a second remote server with the following connection options:
-              - 120s for reconnection timeout
+              Creating a second remote server that reconnects every second for up to 120s,
+              with the following connection options:
               - 1000 messages for maximum queue size
               - 15s for connection timeout
               */
-             NSDictionary *connectionOptions = @{PTDiffusionRemoteServerConnectionOption.reconnectionTimeout: @"120000",
-                                                 PTDiffusionRemoteServerConnectionOption.maximumQueueSize: @"1000",
+             NSDictionary *connectionOptions = @{PTDiffusionRemoteServerConnectionOption.maximumQueueSize: @"1000",
                                                  PTDiffusionRemoteServerConnectionOption.connectionTimeout: @"15000"
                                                  };
 
+             PTDiffusionReconnectionPolicy *const reconnectionPolicy =
+                 [[PTDiffusionReconnectionPolicy alloc] initWithRetryPolicy:[[PTDiffusionRetryPolicy alloc] initWithInterval:1000
+                                                                                                                attempts:PTDiffusionRetryPolicyIndefinite]
+                                                                    timeout:120
+                                                         recoveryBufferSize:PTDiffusionSessionConfiguration.defaultRecoveryBufferSize];
+
              PTDiffusionSecondaryInitiatorRemoteServer *const remoteServer_2 =
-                 [[[[[PTDiffusionRemoteServerBuilder new]
-                     principal:remoteServerPrincipal]
-                    credentials:remoteServerCredentials]
-                   connectionOptions:connectionOptions]
+                 [[[[[[PTDiffusionRemoteServerBuilder new]
+                      principal:remoteServerPrincipal]
+                     credentials:remoteServerCredentials]
+                    connectionOptions:connectionOptions]
+                   reconnectionPolicy:reconnectionPolicy]
                   createSecondaryInitiatorWithName:@"New remote server 2" andURL:@"ws://another.server.url.com"];
 
              [session.remoteServers createRemoteServer:remoteServer_2

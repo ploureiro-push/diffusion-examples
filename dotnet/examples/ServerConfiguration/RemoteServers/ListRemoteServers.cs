@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2025 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,10 +45,17 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .ConnectionOptions(new Dictionary<RemoteServerConnectionOption, string>()
                                     {
-                                        { RemoteServerConnectionOption.RECONNECTION_TIMEOUT, "120000" },
                                         { RemoteServerConnectionOption.CONNECTION_TIMEOUT, "15000" },
                                         { RemoteServerConnectionOption.MAXIMUM_QUEUE_SIZE, "1000" }
                                     })
+                // Reconnect every second for up to 2 minutes
+                .ReconnectionPolicy(Diffusion.NewReconnectionPolicyBuilder()
+                    .RetryPolicy(Diffusion.NewRetryPolicyBuilder()
+                        .Interval(TimeSpan.FromSeconds(1))
+                        .Attempts(int.MaxValue)
+                        .Build())
+                    .Timeout(TimeSpan.FromMinutes(2))
+                    .Build())
                 .Build("Remote Server 1", "ws://new.server.url.com");
 
             server = await session.RemoteServers.CreateRemoteServerAsync(initiator, cancellationToken);
@@ -60,10 +67,17 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.RemoteServ
                 .Credentials(Diffusion.Credentials.Password("password"))
                 .ConnectionOptions(new Dictionary<RemoteServerConnectionOption, string>()
                                     {
-                                        { RemoteServerConnectionOption.RECONNECTION_TIMEOUT, "6000" },
                                         { RemoteServerConnectionOption.CONNECTION_TIMEOUT, "5000" },
                                         { RemoteServerConnectionOption.MAXIMUM_QUEUE_SIZE, "10000" }
                                     })
+                // Reconnect every second for up to 6 seconds
+                .ReconnectionPolicy(Diffusion.NewReconnectionPolicyBuilder()
+                    .RetryPolicy(Diffusion.NewRetryPolicyBuilder()
+                        .Interval(TimeSpan.FromSeconds(1))
+                        .Attempts(int.MaxValue)
+                        .Build())
+                    .Timeout(TimeSpan.FromSeconds(6))
+                    .Build())
                 .Build("Remote Server 2", "ws://another.server.url.com");
 
             server2 = await session.RemoteServers.CreateRemoteServerAsync(initiator, cancellationToken);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
  * limitations under the License.
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.topicviews.dsl;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +51,16 @@ public class TopicViewsDslRemoteTopicViewExample {
             final RemoteServers.RemoteServer remoteServer =
                 Diffusion.newRemoteServerBuilder(RemoteServers.SecondaryInitiator.SecondaryInitiatorBuilder.class)
                     .principal("admin").credentials(Diffusion.credentials().password("password"))
-                    .connectionOption(RemoteServers.RemoteServer.ConnectionOption.RECONNECTION_TIMEOUT, "120000")
                     .connectionOption(RemoteServers.RemoteServer.ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000")
                     .connectionOption(RemoteServers.RemoteServer.ConnectionOption.CONNECTION_TIMEOUT, "15000")
+                    // Reconnect every second for up to 2 minutes
+                    .reconnectionPolicy(Diffusion.newReconnectionPolicyBuilder()
+                        .retryPolicy(Diffusion.newRetryPolicyBuilder()
+                            .interval(1, SECONDS)
+                            .attempts(Integer.MAX_VALUE)
+                            .build())
+                        .timeout(2, MINUTES)
+                        .build())
                     .build("Remote Server 1", "ws://new.server.url.com");
 
             session.feature(RemoteServers.class).createRemoteServer(remoteServer)

@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2026  - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,10 +43,17 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
                         .Credentials(Diffusion.Credentials.Password("password"))
                         .ConnectionOptions(new Dictionary<RemoteServerConnectionOption, string>()
                                             {
-                                                { RemoteServerConnectionOption.RECONNECTION_TIMEOUT, "120000" },
                                                 { RemoteServerConnectionOption.MAXIMUM_QUEUE_SIZE, "1000" },
                                                 { RemoteServerConnectionOption.CONNECTION_TIMEOUT, "15000" }
                                             })
+                        // Reconnect every second for up to 2 minutes
+                        .ReconnectionPolicy(Diffusion.NewReconnectionPolicyBuilder()
+                            .RetryPolicy(Diffusion.NewRetryPolicyBuilder()
+                                .Interval(TimeSpan.FromSeconds(1))
+                                .Attempts(int.MaxValue)
+                                .Build())
+                            .Timeout(TimeSpan.FromMinutes(2))
+                            .Build())
                         .Build("Remote Server 1", "ws://new.server.url.com");
 
             server = await session.RemoteServers.CreateRemoteServerAsync(secondaryInitiator, cancellationToken);

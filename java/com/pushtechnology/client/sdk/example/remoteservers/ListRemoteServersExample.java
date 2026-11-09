@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 - 2024 DiffusionData Ltd.
+ * Copyright (C) 2023 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
  *******************************************************************************/
 package com.pushtechnology.client.sdk.example.remoteservers;
 
+
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +56,6 @@ public class ListRemoteServersExample {
             Diffusion.newRemoteServerBuilder(SecondaryInitiatorBuilder.class);
 
         final Map<ConnectionOption, String> myConnectionOptions = new HashMap<>();
-        myConnectionOptions.put(ConnectionOption.RECONNECTION_TIMEOUT, "120000");
         myConnectionOptions.put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "1000");
         myConnectionOptions.put(ConnectionOption.CONNECTION_TIMEOUT, "15000");
 
@@ -62,13 +64,20 @@ public class ListRemoteServersExample {
                 .principal("admin")
                 .credentials(Diffusion.credentials().password("password"))
                 .connectionOptions(myConnectionOptions)
+                // Reconnect every second for up to 2 minutes
+                .reconnectionPolicy(Diffusion.newReconnectionPolicyBuilder()
+                    .retryPolicy(Diffusion.newRetryPolicyBuilder()
+                        .interval(1, SECONDS)
+                        .attempts(Integer.MAX_VALUE)
+                        .build())
+                    .timeout(2, MINUTES)
+                    .build())
                 .build("Remote Server 1", "ws://new.server.url.com")
         ).join();
 
         builder.reset();
 
         final Map<ConnectionOption, String> myOtherConnectionOptions = new HashMap<>();
-        myOtherConnectionOptions.put(ConnectionOption.RECONNECTION_TIMEOUT, "6000");
         myOtherConnectionOptions.put(ConnectionOption.MAXIMUM_QUEUE_SIZE, "10000");
         myOtherConnectionOptions.put(ConnectionOption.CONNECTION_TIMEOUT, "5000");
 
@@ -77,6 +86,14 @@ public class ListRemoteServersExample {
                 .principal("control")
                 .credentials(Diffusion.credentials().password("password"))
                 .connectionOptions(myOtherConnectionOptions)
+                // Reconnect every second for up to 6 seconds
+                .reconnectionPolicy(Diffusion.newReconnectionPolicyBuilder()
+                    .retryPolicy(Diffusion.newRetryPolicyBuilder()
+                        .interval(1, SECONDS)
+                        .attempts(Integer.MAX_VALUE)
+                        .build())
+                    .timeout(6, SECONDS)
+                    .build())
                 .build("Remote Server 2", "ws://another.server.url.com")
         ).join();
 
