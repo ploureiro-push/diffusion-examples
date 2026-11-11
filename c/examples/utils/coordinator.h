@@ -24,6 +24,7 @@ COORDINATOR_T *coordinator_init(void);
 
 void coordinator_free(COORDINATOR_T *coordinator);
 
+// One broadcast releases one wait; a broadcast with no waiter is kept for the next wait
 void coordinator_wait(COORDINATOR_T *coordinator);
 
 void coordinator_broadcast(COORDINATOR_T *coordinator);
