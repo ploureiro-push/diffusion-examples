@@ -37,17 +37,21 @@ void coordinator_wait(COORDINATOR_T *coordinator)
     if (coordinator == NULL) {
         return;
     }
-    if (apr_atomic_read32(&coordinator->flag) == 0) {
-        // needs to wait
-        apr_thread_mutex_lock(coordinator->mutex);
-        if(apr_thread_cond_timedwait(coordinator->cond, coordinator->mutex, coordinator->timeout * 1000) != APR_SUCCESS) {
+    apr_time_t deadline = apr_time_now() + apr_time_from_msec(coordinator->timeout);
+    apr_thread_mutex_lock(coordinator->mutex);
+    while (apr_atomic_read32(&coordinator->flag) == 0) {
+        apr_interval_time_t remaining = deadline - apr_time_now();
+        apr_status_t rv = APR_TIMEUP;
+        if (remaining > 0) {
+            rv = apr_thread_cond_timedwait(coordinator->cond, coordinator->mutex, remaining);
+        }
+        if (rv != APR_SUCCESS && apr_atomic_read32(&coordinator->flag) == 0) {
             LOG("Waiting expired.");
             exit(1);
         }
-        apr_thread_mutex_unlock(coordinator->mutex);
     }
-    // reset flag
     apr_atomic_set32(&coordinator->flag, 0);
+    apr_thread_mutex_unlock(coordinator->mutex);
 }
 
 

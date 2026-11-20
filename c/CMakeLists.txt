@@ -42,9 +42,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SCRIPTS_FOLDER}")
 set(INCLUDE_DIRECTORIES "")
 set(ADDITIONAL_LD_FLAGS "")
 
-# PThread
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads)
+# PThread - with MSVC an empty target, as FindThreads makes there, without its configure-time probes
+if(MSVC)
+    add_library(Threads::Threads INTERFACE IMPORTED)
+else()
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads)
+endif()
 
 # APR
 cmake_path(SET APR_ROOT_PATH ${DEPENDENCIES_FOLDER}/${OPERATING_SYSTEM}/apr)

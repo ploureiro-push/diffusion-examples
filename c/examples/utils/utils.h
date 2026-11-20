@@ -50,16 +50,24 @@ extern unsigned long g_timeout;
     apr_pool_destroy(g_pool);               \
     apr_terminate();
 
-// Macro to wait
+// Macro to wait: one broadcast releases one wait; a broadcast with no waiter is kept for the next wait
 #define MUTEX_WAIT                                                                          \
-    if (apr_atomic_read32(&g_flag) == 0) {                                                  \
+    {                                                                                       \
+        apr_time_t deadline = apr_time_now() + apr_time_from_msec(g_timeout);               \
         apr_thread_mutex_lock(g_mutex);                                                     \
-        if(apr_thread_cond_timedwait(g_cond, g_mutex, g_timeout * 1000) != APR_SUCCESS) {   \
-            LOG("Waiting expired.");                                                        \
-            exit(1);                                                                        \
+        while (apr_atomic_read32(&g_flag) == 0) {                                           \
+            apr_interval_time_t remaining = deadline - apr_time_now();                      \
+            apr_status_t rv = APR_TIMEUP;                                                   \
+            if (remaining > 0) {                                                            \
+                rv = apr_thread_cond_timedwait(g_cond, g_mutex, remaining);                 \
+            }                                                                               \
+            if (rv != APR_SUCCESS && apr_atomic_read32(&g_flag) == 0) {                     \
+                LOG("Waiting expired.");                                                    \
+                exit(1);                                                                    \
+            }                                                                               \
         }                                                                                   \
-        apr_thread_mutex_unlock(g_mutex);                                                   \
         apr_atomic_set32(&g_flag, 0);                                                       \
+        apr_thread_mutex_unlock(g_mutex);                                                   \
     }
 
 // Macro to broadcast
