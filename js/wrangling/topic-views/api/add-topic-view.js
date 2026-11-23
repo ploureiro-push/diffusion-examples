@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue, expectTopicCounts } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsApiAdd() {
-    /// tag::topic_views_api_add[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -41,15 +37,8 @@ export async function topicViewsApiAdd() {
         'map my/topic/path to views/<path(0)>'
     );
     console.log(`Topic View ${topicView.name} has been created.`);
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/my/topic/path', { diffusion: 'data' });
-    /// end::log
 
     await session.topicViews.removeTopicView('topic_view_1');
 
     await session.closeSession();
-    /// end::topic_views_api_add[]
-    /// tag::log
-    await expectTopicCounts({ 'views/my/topic/path': 0 });
-    /// end::log
 }

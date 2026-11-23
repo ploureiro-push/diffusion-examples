@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,10 @@ static int on_fetch_result(
         };
 
         diffusion_fetch_request_fetch(g_session, fetch_params);
+    }
+    else {
+        printf("All pages loaded. Fetch complete\n");
+        MUTEX_BROADCAST
     }
     list_free(results, (void (*)(void *))diffusion_topic_result_free);
 

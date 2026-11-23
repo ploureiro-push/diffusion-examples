@@ -14,17 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslOptionsTopicValue() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/1234'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_options_topic_value[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -51,9 +42,6 @@ export async function topicViewsDslOptionsTopicValue() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
@@ -72,13 +60,4 @@ export async function topicViewsDslOptionsTopicValue() {
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_options_topic_value[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/1234', {
-        amount: 12.57,
-        currency: 'USD'
-    });
-
-    await check.done();
-    /// end::log
 }

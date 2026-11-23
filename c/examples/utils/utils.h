@@ -50,15 +50,15 @@ extern unsigned long g_timeout;
 
 // Macro to wait
 #define MUTEX_WAIT                                                                          \
+    apr_thread_mutex_lock(g_mutex);                                                         \
     if (apr_atomic_read32(&g_flag) == 0) {                                                  \
-        apr_thread_mutex_lock(g_mutex);                                                     \
         if(apr_thread_cond_timedwait(g_cond, g_mutex, g_timeout * 1000) != APR_SUCCESS) {   \
             LOG("Waiting expired.");                                                        \
             exit(1);                                                                        \
         }                                                                                   \
-        apr_thread_mutex_unlock(g_mutex);                                                   \
-        apr_atomic_set32(&g_flag, 0);                                                       \
-    }
+    }                                                                                        \
+    apr_atomic_set32(&g_flag, 0);                                                           \
+    apr_thread_mutex_unlock(g_mutex);
 
 // Macro to broadcast
 #define MUTEX_BROADCAST                     \
@@ -326,11 +326,6 @@ void utils_print_hash(
 
 bool utils_string_starts_with(
     const char *prefix,
-    const char *string
-);
-
-bool utils_string_matches_regex(
-    const char *pattern,
     const char *string
 );
 

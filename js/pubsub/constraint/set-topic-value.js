@@ -14,12 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue } = require('../../../../test/util');
-/// end::log
 
 export async function setTopicValueConstraintExample() {
-    /// tag::pub_sub_publish_with_constraint_set_topic_value[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -52,8 +48,4 @@ export async function setTopicValueConstraintExample() {
     }
 
     await session.closeSession();
-    /// end::pub_sub_publish_with_constraint_set_topic_value[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path', { diffusion: ['data', 'more data', 'yet more data'] });
-    /// end::log
 }

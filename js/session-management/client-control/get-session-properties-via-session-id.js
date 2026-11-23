@@ -14,30 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../../test/util');
-/// end::log
 
 export async function clientControlGetSessionPropertiesViaSessionId() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        '$Country',
-        '$ClientIP',
-        '$Environment',
-        '$SessionId',
-        '$Transport',
-        '$Principal',
-        '$ServerName',
-        '$StartTime',
-        '$Language',
-        '$Latitude',
-        '$Connector',
-        '$Longitude',
-        '$ClientType',
-        '$Roles',
-    ]]);
-    /// end::log
-    /// tag::client_control_get_session_properties_via_session_id[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -61,15 +39,8 @@ export async function clientControlGetSessionPropertiesViaSessionId() {
     console.log(`${session2.toString()}:`);
     for (const key of Object.keys(properties)) {
         console.log(`  ${key}: ${properties[key]}`);
-        /// tag::log
-        check.log(`${key}`);
-        /// end::log
     }
 
     await session1.closeSession();
     await session2.closeSession();
-    /// end::client_control_get_session_properties_via_session_id[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

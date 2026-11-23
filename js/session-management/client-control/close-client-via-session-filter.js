@@ -14,15 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { promiseWithResolvers } = require('../../../../test/util');
-/// end::log
 
 export async function clientControlCloseClientViaSessionFilter() {
-    /// tag::log
-    const { promise, resolve } = promiseWithResolvers();
-    /// end::log
-    /// tag::client_control_close_client_via_session_filter[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -41,17 +34,9 @@ export async function clientControlCloseClientViaSessionFilter() {
 
     session2.on('close', () => {
         console.log('Session closed');
-        /// tag::log
-        resolve();
-        /// end::log
     });
 
     await session1.clients.close('$Principal is "client"');
 
     await session1.closeSession();
-    /// tag::log
-    await promise;
-    expect(session2.isClosed()).toBe(true);
-    /// end::log
-    /// end::client_control_close_client_via_session_filter[]
 }

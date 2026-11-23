@@ -1,6 +1,4 @@
 #include "utils.h"
-#include "regexp9.h"
-
 
 static int on_topic_update_add_and_set(
     DIFFUSION_TOPIC_CREATION_RESULT_T result,
@@ -1095,16 +1093,18 @@ double utils_random_double(void)
 
 const char *utils_print_global_permission(void *value)
 {
-    uint32_t *ptr = (uint32_t *) value;
-    GLOBAL_PERMISSIONS_T permission = *ptr;
-    return SECURITY_GLOBAL_PERMISSIONS_NAMES[permission];
+    if (value == NULL) {
+        return "Unknown value";
+    }
+    return SECURITY_GLOBAL_PERMISSIONS_NAMES[*((unsigned char *)value)];
 }
 
 const char *utils_print_path_permission(void *value)
 {
-    uint32_t *ptr = (uint32_t *) value;
-    PATH_PERMISSIONS_T permission = *ptr;
-    return SECURITY_PATH_PERMISSIONS_NAMES[permission];
+    if (value == NULL) {
+        return "Unknown value";
+    }
+    return SECURITY_PATH_PERMISSIONS_NAMES[*((unsigned char *)value)];
 }
 
 const char *utils_print_string(void *value)
@@ -1211,7 +1211,7 @@ void utils_print_hash(
 {
     char **keys = hash_keys(hash);
     for(char **ptr = keys; *ptr != NULL; ptr++) {
-        if (pattern == NULL || utils_string_matches_regex(pattern, *ptr)) {
+        if (pattern == NULL || strncmp(*ptr, pattern, strlen(pattern)) == 0) {
             void *value = hash_get(hash, *ptr);
             const char *value_string = print_function(value);
             printf("\t%s: %s\n", *ptr, value_string);
@@ -1230,16 +1230,6 @@ bool utils_string_starts_with(
         string_length < prefix_length ? false : memcmp(prefix, string, prefix_length) == 0;
 }
 
-
-bool utils_string_matches_regex(
-    const char *pattern,
-    const char *string)
-{
-    Resub rs[1];
-    Reprog *p = regcomp9((char *) pattern);
-    memset(rs, 0, sizeof(Resub));
-    return regexec9(p, (char *) string, rs, 1);
-}
 
 char *utils_list_to_string(LIST_T *list)
 {

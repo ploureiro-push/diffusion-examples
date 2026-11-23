@@ -14,20 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester, promiseWithResolvers } = require('../../../test/util');
-/// end::log
 
 export async function messagingSendToSessionFilter() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Received message: Hello'],
-        ['Received response: Goodbye'],
-    ]);
-
-    const responsePromise = promiseWithResolvers();
-    /// end::log
-    /// tag::messaging_send_to_session_filter[]
     // Connect to the server.
     const session1 = await diffusion.connect({
         host: 'localhost',
@@ -39,9 +27,6 @@ export async function messagingSendToSessionFilter() {
     const stream1 = {
         onRequest: (path, request, responder) => {
             console.log(`Received message: ${request}`);
-            /// tag::log
-            check.log(`Received message: ${request}`);
-            /// end::log
             responder.respond('Goodbye');
         },
         onError: (error) => {
@@ -66,9 +51,6 @@ export async function messagingSendToSessionFilter() {
         onRequest: (path, request, responder) => {
             console.log(`Received message: ${request}`);
             responder.respond('I\'m not supposed to receive a message.');
-            /// tag::log
-            check.log('I\'m not supposed to receive a message.');
-            /// end::log
         },
         onError: (error) => {
             console.error('An error occurred.', error);
@@ -95,25 +77,14 @@ export async function messagingSendToSessionFilter() {
         {
             onResponse: (sessionId, response)=> {
                 console.log(`Received response: ${response}`);
-                /// tag::log
-                check.log(`Received response: ${response}`);
-                responsePromise.resolve();
-                /// end::log
             },
             onResponseError: (sessionId, error) => {
                 console.error('Received an error response', error);
             }
         }
     );
-    /// tag::log
-    await responsePromise.promise;
-    /// end::log
 
     await session1.closeSession();
     await session2.closeSession();
     await session3.closeSession();
-    /// end::messaging_send_to_session_filter[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

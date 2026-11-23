@@ -14,19 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsDslOptionsSeparator() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/Fred_Flintstone',
-        'Subscribed to views/Wilma_Flintstone',
-        'Subscribed to views/Pebbles_Flintstone'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_options_separator[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -69,9 +58,6 @@ export async function topicViewsDslOptionsSeparator() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -86,18 +72,4 @@ export async function topicViewsDslOptionsSeparator() {
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_options_separator[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/Fred_Flintstone', {
-        name: 'Fred/Flintstone'
-    });
-    await expectJsonTopicToHaveValue('views/Wilma_Flintstone', {
-        name: 'Wilma/Flintstone'
-    });
-    await expectJsonTopicToHaveValue('views/Pebbles_Flintstone', {
-        name: 'Pebbles/Flintstone'
-    });
-
-    await check.done();
-    /// end::log
 }

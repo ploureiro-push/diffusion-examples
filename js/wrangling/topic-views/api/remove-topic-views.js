@@ -14,23 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } = require('../../../../../test/util');
-/// end::log
 
 export async function topicViewsApiRemove() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [
-            'Topic View topic_view_1: map my/topic/path to views/<path(0)> (ADMINISTRATOR)',
-            'Topic View topic_view_2: map my/topic/path/array to views/<path(0)> (ADMINISTRATOR)'
-        ],
-        [
-            'Topic View topic_view_2: map my/topic/path/array to views/<path(0)> (ADMINISTRATOR)'
-        ]
-    ]);
-    /// end::log
-    /// tag::topic_views_api_remove[]
     const session = await diffusion.connect({
         host: 'localhost',
         port: 8080,
@@ -52,9 +37,6 @@ export async function topicViewsApiRemove() {
         'map my/topic/path to views/<path(0)>'
     );
     console.log(`Topic View ${topicView1.name} has been created.`);
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/my/topic/path', { diffusion: 'data' });
-    /// end::log
 
     await session.topicUpdate.set(
         'my/topic/path/array',
@@ -68,16 +50,10 @@ export async function topicViewsApiRemove() {
         'map my/topic/path/array to views/<path(0)>'
     );
     console.log(`Topic View ${topicView2.name} has been created.`);
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/my/topic/path/array', { diffusion: 'data' });
-    /// end::log
 
     const topicViews1 = await session.topicViews.listTopicViews();
     for (const topicView of topicViews1) {
         console.log(`Topic View ${topicView.name}: ${topicView.specification} (${[...topicView.roles]})`);
-        /// tag::log
-        check.log(`Topic View ${topicView.name}: ${topicView.specification} (${[...topicView.roles]})`);
-        /// end::log
     }
 
     await session.topicViews.removeTopicView('topic_view_1');
@@ -85,14 +61,7 @@ export async function topicViewsApiRemove() {
     const topicViews2 = await session.topicViews.listTopicViews();
     for (const topicView of topicViews2) {
         console.log(`Topic View ${topicView.name}: ${topicView.specification} (${[...topicView.roles]})`);
-        /// tag::log
-        check.log(`Topic View ${topicView.name}: ${topicView.specification} (${[...topicView.roles]})`);
-        /// end::log
     }
 
     await session.closeSession();
-    /// end::topic_views_api_remove[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

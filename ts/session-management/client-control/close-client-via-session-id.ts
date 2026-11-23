@@ -14,15 +14,8 @@
  *******************************************************************************/
 
 import { connect } from 'diffusion';
-/// tag::log
-import { promiseWithResolvers } from '../../../../test/util';
-/// end::log
 
 export async function clientControlCloseClientViaSessionId(): Promise<void> {
-    /// tag::log
-    const { promise, resolve } = promiseWithResolvers<void>();
-    /// end::log
-    /// tag::client_control_close_client_via_session_id[]
     // Connect to the server.
     const session1 = await connect({
         host: 'localhost',
@@ -41,17 +34,9 @@ export async function clientControlCloseClientViaSessionId(): Promise<void> {
 
     session2.on('close', () => {
         console.log('Session closed');
-        /// tag::log
-        resolve();
-        /// end::log
     });
 
     await session1.clients.close(session2.sessionId);
 
     await session1.closeSession();
-    /// tag::log
-    await promise;
-    expect(session2.isClosed()).toBe(true);
-    /// end::log
-    /// end::client_control_close_client_via_session_id[]
 }

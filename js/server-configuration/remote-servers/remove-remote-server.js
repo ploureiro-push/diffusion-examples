@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function remoteServersRemove() {
-    /// tag::remote_servers_remove[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -36,18 +35,8 @@ export async function remoteServersRemove() {
         .missingTopicNotificationFilter('?abc')
         .build('Remote Server 1', 'ws://new.server.url.com');
     await session.remoteServers.createRemoteServer(definition);
-    /// tag::log
-    const remoteServers1 = await session.remoteServers.listRemoteServers();
-    expect(remoteServers1.length).toBe(1);
-    expect(remoteServers1[0].name).toBe('Remote Server 1');
-    /// end::log
 
     await session.remoteServers.removeRemoteServer('Remote Server 1');
-    /// tag::log
-    const remoteServers2 = await session.remoteServers.listRemoteServers();
-    expect(remoteServers2.length).toBe(0);
-    /// end::log
 
     await session.closeSession();
-    /// end::remote_servers_remove[]
 }

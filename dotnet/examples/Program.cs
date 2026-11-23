@@ -1,5 +1,5 @@
 ﻿/**
-* Copyright © 2023 - 2024 Diffusion Data Ltd.
+* Copyright © 2023 - 2026 Diffusion Data Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ using PushTechnology.ClientInterface.Examples.ServerConfiguration.SecurityContro
 using PushTechnology.ClientInterface.Examples.SessionManagement;
 using PushTechnology.ClientInterface.Examples.SessionManagement.ClientControl;
 using PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL;
+using PushTechnology.ClientInterface.Examples.PubSub.JSONPatch;
+using PushTechnology.ClientInterface.Examples.ServerConfiguration.Metrics;
 
 namespace PushTechnology.ClientInterface.Examples
 {

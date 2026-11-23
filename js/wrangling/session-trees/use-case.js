@@ -14,22 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester, promiseWithResolvers } = require('../../../../test/util');
-/// end::log
 
 export async function sessionTreesUseCase() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Session1 subscribed to my/personal/path',
-        'Session2 subscribed to my/personal/path',
-        'Session1 value changed to Good morning Administrator',
-        'Session2 value changed to Good night Anonymous',
-    ]]);
-    const promiseValue1 = promiseWithResolvers();
-    const promiseValue2 = promiseWithResolvers();
-    /// end::log
-    /// tag::session_trees_use_case[]
     let session;
     try {
         // Connect to the server.
@@ -86,19 +72,12 @@ export async function sessionTreesUseCase() {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Session1 subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue} to ${newValue}`);
-            /// tag::log
-            check.log(`Session1 value changed to ${newValue}`);
-            promiseValue1.resolve();
-            /// end::log
         }
     });
 
@@ -125,19 +104,12 @@ export async function sessionTreesUseCase() {
     valueStream2.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Session2 subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue} to ${newValue}`);
-            /// tag::log
-            check.log(`Session2 value changed to ${newValue}`);
-            promiseValue2.resolve();
-            /// end::log
         }
     });
 
@@ -148,17 +120,10 @@ export async function sessionTreesUseCase() {
         throw err;
     }
 
-    /// tag::log
-    await Promise.all([promiseValue1.promise, promiseValue2.promise]);
-    /// end::log
     try {
         await session.closeSession();
         await session2.closeSession();
     } catch (err) {
         console.error('An error occurred when closing session.', err);
     }
-    /// end::session_trees_use_case[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

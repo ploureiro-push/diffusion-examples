@@ -19,12 +19,8 @@ import {
     topicUpdate,
     updateConstraints
 } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue } from '../../../../test/util';
-/// end::log
 
 export async function setTopicJsonValueWithConstraintExample(): Promise<void> {
-    /// tag::pub_sub_publish_with_constraint_set_topic_json_value_with[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -58,8 +54,4 @@ export async function setTopicJsonValueWithConstraintExample(): Promise<void> {
     }
 
     await session.closeSession();
-    /// end::pub_sub_publish_with_constraint_set_topic_json_value_with[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('my/topic/path', { diffusion: 'baz' });
-    /// end::log
 }

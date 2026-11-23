@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function connectionReconnectExample() {
-    /// tag::connection_resilience_reconnection_strategy[]
     let session;
     let attempts = 0;
 
@@ -51,11 +50,6 @@ export async function connectionReconnectExample() {
     console.log(`Connected. Session Identifier: ${session.sessionId.toString()}`);
 
     // Insert work here
-    /// tag::log
-    expect(session.sessionId).not.toBeNull();
-    expect(session.isConnected()).toBe(true);
-    /// end::log
 
     await session.closeSession();
-    /// end::connection_resilience_reconnection_strategy[]
 }

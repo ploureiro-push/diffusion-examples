@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function addLockedPrincipal(): Promise<void> {
-    /// tag::system_authentication_control_add_locked_principal[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -30,12 +29,5 @@ export async function addLockedPrincipal(): Promise<void> {
         .build();
     await session.security.updateAuthenticationStore(authenticationScript);
 
-    /// tag::log
-    const restoreScript = session.security.authenticationScriptBuilder()
-        .removePrincipal('super_user')
-        .build();
-    await session.security.updateAuthenticationStore(restoreScript);
-    /// end::log
     await session.closeSession();
-    /// end::system_authentication_control_add_locked_principal[]
 }

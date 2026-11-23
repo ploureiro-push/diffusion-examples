@@ -13,7 +13,14 @@ skip-string-normalization = false
 testpaths = "src/diffusion_examples"
 junit_family = "xunit2"
 cache_dir = "target/.pytest_cache"
-filterwarnings = ["ignore:coroutine 'Connection.read_loop' was never awaited", ]
+filterwarnings = [
+    "ignore:coroutine 'Connection.read_loop' was never awaited",
+    # All from dependencies (including the diffusion client package itself), not this
+    # project's own code.
+    "ignore::DeprecationWarning:pytest_asyncio",
+    "ignore::SyntaxWarning:stringcase",
+    "ignore::DeprecationWarning:diffusion",
+]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')"
 ]

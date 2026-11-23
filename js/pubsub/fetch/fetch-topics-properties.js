@@ -14,33 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester } = require('../../../../test/util');
-/// end::log
 
 export async function pubSubFetchTopicProperties() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        [
-            'my/topic/path/with/properties/0 DONT_RETAIN_VALUE: true',
-            'my/topic/path/with/properties/0 PERSISTENT: false',
-            'my/topic/path/with/properties/0 PUBLISH_VALUES_ONLY: true',
-            'my/topic/path/with/properties/1 DONT_RETAIN_VALUE: true',
-            'my/topic/path/with/properties/1 PERSISTENT: false',
-            'my/topic/path/with/properties/1 PUBLISH_VALUES_ONLY: true',
-            'my/topic/path/with/properties/2 DONT_RETAIN_VALUE: true',
-            'my/topic/path/with/properties/2 PERSISTENT: false',
-            'my/topic/path/with/properties/2 PUBLISH_VALUES_ONLY: true',
-            'my/topic/path/with/properties/3 DONT_RETAIN_VALUE: true',
-            'my/topic/path/with/properties/3 PERSISTENT: false',
-            'my/topic/path/with/properties/3 PUBLISH_VALUES_ONLY: true',
-            'my/topic/path/with/properties/4 DONT_RETAIN_VALUE: true',
-            'my/topic/path/with/properties/4 PERSISTENT: false',
-            'my/topic/path/with/properties/4 PUBLISH_VALUES_ONLY: true'
-        ]
-    ]);
-    /// end::log
-    /// tag::pub_sub_fetch_topic_properties[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -84,11 +59,6 @@ export async function pubSubFetchTopicProperties() {
         const properties = result.specification().properties;
         for (const property of Object.keys(properties)) {
             console.log(`  ${property}: ${properties[property]}`);
-            /// tag::log
-            if (['DONT_RETAIN_VALUE', 'PERSISTENT', 'PUBLISH_VALUES_ONLY'].includes(property)) {
-                check.log(`${result.path()} ${property}: ${properties[property]}`);
-            }
-            /// end::log
         }
     }
 
@@ -101,14 +71,8 @@ export async function pubSubFetchTopicProperties() {
         const properties = result.specification().properties;
         for (const property of Object.keys(properties)) {
             console.log(`  ${property}: ${properties[property]}`);
-            /// tag::log
-            if (['DONT_RETAIN_VALUE', 'PERSISTENT', 'PUBLISH_VALUES_ONLY'].includes(property)) {
-                check.log(`${result.path()} ${property}: ${properties[property]}`);
-            }
-            /// end::log
         }
     }
 
     await session.closeSession();
-    /// end::pub_sub_fetch_topic_properties[]
 }

@@ -16,7 +16,6 @@
 const diffusion = require('diffusion');
 
 export async function securityControlRemovePathPermissions() {
-    /// tag::security_control_remove_path_permissions[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -40,5 +39,4 @@ export async function securityControlRemovePathPermissions() {
     await session.security.updateSecurityStore(securityScript2);
 
     await session.closeSession();
-    /// end::security_control_remove_path_permissions[]
 }

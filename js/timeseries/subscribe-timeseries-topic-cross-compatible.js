@@ -14,20 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { PartiallyOrderedCheckpointTester, promiseWithResolvers } = require('../../../test/util');
-/// end::log
 
 export async function timeSeriesSubscribeCrossCompatible() {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([
-        ['Subscribed to my/time/series/topic/path'],
-        [`Closed`]
-    ]);
-
-    let oldValue = 'undefined';
-    /// end::log
-    /// tag::time_series_subscribe_cross_compatible[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -48,23 +36,12 @@ export async function timeSeriesSubscribeCrossCompatible() {
     jsonValueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {
             console.log(`Unsubscribed from ${topic}: ${reason}`);
         },
-        /// tag::log
-        close : () => {
-            check.log(`Closed`);
-        },
-        /// end::log
         value : (topic, spec, newValue, oldValue) => {
             console.log(`${topic} changed from ${oldValue.get()} to ${newValue.get()}`);
-            /// tag::log
-            check.log(`${topic} changed from ${oldValue?.get()} to ${newValue.get()}`);
-            /// end::log
         }
     });
 
@@ -72,13 +49,8 @@ export async function timeSeriesSubscribeCrossCompatible() {
 
     for (let count = 0; count < 25; count++) {
         const value = Math.random();
-        /// tag::log
-        check.appendExpectedChoice(`my/time/series/topic/path changed from ${oldValue} to ${value}`);
-        oldValue = `${value}`;
-        /// end::log
         await session.timeseries.append('my/time/series/topic/path', value, diffusion.datatypes.double());
     }
 
     await session.closeSession();
-    /// end::time_series_subscribe_cross_compatible[]
 }

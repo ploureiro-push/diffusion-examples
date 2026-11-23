@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2024 Diffusion Data Ltd.
+ * Copyright © 2024 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ namespace PushTechnology.ClientInterface.Examples.PubSub.JSONPatch
             var result = await session.TopicUpdate.ApplyJSONPatchAsync(topic, "[{\"op\":\"remove\", \"path\": \"/George\"}]", cancellationToken);
 
             WriteLine($"JSON patch remove has been successfully applied.");
+            await Task.Delay(2000);
 
             session.Close();
         }

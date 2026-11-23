@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 DiffusionData Ltd.
+ * Copyright © 2024 - 2026 DiffusionData Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,7 @@ static int on_append(
         const DIFFUSION_TIME_SERIES_EVENT_METADATA_T *event_metadata,
         void *context)
 {
+        MUTEX_BROADCAST
         return HANDLER_SUCCESS;
 }
 

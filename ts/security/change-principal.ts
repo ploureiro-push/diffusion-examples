@@ -16,7 +16,6 @@
 import { connect } from 'diffusion';
 
 export async function changePrincipalExample(): Promise<void> {
-    /// tag::security_change_principal[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -29,5 +28,4 @@ export async function changePrincipalExample(): Promise<void> {
     console.log('Principal has been changed to control');
 
     await session.closeSession();
-    /// end::security_change_principal[]
 }

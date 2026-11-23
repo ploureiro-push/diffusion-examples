@@ -36,8 +36,8 @@ set(DEPENDENCIES ${DEPENDENCIES} diffusion)
 
 # list(APPEND WINDOWS_PATH ${DIFFUSION_LIB_PATH})
 
-message("")
-message("Diffusion has been imported from ${DIFFUSION_ROOT_FOLDER}")
-message("    - ${diffusion_INCLUDE_DIRECTORIES}")
-message("")
+message(STATUS "")
+message(STATUS "Diffusion has been imported from ${DIFFUSION_ROOT_FOLDER}")
+message(STATUS "    - ${diffusion_INCLUDE_DIRECTORIES}")
+message(STATUS "")
 

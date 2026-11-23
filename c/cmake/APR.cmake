@@ -45,7 +45,7 @@ set(DEPENDENCIES ${DEPENDENCIES} apr apr-util)
 
 # list(APPEND WINDOWS_PATH ${APR_LIB_PATH} ${APR_UTIL_LIB_PATH})
 
-message("")
-message("APR has been imported from ${APR_ROOT_PATH}")
-message("    - ${apr_INCLUDE_DIRECTORIES}")
-message("")
+message(STATUS "")
+message(STATUS "APR has been imported from ${APR_ROOT_PATH}")
+message(STATUS "    - ${apr_INCLUDE_DIRECTORIES}")
+message(STATUS "")

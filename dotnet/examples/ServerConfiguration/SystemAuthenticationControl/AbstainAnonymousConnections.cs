@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2024 Diffusion Data Ltd.
+ * Copyright © 2024 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,21 @@ namespace PushTechnology.ClientInterface.Examples.ServerConfiguration.SystemAuth
             {
                 WriteLine($"{ex.Message}");
             }
+            await Task.Delay(2000);
+
+            updateScript = session.SystemAuthenticationControl.Script
+                .AllowAnonymousConnections(new List<string>())
+                .ToScript();
+
+            await session.SystemAuthenticationControl.UpdateStoreAsync(updateScript, cancellationToken);
+
+
+            var closeRegistrationTask = registration.CloseAsync();
+            if (await Task.WhenAny(closeRegistrationTask, Task.Delay(30_000)) != closeRegistrationTask)
+            {
+                throw new TimeoutException("registration.CloseAsync() did not complete within 30s");
+            }
+            await closeRegistrationTask;
 
             session2.Close();
             session.Close();

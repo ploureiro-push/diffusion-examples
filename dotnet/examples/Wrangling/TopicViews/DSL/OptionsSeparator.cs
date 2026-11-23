@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,10 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
             await session.TopicUpdate.AddAndSetAsync("my/topic/path/1", topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
 
             string json2 = "{\"name\":\"Wilma/Flintstone\"}";
-            await session.TopicUpdate.AddAndSetAsync("my/topic/path/2", topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
+            await session.TopicUpdate.AddAndSetAsync("my/topic/path/2", topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json2), cancellationToken);
 
             string json3 = "{\"name\":\"Pebbles/Flintstone\"}";
-            await session.TopicUpdate.AddAndSetAsync("my/topic/path/3", topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json), cancellationToken);
+            await session.TopicUpdate.AddAndSetAsync("my/topic/path/3", topicSpecification, Diffusion.DataTypes.JSON.FromJSONString(json3), cancellationToken);
 
             var jsonStream = new JSONStream();
             session.Topics.AddStream(topicSelector, jsonStream);
@@ -60,7 +60,12 @@ namespace PushTechnology.ClientInterface.Examples.Wrangling.TopicViews.DSL
 
             var view1 = await session.TopicViews.CreateTopicViewAsync("topic_view_1", "map ?my/topic/path// to views/<scalar(/name)> separator '_'", cancellationToken);
             WriteLine($"Topic View {view1.Name} has been created.");
-            
+            await Task.Delay(2000);
+
+            await session.TopicViews.RemoveTopicViewAsync("topic_view_1", cancellationToken);
+
+            await session.TopicControl.RemoveTopicsAsync("?my/topic/path//", cancellationToken);
+                        
             session.Close();
         }
 

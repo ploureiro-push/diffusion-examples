@@ -14,18 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, TopicNotificationListener, TopicNotificationType, topics } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../test/util';
-/// end::log
 
 export async function monitoringTopicNotifications(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Topic my/topic/path has been added.',
-        'Descendant Topic my/topic/path/descendant has been added.'
-    ]]);
-    /// end::log
-    /// tag::monitoring_topic_notifications[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -39,9 +29,6 @@ export async function monitoringTopicNotifications(): Promise<void> {
             switch (type) {
                 case TopicNotificationType.ADDED:
                     console.log(`Topic ${path} has been added.`);
-                    /// tag::log
-                    check.log(`Topic ${path} has been added.`);
-                    /// end::log
                     break;
                 case TopicNotificationType.SELECTED:
                     console.log(`Topic ${path} has been selected.`);
@@ -58,9 +45,6 @@ export async function monitoringTopicNotifications(): Promise<void> {
             switch (type) {
                 case TopicNotificationType.ADDED:
                     console.log(`Descendant Topic ${path} has been added.`);
-                    /// tag::log
-                    check.log(`Descendant Topic ${path} has been added.`);
-                    /// end::log
                     break;
                 case TopicNotificationType.SELECTED:
                     console.log(`Descendant Topic ${path} has been selected.`);
@@ -104,8 +88,4 @@ export async function monitoringTopicNotifications(): Promise<void> {
     await session.unsubscribe('?my/topic/path//');
 
     await session.closeSession();
-    /// end::monitoring_topic_notifications[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

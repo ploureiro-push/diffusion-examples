@@ -14,15 +14,8 @@
  *******************************************************************************/
 
 const diffusion = require('diffusion');
-/// tag::log
-const { expectTimeseriesDoubleTopicToHaveValues } = require('../../../test/util');
-/// end::log
 
 export async function timeSeriesEditValue() {
-    /// tag::log
-    const values = [];
-    /// end::log
-    /// tag::time_series_edit_value[]
     // Connect to the server.
     const session = await diffusion.connect({
         host: 'localhost',
@@ -48,9 +41,6 @@ export async function timeSeriesEditValue() {
             diffusion.datatypes.double()
         );
         metaData.push(result);
-        /// tag::log
-        values.push(value);
-        /// end::log
     }
 
     const eventToEdit = metaData[20];
@@ -62,12 +52,4 @@ export async function timeSeriesEditValue() {
     );
 
     await session.closeSession();
-    /// end::time_series_edit_value[]
-    /// tag::log
-    values[20] = 3.14;
-    await expectTimeseriesDoubleTopicToHaveValues(
-        'my/time/series/topic/path',
-        values.slice(-14)
-    );
-    /// end::log
 }

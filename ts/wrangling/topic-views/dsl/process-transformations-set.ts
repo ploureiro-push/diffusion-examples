@@ -14,18 +14,8 @@
  *******************************************************************************/
 
 import { connect, datatypes, topics } from 'diffusion';
-/// tag::log
-import { expectJsonTopicToHaveValue, PartiallyOrderedCheckpointTester } from '../../../../../test/util';
-/// end::log
 
 export async function topicViewsDslProcessTransformationsSet(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([[
-        'Subscribed to views/1',
-        'Subscribed to views/2'
-    ]]);
-    /// end::log
-    /// tag::topic_views_dsl_process_transformations_set[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -68,9 +58,6 @@ export async function topicViewsDslProcessTransformationsSet(): Promise<void> {
     valueStream.on({
         subscribe : (topic, specification) => {
             console.log(`Subscribed to ${topic}`);
-            /// tag::log
-            check.log(`Subscribed to ${topic}`);
-            /// end::log
         },
         unsubscribe : (topic, specification, reason) => {},
         value : (topic, spec, newValue, oldValue) => {}
@@ -94,27 +81,4 @@ export async function topicViewsDslProcessTransformationsSet(): Promise<void> {
     console.log(`Topic View ${topicView.name} has been created.`);
 
     await session.closeSession();
-    /// end::topic_views_dsl_process_transformations_set[]
-    /// tag::log
-    await expectJsonTopicToHaveValue('views/1', {
-        account: '1234',
-        balance: {
-            amount: 12.57,
-            amount_in_cents: 1257,
-            currency: 'USD'
-        },
-        tier: 2
-    });
-    await expectJsonTopicToHaveValue('views/2', {
-        account: '5678',
-        balance: {
-            amount: 98.76,
-            amount_in_cents: 9876,
-            currency: 'USD'
-        },
-        tier: 1
-    });
-
-    await check.done();
-    /// end::log
 }

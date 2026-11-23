@@ -14,15 +14,8 @@
  *******************************************************************************/
 
 import { connect } from 'diffusion';
-/// tag::log
-import { PartiallyOrderedCheckpointTester } from '../../../../test/util';
-/// end::log
 
 export async function clientControlQueueConflationViaSessionFilter(): Promise<void> {
-    /// tag::log
-    const check = new PartiallyOrderedCheckpointTester([]);
-    /// end::log
-    /// tag::client_control_queue_conflation_via_session_filter[]
     // Connect to the server.
     const session1 = await connect({
         host: 'localhost',
@@ -43,8 +36,4 @@ export async function clientControlQueueConflationViaSessionFilter(): Promise<vo
 
     await session1.closeSession();
     await session2.closeSession();
-    /// end::client_control_queue_conflation_via_session_filter[]
-    /// tag::log
-    await check.done();
-    /// end::log
 }

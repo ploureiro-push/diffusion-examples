@@ -16,7 +16,6 @@
 import { connect, newTopicMetricCollectorBuilder } from 'diffusion';
 
 export async function metricsListTopicMetricCollectors(): Promise<void> {
-    /// tag::metrics_topic_metric_collector_list[]
     // Connect to the server.
     const session = await connect({
         host: 'localhost',
@@ -49,13 +48,6 @@ export async function metricsListTopicMetricCollectors(): Promise<void> {
         console.log(`${collector.name}: ${collector.topicSelector} (${collector.maximumGroups}, ` +
             `${collector.exportToPrometheus}, ${collector.groupByTopicType}, ${collector.groupByTopicView}, ${collector.groupByPathPrefixParts})`);
     }
-    /// tag::log
-    expect(topicMetricCollectors.collectors.length).toBe(2);
-    expect(topicMetricCollectors.collectors.map((c) => c.name)).toEqual(jasmine.arrayContaining(
-        ['Topic Metric Collector 1', 'Topic Metric Collector 2']
-    ));
-    /// end::log
 
     await session.closeSession();
-    /// end::metrics_topic_metric_collector_list[]
 }

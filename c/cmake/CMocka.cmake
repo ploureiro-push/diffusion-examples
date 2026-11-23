@@ -44,7 +44,7 @@ set(DEPENDENCIES ${DEPENDENCIES} cmocka-static)
 
 list(APPEND WINDOWS_PATH ${CMOCKA_DLL_PATH})
 
-message("")
-message("CMocka has been imported from ${CMOCKA_ROOT_PATH}")
-message("    - ${cmocka_INCLUDE_DIRECTORIES}")
-message("")
+message(STATUS "")
+message(STATUS "CMocka has been imported from ${CMOCKA_ROOT_PATH}")
+message(STATUS "    - ${cmocka_INCLUDE_DIRECTORIES}")
+message(STATUS "")

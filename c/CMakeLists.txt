@@ -4,7 +4,7 @@ project(diffusion_sdk_c_examples)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type")
 set(CMAKE_OSX_ARCHITECTURES "${ARCHITECTURE}")
 
 cmake_path(SET DEPENDENCIES_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
@@ -17,6 +17,16 @@ cmake_path(SET CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TARGET}/lib/${ARCHITECTURE})
 cmake_path(SET CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TARGET}/bin/${ARCHITECTURE})
 cmake_path(SET CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TARGET}/bin/${ARCHITECTURE})
 
+
+# =============================================================================
+# Debug
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-fsanitize=undefined -fsanitize=address)
+    add_link_options(-fsanitize=undefined -fsanitize=address)
+endif()
+
+
 # =============================================================================
 # Dependencies
 
@@ -24,9 +34,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SCRIPTS_FOLDER}")
 set(INCLUDE_DIRECTORIES "")
 set(ADDITIONAL_LD_FLAGS "")
 
-# PThread
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads)
+# PThread - with MSVC an empty target, as FindThreads makes there, without its configure-time probes
+if(MSVC)
+    add_library(Threads::Threads INTERFACE IMPORTED)
+else()
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads)
+endif()
 
 # APR
 cmake_path(SET APR_ROOT_PATH ${DEPENDENCIES_FOLDER}/${OPERATING_SYSTEM}/apr)

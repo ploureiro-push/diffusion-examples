@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright © 2023 - 2024 Diffusion Data Ltd.
+ * Copyright © 2023 - 2026 Diffusion Data Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,13 @@ namespace PushTechnology.ClientInterface.Examples.SessionManagement
                 WriteLine($"An error occurred when running the example : {ex}.");
             }
 
-            await registration.CloseAsync();
+            var closeRegistrationTask = registration.CloseAsync();
+            if (await Task.WhenAny(closeRegistrationTask, Task.Delay(30_000)) != closeRegistrationTask)
+            {
+                throw new TimeoutException("registration.CloseAsync() did not complete within 30s");
+            }
+            await closeRegistrationTask;
+            await Task.Delay(2000);
 
             session4?.Close();
             session3?.Close();
